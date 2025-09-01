@@ -61,11 +61,4 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
         valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
         e.target.value = valor;
     });
-
-    //CEP
-    document.getElementById('cep').addEventListener('input', function (e) {
-        let valor = e.target.value.replace(/\D/g, '');
-        valor = valor.replace(/^(\d{5})(\d{3}).*/, '$1-$2');
-        e.target.value = valor;
-    });
 });

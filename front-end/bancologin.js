@@ -27,48 +27,41 @@ app.get('/', (req, res) => {//GET que envia o HTML pro navegador
   res.sendFile(path.join(__dirname,'public', 'index.html'));
 });
 
-app.post('/cadastro', (req, res) => {//isso que envia se der certo as informaçoes para o terminal vc code (POST que recebe os dados do formulario e insere no banco)
-  console.log('Requisição recebida:', req.body); // Log para debug
-  console.log('Corpo da requisição:', req.body);
 
+app.post('/cadastro', (req, res) => {
+  const { nome, telefone, cpf, cidade, email, senha } = req.body;
 
-
-  const { nome, telefone, cpf, localizacaoAtual_id, email, senha } = req.body;
-    console.log('Dados recebidos para inserção:');
-  console.log({
-  nome, telefone, cpf, localizacaoAtual_id, email, senha
-  });
-
-  //isso so é as validacões
-  if (!nome || !telefone || !cpf || !localizacaoAtual_id || !email || !senha) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Todos os campos são obrigatorios!' 
+  if (!nome || !telefone || !cpf || !cidade || !email || !senha) {
+    return res.status(400).json({
+      success: false,
+      message: 'Todos os campos são obrigatórios!'
     });
   }
-//isso é oq insire os dados do usuario no banco(os ? é oq o usario responde)
-  const query = `INSERT INTO usuario (nome, telefone, cpf, localizacaoAtual_id, email, senha, bio, fotoDePerfil) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-  connection.query(query, [nome, telefone, cpf, localizacaoAtual_id, email, senha, '', ''], (error, results) => {
+
+  const query = `
+    INSERT INTO usuario 
+      (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
+    VALUES (?, ?, ?, ?, ?, ?, '', '')`;
+
+  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
     if (error) {
       console.error('Erro ao inserir no banco:', error);
-      
-      //isso é se o erro for pq o cep ou email ja estao cadastrado no nosso sistema, ai avisa o usuario
       if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'localizacao ou email ja cadastrado!' 
+        return res.status(400).json({
+          success: false,
+          message: 'Email ou CPF já cadastrado!'
         });
       }
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Erro ao cadastrar usuario' 
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao cadastrar usuário'
       });
     }
-    //usuario casdastrado com susceso
-    console.log('Usuario cadastrado com sucesso!', results);
-    res.json({ 
-      success: true, 
-      message: 'Usuario cadastrado com sucesso!' 
+
+    console.log('Usuário cadastrado com sucesso!');
+    res.json({
+      success: true,
+      message: 'Usuário cadastrado com sucesso!'
     });
   });
 });
