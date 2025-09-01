@@ -1,0 +1,277 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+           
+        }
+        .container {
+            min-height: 100vh;
+            background: url('./img/Imagem\ do\ WhatsApp\ de\ 2025-08-18\ à\(s\)\ 16.34.31_964177ad.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 20;
+        }
+        .left-section {
+            width: 50%;
+            padding-right: 50px;
+            text-align: left;
+            margin-bottom: 0;
+        }
+        .logo {
+            font-size: 5rem;
+            color: #18DE46;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .main-title {
+            font-size: 3rem;
+            line-height: 1.2;
+            color: #1c1e21;
+        }
+        .main-title2 {
+            font-size: 3rem;
+            line-height: 1.2;
+            color: #18DE46;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            color: #606770;
+            margin-top: 18px;
+        }
+        .login-card {
+            width: 500px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .login-card h2 {
+            font-size: 2rem;
+            color: #1c1e21;
+            margin-bottom: 10px;
+        }
+        .small-text {
+            color: #606770;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #606770;
+            font-size: 0.9rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #18DE46;
+            box-shadow: rgba(24, 222, 70, 0.2);
+        }
+       
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #18DE46;
+            color: #fff;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .btn-create-account {
+            background-color: #18DE46;
+            color: #fff;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        a {
+            color: #18DE46;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .forgot-password {
+            font-size: 0.9rem;
+            margin-top: 50px;
+        }
+        section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        section h2 {
+            color: #18DE46;
+            margin-bottom: 18px;
+        }
+        .allplay{
+            margin-top: 40px;
+        }
+        .play{margin-top: 20px;
+            color:#838383;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cardAPC {
+            width: 50%;/*esse ta deixando como eu quero*/
+            display: grid;
+            justify-content: flex-end;
+            flex-wrap: wrap; /* Permite que os cards quebrem para a proxima linha */
+            gap: 20px;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            grid-template-columns: repeat(2, 1fr);
+            margin-right: 7%;
+        }
+        .why-cards{
+            display: flex;
+            text-align: center;
+            margin-top: 30px;
+            gap: 80px;
+        }
+        .atleta-section{
+            display: flex;
+            width: 100%;
+            margin-bottom: 5%;
+           
+        }
+        .professor-section{
+            display: flex;
+            width: 100%;
+            margin-bottom: 5%;
+        }
+        .clube-section{
+            display: flex;
+            width: 100%;
+            margin-bottom: 5%;
+           
+        }
+        .containerAtleta{
+            width: 100%;
+        }
+        .containerFonte{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 50%;
+        }
+        .containerProfessor{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 50%;
+        }
+        .containerClube{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 50%;
+            ;
+        }
+        .card{
+            padding: 15px;
+            background: linear-gradient(to bottom, #f2f2f2, hsl(134, 45%, 75%));        
+            border-radius: 8px;
+            margin-bottom: 60px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000000;
+        }
+        .card-text {
+            font-size: 14px;
+            color: #373636;
+            font-weight: 400;
+        }
+        .altetafonte, .professorfonte, .clubefonte{
+            text-align: left;
+            font-size: 70px;
+            color: #135D2B;
+            margin-bottom: 10px;
+            width: 50%;
+        }
+        .altetafonte1, .professorfonte1, .clubefonte1{
+             text-align: left;
+             width: 50%;
+             font-size: 30px;
+        }
+        .cardAtleta, .cardProfessor, .cardClube {
+            background: linear-gradient(to bottom, #e2dfdf, hsl(134, 52%, 70%));
+            border-radius: 12px;
+            padding: 20px;
+            width: 300px;
+        }
+        .cardAtleta .card-title,
+        .cardProfessor .card-title,
+        .cardClube .card-title{
+            font-size: 18px;
+            font-weight: bold;
+            color: #000000;
+        }
+        .cardAtleta .card-text,
+        .cardProfessor .card-text,
+        .cardClube .card-text {
+            font-size: 14px;
+            color: #313131;
+        }
+        .anc{
+             color: #135D2B;
+        }
+        footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            background: linear-gradient(to bottom, #e2dfdf,  #42c761);
+            color: #000000;
+            padding: 40px 20px;
+            gap: 20px;
+            margin-left: 100px;
+            margin-right: 100px;
+        }
+        footer a {
+            color: #000000;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .left-section {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 70px;
+            }
+        }

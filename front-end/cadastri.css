@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+* {
+  margin: 0;                     /* remove margens padrão */
+  padding: 0;                    /* remove padding padrão */
+  box-sizing: border-box;        /* inclui padding e border na largura e altura dos elementos */
+  font-family: "Inter", sans-serif; /* define fonte padrão */
+}
+
+/* Corpo da página */
+body {
+  height: 100vh;                 /* ocupa toda a altura da tela */
+  display: flex;                 /* define layout flexível */
+  justify-content: center;       /* centraliza horizontalmente os elementos filhos */
+  align-items: center;           /* centraliza verticalmente os elementos filhos */
+  background: #f5f5f5;           /* cor de fundo cinza claro */
+}
+
+/* Container principal: divide tela em duas colunas */
+.container {
+  display: flex;                 /* organiza elementos filhos em linha */
+  width: 100%;                   /* ocupa toda a largura disponível */
+  height: 100vh;                 /* ocupa altura total da tela */
+}
+
+/* Metade esquerda: imagem */
+.image {
+  flex: 1;                       /* ocupa metade do container */
+  background: url("./Img/Captura\ de\ tela\ 2025-08-18\ 102448.png")  no-repeat center center; /* define imagem de fundo */
+  background-size: cover;        /* ajusta imagem para cobrir todo o espaço sem distorcer */
+}
+
+/* Metade direita: formulário */
+.form-box {
+  flex: 1;                       /* ocupa metade do container */
+  display: flex;                 /* define layout flexível */
+  justify-content: center;       /* centraliza horizontalmente */
+  align-items: center;           /* centraliza verticalmente */
+}
+
+/* Estilo do formulário */
+form {
+  background: #fff;              /* fundo branco */
+  padding: 20px 30px;            /* espaçamento interno */
+  border-radius: 10px;           /* cantos arredondados */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* sombra para profundidade */
+  width: 900px;                  /* largura fixa */
+}
+
+/* Título do formulário */
+form h1 {
+  font-size: 35px;               /* tamanho da fonte */
+  font-weight: bold;             /* fonte em negrito */
+  text-align: center;            /* centraliza texto */
+  margin-bottom: 5px;            /* espaçamento abaixo do título */
+}
+
+/* Parágrafo abaixo do título */
+form p {
+  text-align: center;            /* centraliza texto */
+  font-size: 14px;               /* tamanho da fonte */
+  margin-bottom: 20px;           /* espaçamento abaixo */
+  color: #555;                   /* cor cinza escura */
+}
+
+/* Caixa de input */
+.input-box {
+  position: relative;            /* necessário para posicionar ícones dentro */
+  margin-bottom: 15px;           /* espaçamento abaixo do input */
+}
+
+/* Label do input */
+.input-box label {
+  display: block;                /* ocupa toda a largura */
+  margin-bottom: 5px;            /* espaçamento abaixo da label */
+  font-size: 13px;               /* tamanho da fonte */
+  font-weight: 600;              /* fonte semi-negrito */
+}
+
+/* Campo de input */
+.input-box input {
+  width: 100%;                   /* ocupa toda largura do container */
+  padding: 10px 35px 10px 10px;  /* espaçamento interno: direita maior para ícone */
+  border: 1px solid #ccc;        /* borda cinza clara */
+  border-radius: 6px;            /* cantos arredondados */
+  outline: none;                 /* remove contorno padrão ao focar */
+  font-size: 14px;               /* tamanho da fonte */
+  transition: border-color 0.3s ease; /* animação suave ao mudar borda */
+}
+
+/* Input ao focar */
+.input-box input:focus {
+  border-color: #00c853;         /* borda fica verde ao focar */
+}
+
+/* Ícone dentro do input */
+.input-box i {
+  position: absolute;            /* posição absoluta dentro da caixa */
+  right: 12px;                   /* distância da direita */
+  top: 55%;                      /* distância do topo */
+  transform: translateY(-50);    /* corrige a posição para ficar exatamente no meio */
+  color: #777;                 /* cor cinza */
+  font-size: 14px;               /* tamanho do ícone */
+}
+
+/* Botão de cadastro */
+.btn-cadastrar {
+  width: 100%;                   /* ocupa toda largura do form */
+  padding: 12px;                 /* espaçamento interno */
+  background: #00c853;           /* cor verde */
+  color: #fff;                   /* cor do texto branca */
+  border: none;                  /* sem borda */
+  border-radius: 6px;            /* cantos arredondados */
+  font-weight: bold;             /* fonte em negrito */
+  font-size: 16px;               /* tamanho da fonte */
+  cursor: pointer;               /* cursor muda ao passar o mouse */
+  margin-top: 10px;              /* espaçamento acima */
+  transition: background 0.3s ease; /* animação suave na cor de fundo */
+}
+
+/* Botão ao passar o mouse */
+.btn-cadastrar:hover {
+  background: #009624;           /* verde mais escuro */
+}
+
+/* Textos extras abaixo do botão */
+form div p {
+  font-size: 12px;               /* fonte pequena */
+  text-align: center;            /* centraliza texto */
+  margin-top: 10px;              /* espaçamento acima */
+  color: #555;                   /* cor cinza escura */
+}
+
+/* Link dentro do form */
+form div a {
+  color: #00c853;                /* cor verde */
+  font-weight: bold;             /* negrito */
+  text-decoration: none;         /* remove sublinhado */
+}
+
+/* Link ao passar o mouse */
+form div a:hover {
+  text-decoration: underline;    /* sublinha ao passar o mouse */
+}

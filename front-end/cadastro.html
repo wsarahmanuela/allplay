@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/83a13259ee.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="cadastri.css">
+    <title>CADASTRO</title>
+</head>
+
+<body>
+
+    <main class="container">
+        <!-- Lado esquerdo: imagem -->
+        <div class="image"></div>
+
+        <!-- Lado direito: formulário -->
+        <div class="form-box">
+            <form action="/cadastro" method="POST" id="cadastroForm"><!--colocar isso no esportes tbm NAO ESQUECER-->
+                <h1>CADASTRE-SE</h1>
+                <p>Conecte-se com os esportes!</p>
+
+                <div class="input-box">
+                    <label for="nome">Nome:</label>
+                    <input id="nome" name="nome" type="text" placeholder="Digite o seu nome completo">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="input-box">
+                    <label for="telefone">Telefone:</label>
+                    <input id="telefone" name="telefone" type="tel" placeholder="(DD) XXXXX-XXXX">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+
+                <div class="input-box">
+                    <label for="cpf">CPF:</label>
+                    <input id="cpf" name="cpf" type="text" placeholder="XXX.XXX.XXX-XX">
+                    <i class="fa-solid fa-address-card"></i>
+                </div>
+
+                <div class="input-box">
+                    <label for="cep">CEP:</label>
+                    <input id="cep" name="cep" type="text" placeholder="XXXXX-XXX">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+
+                <div class="input-box">
+                    <label for="email">Email:</label>
+                    <input id="email" name="email" type="email" placeholder="nome123@gmail.com">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+
+                <div class="input-box">
+                    <label for="senha">Senha:</label>
+                    <input id="senha" name="senha" type="password"
+                        placeholder="A senha deve conter pelo menos 4 dígitos">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+
+                <div class="input-box">
+                    <label for="confirmar-senha">Confirme a Senha:</label>
+                    <input id="confirmar-senha" name="confirmar-senha" type="password"
+                        placeholder="Reescreva a senha novamente">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+
+                <button type="submit" class="btn-cadastrar">CADASTRAR</button>
+
+                <div>
+                    <p>Já tem uma conta? <a href="#">Faça login</a></p>
+                </div>
+
+                <div>
+                    <p>Ao se cadastrar, você concorda com nossos <a href="#">Termos de Uso</a> e <a href="#">Política de
+                            Privacidade</a>.</p>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
