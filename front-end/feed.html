@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Play</title>
+    <link rel="stylesheet" href="feed.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <script src="https://kit.fontawesome.com/93596a3fd2.js" crossorigin="anonymous"></script>
+    <!--Javascript-->
+    <script src="feed.js"></script>
+</head>
+<body>
+    <!-- barra verde -->
+   <nav>
+    <!-- dividir a classe da coluna da esquerda -->
+    <div class="nav-left">
+        <div class="logo"> 
+            <h1>ALL PLAY</h1>
+        </div>
+        <!-- ícones do app -->
+        <ul>
+            <li><img src="imagens/Notificacao.png.png" alt="Notificação"></li>
+        </ul>
+    </div>
+
+    <div class="nav-right">
+        <!--Classe de barra de pesquisa-->
+        <div class="search-box">
+            <img src="imagens/search.image.png">
+            <input type="text" placeholder="Search">
+        </div>
+        <div class="nav-user-icon online">
+            <img src="imagens/profile.picture.jpg">
+        </div>
+    </div>
+</nav>
+
+<!--Três colunas-->
+<div class="container">
+    <!-- COLUNA ESQUERDA -->
+    <div class="left-sidebar">
+        <div class="imp-links">
+            <a href="#"><img src="imagens/news.png">Notícias recentes</a>
+            <a href="#"><img src="imagens/friends.png">Amigos</a>
+            <a href="#"><img src="imagens/club.png">Clubes</a>  
+            <a href="#">Ver Mais</a>
+        </div>
+        <div class="shortcut-links">
+            <p>Seus esportes</p>
+            <a href="#"> <img src="imagens/basket.png">Basquete</a>
+            <a href="#"> <img src="imagens/volei.png">Vôlei</a>
+            <a href="#"> <img src="imagens/futebol.png">Futebol</a>
+            <a href="#"> <img src="imagens/tenisdmesa.png">Tênis de mesa</a>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+        <div class="conteudo-post">
+            <div class="perfil-usuario">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <p>Usuário sem nome</p>
+                    <small>Esporte <i class="fa-solid fa-square-arrow-up-right"></i></small>
+                </div>
+            </div>
+
+            <div class="post-input-container">
+                <textarea id="post-text" rows="3" placeholder="O que deseja compartilhar?"></textarea>
+
+                <div class="add-post-links">
+                    <a href="#"><i class="fa-solid fa-images" style="color: #0d7000;"></i>Imagem</a>
+                    <a href="#"></a>
+                    <a href="#"></a>
+                    <!--Botão de postagem-->
+                    <button type="button" class="post-btn" onClick="criarPost()">Postar</button>
+                </div>
+            </div>
+        </div>
+
+            <div class="post-container">
+                
+            </div>
+
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div class="right-sidebar">
+        <div class="sidebar-titulo">
+            <h4>Eventos</h4>
+            <a href="#">Ver tudo</a>
+        </div>
+<!-- Coluna de eventos --> <!-- Título do evento -->
+        <div class="event">
+            <div class="left-event">
+                <h3>18</h3>
+                <span>Setembro</span>
+            </div>
+            <div class="right-event">
+                <h4>Patota</h4>
+                <p><i class="fa-solid fa-location-dot"></i> Atlético Tupi - Gaspar</p>
+                <a href="#">Mais informações</a>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="left-event">
+                <h3>24</h3>
+                <span>Novembro</span>
+            </div>
+            <div class="right-event">
+                <h4>Corrida</h4>
+                <p><i class="fa-solid fa-location-dot"></i> Parque Ramiro - Bnu</p>
+                <a href="#">Mais informações</a>
+            </div>
+        </div>
+
+        <div class="sidebar-titulo">
+            <h4>Anúncios</h4>
+            <a href="#">Fechar</a>
+        </div>
+        <p class="sidebar-text">Matricule seus filhos na escolinha de futebol mais próxima: </p>
+        <img src="imagens/criancas.jpg" class="sidebar-ads">
+
+        <div class="sidebar-titulo">
+            <h4>Mensagens</h4>
+            <a href="#">Ver mais</a>
+        </div>
+
+        <div class="online-list">
+            <div class="online">
+                <img src="imagens/iconmebro1.png">
+            </div>
+            <p>Sarah Manuela</p>
+        </div>
+        <div class="online-list">
+            <div class="online">
+                <img src="imagens/iconmembro2.png">
+            </div>
+            <p>Ana Julia</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
