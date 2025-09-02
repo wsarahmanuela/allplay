@@ -26,7 +26,7 @@ body {
 /* Metade esquerda: imagem */
 .image {
   flex: 1;                       /* ocupa metade do container */
-  background: url("./imagens/ImagemTelaDeCadastro.png")  no-repeat center center; /* define imagem de fundo */
+  background: url("./ImagensCadastro/ImagemTelaDeCadastro.png")  no-repeat center center; /* define imagem de fundo */
   background-size: cover;        /* ajusta imagem para cobrir todo o espaço sem distorcer */
 }
 
