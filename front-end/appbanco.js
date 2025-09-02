@@ -11,24 +11,24 @@ const connection = mysql2.createConnection({//isso tudo só é conexao com o ban
   host: 'localhost',
   user: 'root',
   password: 'Glsarah25!',
-  database: 'pi_bbd'
+  database: 'pi_bbd'//o nome do nosso banco
 });
 
-connection.connect((err) => {//verificação com banco, vai tentar conectar com o bando se der errado mostra no terminar vc code e ser der certo tbm mostra maas mostar com as informacções 
+connection.connect((err) => {//verificaçao com banco, vai tentar conectar com o bando se der errado mostra no terminar vc code e ser der certo tbm mostra maas mostar com as informacções 
   if (err) {
-    console.error('Erro ao conectar no banco de dados:', err);
+    console.error('Erro ao conectar no banco de dados:', err);//tipo se o usuario colocar algo vai aparecer essa mensagem
     return;
   }
-  console.log('Conectado ao banco de dados MySQL!');
+  console.log('Conectado ao banco de dados MySQL!');// e esse comentario se estiver tudo certo, isso aparece no terminal ta
   console.log('Tabela usuarios verificada/criada com sucesso!');
 });
 // envia o arquivo indexhtml oara a pasta public 
 app.get('/', (req, res) => {//GET que envia o HTML pro navegador
-  res.sendFile(path.join(__dirname,'public', 'index.html'));
+  res.sendFile(path.join(__dirname,'public', 'index.html'));//ta na pasta publica 
 });
 
 
-app.post('/cadastro', (req, res) => {
+app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao esvrever em todos os campos
   const { nome, telefone, cpf, cidade, email, senha } = req.body;
 
   if (!nome || !telefone || !cpf || !cidade || !email || !senha) {
@@ -41,27 +41,28 @@ app.post('/cadastro', (req, res) => {
   const query = `
     INSERT INTO usuario 
       (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
-    VALUES (?, ?, ?, ?, ?, ?, '', '')`;
+    VALUES (?, ?, ?, ?, ?, ?, '', '')`;//isso so ta mostrando que vai ser adicionado novas informacoes na tabela
 
-  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
-    if (error) {
+
+
+  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {//isso ta executando no banco
+    if (error) {//isso verefica se tem algum erro ai vai aparecer essa mensagem
       console.error('Erro ao inserir no banco:', error);
-      if (error.code === 'ER_DUP_ENTRY') {
+      if (error.code === 'ER_DUP_ENTRY') {//isso vai vereficar se ja tem o email ou spf ja cadastrado no banco 
         return res.status(400).json({
           success: false,
           message: 'Email ou CPF já cadastrado!'
         });
       }
-      return res.status(500).json({
+      return res.status(500).json({//ai aqui vai ser outro tipo de erro 
         success: false,
-        message: 'Erro ao cadastrar usuário'
+        message: 'Erro ao cadastrar usuario'
       });
     }
-
     console.log('Usuário cadastrado com sucesso!');
     res.json({
       success: true,
-      message: 'Usuário cadastrado com sucesso!'
+      message: 'Usuário cadastrado com sucesso!'// e aqui mostra se deu certo so 
     });
   });
 });
