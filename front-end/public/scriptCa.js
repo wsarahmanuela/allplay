@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
     console.log('JavaScript externo carregado!');
 
     const form = document.getElementById('cadastroForm');
+    const botao = form.querySelector('.btn-cadastrar');
+    const textoOriginal = botao.textContent;
+
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();//bloqueia o envio automatico e ele coleta os dados 
