@@ -1,3 +1,7 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
 #containerTexto{
        font-family: Arial, sans-serif;
     margin: 0;
@@ -12,6 +16,7 @@
     background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
     color:#1E5C28;
     text-align: center;
+    
 }
 
 
@@ -70,19 +75,46 @@
     background-color:#2BA848;
     border-radius: 10px;
     color: #fff;
-    margin-top: 5px;
+
+
+height: 50px;
+  padding: 12px;                 /* espaçamento interno */
+  background: #00c853;           /* cor verde */
+  color: #fff;                   /* cor do texto branca */
+  border: none;                  /* sem borda */
+  border-radius: 6px;            /* cantos arredondados */
+  font-weight: bold;             /* fonte em negrito */
+  font-size: 16px;               /* tamanho da fonte */
+  cursor: pointer;  
+  line-height: 0; /* centraliza verticalmente */
+text-align: 0; /* centraliza horizontalmente */       
+
     margin-bottom: 10px;
     width: 350px;
     margin-top:50px ;
 }
 
 #Botao:hover{
-     background-color:#127e2b;
+    background: #009624;          
      transform:scale(1.05);
 }
 #Botao:active{
     transform: scale(0.98);
+
 }
+
+.esporte.selecionado {
+    border: 2px solid #2BA848;
+    background-color: #d8f5df;
+}
+
+#contador h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2BA848; /* verde */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
 
 
 
