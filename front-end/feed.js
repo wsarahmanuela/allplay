@@ -22,3 +22,7 @@ function criarPost() {
 
     document.getElementById("post-text").value = "";
 }
+var configmenu = document.querySelector(".config-menu");
+function configuracoesMenuAlter(){
+    configmenu.classList.toggle("config-menu-height");
+}

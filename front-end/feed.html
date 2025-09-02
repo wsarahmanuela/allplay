@@ -9,7 +9,6 @@
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <script src="https://kit.fontawesome.com/93596a3fd2.js" crossorigin="anonymous"></script>
     <!--Javascript-->
-    <script src="feed.js"></script>
 </head>
 <body>
     <!-- barra verde -->
@@ -31,10 +30,58 @@
             <img src="imagens/search.image.png">
             <input type="text" placeholder="Search">
         </div>
-        <div class="nav-user-icon online">
+        <div class="nav-user-icon online" onclick="configuracoesMenuAlter()">
             <img src="imagens/profile.picture.jpg">
         </div>
+
+
     </div>
+
+    <!-- Abrir painel de config -->
+     <div class="config-menu">
+        <div class="config-menu-inner">
+
+            <div class="perfil-usuario">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <p>Usuário sem nome</p>
+                    <a href="#">Ver seu perfil</a>
+                </div>
+            </div>
+            <hr>
+            <div class="perfil-usuario">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <p>Feedback</p>
+                    <a href="#">Ver seu perfil</a>
+                        </div>
+                    </div>
+
+            <hr>
+            <div class="config-links">
+                <i class="fa-solid fa-gear" class="config-icon"></i>
+                <a href="#">Configurações e Privacidade </a>
+            </div>
+            <div class="config-links">
+                <i class="fa-solid fa-circle-info" class="config-icon"></i>
+                <a href="#">Ajuda e Suporte</a>
+            </div>
+            <div class="config-links">
+                <i class="fa-solid fa-circle-info" class="config-icon"></i>
+                <a href="#">Acessibilidade</a>
+            </div>
+            <!--ICONE DE SAIR -->
+             <div class="config-links">
+                <i class="fa-solid fa-right-from-bracket" class="config-icon"></i>
+                <!--MUDAR A TELA AQUI PARA A TELA DE LOGIN -->
+                <a href="#">Sair</a>
+            </div>
+
+
+                </div>
+
+             </div>
+
 </nav>
 
 <!--Três colunas-->
@@ -81,7 +128,64 @@
         </div>
 
             <div class="post-container">
-                
+                <div class="post-row">
+                    <div class="perfil-usuario">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <p>Yago</p>
+                    <small>Basquete <i class="fa-solid fa-square-arrow-up-right"></i></small>
+                    <span>24 de Junho, 2025, 13:40 pm</span>
+                </div>
+                </div>
+            </div>
+            <p class="post-text2">Um bom jogo com meus amigos, não tem como negar não é? <a href="#">#Basquete</a></p>
+            <img src="amigos.jpg" class="post-img">
+
+            <div class="post-row">
+                <!-- 2 colunas -->
+                 <div class="icons-atividade">
+                    <!--Like-->
+                    <div><i class="fa-solid fa-heart" style="color: #ce2222;"></i></i>120</div>
+                    <!--Comentário-->
+                    <div><i class="fa-solid fa-comment"></i>20</div>
+                    <!--Compartilhamento-->
+                    <div><i class="fa-solid fa-share"></i>2</div>
+                 </div>
+                 <!--<div class="post-usuario-icone">
+                 </div>!-->
+            </div>
+
+            </div>
+
+            <!-- POST 2 DO FEED-->
+             <div class="post-container">
+                <div class="post-row">
+                    <div class="perfil-usuario">
+                <img src="natan.webp">
+                <div>
+                    <p>Natan</p>
+                    <small>Vôlei<i class="fa-solid fa-square-arrow-up-right"></i></small>
+                    <span>24 de Junho, 2025, 13:40 pm</span>
+                </div>
+                </div>
+            </div>
+            <p class="post-text2">Seeeempre por aqui! <a href="#">#Vôlei</a></p>
+            <img src="volei.jpg" class="post-img">
+
+            <div class="post-row">
+                <!-- 2 colunas -->
+                 <div class="icons-atividade">
+                    <!--Like-->
+                    <div><i class="fa-solid fa-heart"></i></i>300</div>
+                    <!--Comentário-->
+                    <div><i class="fa-solid fa-comment"></i>20</div>
+                    <!--Compartilhamento-->
+                    <div><i class="fa-solid fa-share"></i>10</div>
+                 </div>
+                 <!--<div class="post-usuario-icone">
+                 </div>!-->
+            </div>
+
             </div>
 
     </div>
@@ -92,6 +196,7 @@
             <h4>Eventos</h4>
             <a href="#">Ver tudo</a>
         </div>
+        
 <!-- Coluna de eventos --> <!-- Título do evento -->
         <div class="event">
             <div class="left-event">
@@ -143,5 +248,6 @@
         </div>
     </div>
 </div>
+<script src="feed.js"></script>
 </body>
 </html>
