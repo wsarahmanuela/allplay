@@ -1,0 +1,92 @@
+#containerTexto{
+       font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    text-align: center;
+}
+#degrade{
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 40px 20px;
+    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
+    color:#1E5C28;
+    text-align: center;
+}
+
+
+#cor{
+    color:#1E5C28;
+}
+
+
+#contador{
+    margin: 10px 0 20px 0;
+    margin-bottom:bold;
+}
+
+
+.GridEsportes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* aumenta o min */
+    gap: 20px; /* controla o espaçamento entre os quadradinhos */
+    justify-items: center; /* centraliza os quadrados na coluna */
+    margin: 20px auto; /* dá respiro ao redor */
+    max-width: 1000px; /* evita que fique colado nas bordas */
+}
+
+.esporte {
+    background: white;
+    border: 2px solid #838186;
+    border-radius: 10px;
+    padding: 10px;
+    width: 120px;
+    height: 120px;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 
+        -3px 0 3px rgb(144, 150, 144),    
+         0 3px 3px rgb(144, 150, 144),    
+         3px 0 3px rgb(144, 150, 144);
+    transition: transform 0.2s ease-in-out;
+}
+
+.esporte:hover {
+    transform: scale(1.10);
+    box-shadow: 0 0 10px rgb(6, 70, 6);
+}
+
+#containerBotao{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#Botao{
+    background-color:#2BA848;
+    border-radius: 10px;
+    color: #fff;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    width: 350px;
+    margin-top:50px ;
+}
+
+#Botao:hover{
+     background-color:#127e2b;
+     transform:scale(1.05);
+}
+#Botao:active{
+    transform: scale(0.98);
+}
+
+
+
+
+
+
+
