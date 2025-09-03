@@ -22,6 +22,7 @@ function criarPost() {
         <p style="margin-top:10px; color:#333;">${texto}</p>`;
 
     // só p aparecer no container (por isso vai la pra baixo) - adiciona no final (maria)
+    // mudar p cima dps do feed estatico (sarah)
     feed.appendChild(novoPost);
 
     // limpa o campo antes d postar (maria)
