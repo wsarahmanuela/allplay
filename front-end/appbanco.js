@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true })); // necessario para funcionar co
 const connection = mysql2.createConnection({//isso tudo só é conexao com o banco, ai aqui vai a senha de vcs do banco e o nome da tabela, isso vai mudando
   host: 'localhost',
   user: 'root',
-  password: 'Glsarah25!',
+  password: 'Natan.2007',
   database: 'pi_bbd'//o nome do nosso banco
 });
 
