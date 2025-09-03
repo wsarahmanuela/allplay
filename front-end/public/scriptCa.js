@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
 
 
     form.addEventListener('submit', async function (e) {
-        e.preventDefault();//bloqueia o envio automatico e ele coleta os dados 
+        e.preventDefault();//bloqueia o envio automatico e ele coleta os dados  
 
         const formData = new FormData(this);//pega os dados do do usuario e transforma em uM "objeto"
         const dados = Object.fromEntries(formData.entries());
