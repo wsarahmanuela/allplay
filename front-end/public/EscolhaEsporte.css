@@ -1,33 +1,34 @@
-html, body {
-    margin: 0;
-    padding: 0;
+html, body {  /* seleciona os elementos raiz da pagina*/
+    margin: 0; /* remove a pagina padrao do navegador*/
+    padding: 0; /* remove o preenchimento interno padrao*/
+    /* para tirar os espaços da borda da pagina*/
 }
-#containerTexto{
-       font-family: Arial, sans-serif;
-    margin: 0;
+#containerTexto{ /*seleciona a div do titulo e do contador  */
+       font-family: Arial, sans-serif; /*escolhe a fonte usada dentro desse container */
+    margin: 0; 
     padding: 0;
-    background: #fff;
-    text-align: center;
+    background: #fff; /*fundo branco */
+    text-align: center;/*cetraliza os textos do container horizontalmente */
 }
-#degrade{
+#degrade{ /*seleciona o topo da pagina com a logo e subtitulo */
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 40px 20px;
-    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
-    color:#1E5C28;
+    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826); /*gradiente horizontal do branco ao verde escuro */
+    color:#1E5C28; /*cor do texto dentro do container */
     text-align: center;
     
 }
 
 
-#cor{
-    color:#1E5C28;
+#cor{ /*seleciona a div <h2>Escolha seus esportes favoritos</h2> */
+    color:#1E5C28; /*faz o titulo ficar verde */
 }
 
 
 #contador{
-    margin: 10px 0 20px 0;
-    margin-bottom:bold;
+    margin: 10px 0 20px 0;  /* define margens */
+    margin-bottom: 20px;
 }
 
 
