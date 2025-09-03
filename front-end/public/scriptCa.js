@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
 
 
     form.addEventListener('submit', async function (e) {
-        e.preventDefault();//bloqueia o envio automatico e ele coleta os dados 
+        e.preventDefault();//bloqueia o envio automatico e ele coleta os dados  
 
         const formData = new FormData(this);//pega os dados do do usuario e transforma em uM "objeto"
         const dados = Object.fromEntries(formData.entries());
@@ -19,12 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
             return;
         }
 
-        if (dados.senha.length < 4) {//valida a senha
+        if (dados.senha.length < 4) {//valida a senha 
             alert('A senha deve ter pelo menos 4 caracteres!');
             return;
         }
 
-        try {//isso ta enviando os dados para o backend (node)
+        try {//isso ta enviando os dados para o backend (node) (maria)
             const response = await fetch('/cadastro', {
                 method: 'POST',
                 headers: {
@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
 
     //CPF
     document.getElementById('cpf').addEventListener('input', function (e) {
-        let valor = e.target.value.replace(/\D/g, '');
-        valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
+        let valor = e.target.value.replace(/\D/g, ''); 
+        valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4'); 
         e.target.value = valor;
     });
 });
