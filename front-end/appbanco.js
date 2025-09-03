@@ -28,7 +28,7 @@ app.get('/', (req, res) => {//GET que envia o HTML pro navegador (maria)
 });
 
 
-app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao esvrever em todos os campos 
+app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao esvrever em todos os campos  (sarah)
   const { nome, telefone, cpf, cidade, email, senha } = req.body;
 
   if (!nome || !telefone || !cpf || !cidade || !email || !senha) {
@@ -41,20 +41,20 @@ app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao
   const query = `
     INSERT INTO usuario 
       (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
-    VALUES (?, ?, ?, ?, ?, ?, '', '')`;//isso so ta mostrando que vai ser adicionado novas informacoes na tabela
+    VALUES (?, ?, ?, ?, ?, ?, '', '')`;//isso so ta mostrando que vai ser adicionado novas informacoes na tabela (sarah)
 
 
 
-  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {//isso ta executando no banco
-    if (error) {//isso verefica se tem algum erro ai vai aparecer essa mensagem
+  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {//isso ta executando no banco (sarah)
+    if (error) {//isso verefica se tem algum erro ai vai aparecer essa mensagem (sarah)
       console.error('Erro ao inserir no banco:', error);
-      if (error.code === 'ER_DUP_ENTRY') {//isso vai vereficar se ja tem o email ou spf ja cadastrado no banco 
+      if (error.code === 'ER_DUP_ENTRY') {//isso vai vereficar se ja tem o email ou spf ja cadastrado no banco (sarah)
         return res.status(400).json({
           success: false,
           message: 'Email ou CPF já cadastrado!'
         });
       }
-      return res.status(500).json({//ai aqui vai ser outro tipo de erro 
+      return res.status(500).json({//ai aqui vai ser outro tipo de erro ((sarah)
         success: false,
         message: 'Erro ao cadastrar usuario'
       });
@@ -62,12 +62,12 @@ app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao
     console.log('Usuário cadastrado com sucesso!');
     res.json({
       success: true,
-      message: 'Usuário cadastrado com sucesso!'// e aqui mostra se deu certo so 
+      message: 'Usuário cadastrado com sucesso!'// aqui mostra se deu certo so (maria)
     });
   });
 });
 
-//rota para testar se o servidor esta funcionando
+//rota para testar se o servidor esta funcionando (sarah)
 app.get('/teste', (req, res) => {
   res.json({ message: 'Servidor funcionando!' });
 });
