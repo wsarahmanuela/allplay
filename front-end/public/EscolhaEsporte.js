@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
         card.addEventListener("click", () => {
             const nomeEsporte = card.querySelector(".cardText").innerText;
 
-            // Se já está selecionado → desseleciona
+            // Se já está selecionado desseleciona
             if (selecionados.includes(nomeEsporte)) {
                 selecionados = selecionados.filter(e => e !== nomeEsporte);
                 card.style.border = "2px solid #838186"; // volta para o padrão
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.style.border = "2px solid #2BA848"; 
                 card.style.background = "#d8f5df"; 
             } 
-            // Se já tiver 5 → impede
+            // Se já tiver 5 impede
             else {
                 alert("Você só pode selecionar até 5 esportes.");
             }
