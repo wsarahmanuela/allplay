@@ -15,8 +15,7 @@ function criarPost() {
                 <small>Agora mesmo</small>
             </div>
         </div>
-        <p style="margin-top:10px; color:#333;">${texto}</p>
-    `;
+        <p style="margin-top:10px; color:#333;">${texto}</p>`;
 
     feed.appendChild(novoPost);
 
