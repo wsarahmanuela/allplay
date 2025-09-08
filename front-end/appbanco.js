@@ -6,17 +6,12 @@ const path = require('path');//nativo do node para trabalhar com os arquivos (sa
 app.use(express.static('public')); //permite servir os aruivos(html,css e o js da pasta public por isso tem que colocar numa pasta publico) (sarah)
 app.use(express.json());//permite que os dados dos usuario chegam no fetch (sarah)
 app.use(express.urlencoded({ extended: true })); // necessario para funcionar com <form> e permite ler oq o usuario colocou no cadastro (sarah) 
-// dando erro linha 8 (maria)
+// dando erro linha 13 (maria)
 const connection = mysql2.createConnection({//isso tudo só é conexao com o banco, ai aqui vai a senha de vcs do banco e o nome da tabela, isso vai mudando (sarah)
   host: 'localhost',
   user: 'root',
-<<<<<<< HEAD
   password: 'Glsarah25!',
   database: 'pi_bbd'//o nome do nosso banco
-=======
-  password: 'Natan.2007',
-  database: 'pi_bbd'
->>>>>>> 852618a24978956989b27741b29fd1d3a21c5b70
 });
 
 connection.connect((err) => {//verificaçao com banco, vai tentar conectar com o bando se der errado mostra no terminar vc code e ser der certo tbm mostra maas mostar com as informacções 

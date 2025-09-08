@@ -11,6 +11,7 @@ function criarPost() {
     novoPost.className = "conteudo-post";
 
         // modelo do post provisorio (maria)
+        // inner = sintaxe do ngc
     novoPost.innerHTML = `
         <div class="perfil-usuario">
             <img src="imagens/profile.picture.jpg">
