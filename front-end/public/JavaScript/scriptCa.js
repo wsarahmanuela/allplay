@@ -1,28 +1,30 @@
-document.addEventListener('DOMContentLoaded', function () {//espera o html funcionar
+document.addEventListener('DOMContentLoaded', function () {
     console.log('JavaScript externo carregado!');
 
     const form = document.getElementById('cadastroForm');
     const botao = form.querySelector('.btn-cadastrar');
     const textoOriginal = botao.textContent;
-
-
     form.addEventListener('submit', async function (e) {
-        e.preventDefault();//bloqueia o envio automatico e ele coleta os dados  
+        e.preventDefault(); 
 
-        const formData = new FormData(this);//pega os dados do do usuario e transforma em uM "objeto"
+        const formData = new FormData(this);
         const dados = Object.fromEntries(formData.entries());
 
-        console.log('Dados do formulário:', dados);// ta exibindo o cadastro na web
+        console.log('Dados do formulário:', dados);
 
-        if (dados.senha !== dados['confirmar-senha']) {//isso verifica se as duas senha estao certas
+        // Validação das senhas
+        if (dados.senha !== dados['confirmar-senha']) {
             alert('As senhas não coincidem!');
             return;
         }
 
-        if (dados.senha.length < 4) {//valida a senha 
+        if (dados.senha.length < 4) {
             alert('A senha deve ter pelo menos 4 caracteres!');
             return;
         }
+
+        botao.textContent = 'Cadastrando...';
+        botao.disabled = true;
 
         try {//isso ta enviando os dados para o backend (node) (maria)
             const response = await fetch('/cadastro', {
@@ -54,14 +56,16 @@ document.addEventListener('DOMContentLoaded', function () {//espera o html funci
     //telefone
     document.getElementById('telefone').addEventListener('input', function (e) {
         let valor = e.target.value.replace(/\D/g, '');
-        valor = valor.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-        e.target.value = valor;
+        if (valor.length > 11) valor = valor.slice(0, 11);
+        valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+        e.target.value = valor.trim();
     });
 
     //CPF
     document.getElementById('cpf').addEventListener('input', function (e) {
-        let valor = e.target.value.replace(/\D/g, ''); 
-        valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4'); 
-        e.target.value = valor;
+        let valor = e.target.value.replace(/\D/g, '');
+        if (valor.length > 11) valor = valor.slice(0, 11);
+        valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4');
+        e.target.value = valor.trim();
     });
 });

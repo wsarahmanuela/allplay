@@ -3,35 +3,38 @@ const app = express();
 const mysql2 = require('mysql2');
 const path = require('path');
 
+// Configurar middlewares
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Conexão com o banco
 const connection = mysql2.createConnection({
+    host: 'localhost', // Adicione isso
     user: 'root',
     password: 'Glsarah25!',
     database: 'pi_bbd'
 });
 
-router.post("/login", (req, res) => {
+// Rota de login
+app.post('/login', (req, res) => {
     const { email, senha } = req.body;
-    
+
     if (!email || !senha) {
-        return res.status(400).json({ mensagem: "Email e senha são obrigatórios." });
+        return res.status(400).json({ message: "Email e senha são obrigatórios." });
     }
 
     const sql = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
-    db.query(sql, [email, senha], (erro, resultados) => {
+    connection.query(sql, [email, senha], (erro, resultados) => {
         if (erro) {
             console.error("Erro ao buscar usuário:", erro);
-            return res.status(500).json({ mensagem: "Erro interno do servidor." });
+            return res.status(500).json({ message: "Erro no servidor." });
         }
 
         if (resultados.length > 0) {
-            return res.json({ mensagem: "Login bem-sucedido!" });
+            return res.status(200).json({ message: "Login bem-sucedido!" });
         } else {
-            return res.status(401).json({ mensagem: "Email ou senha incorretos." });
+            return res.status(401).json({ message: "Email ou senha incorretos." });
         }
     });
-});
-module.exports = router;
-
+  });

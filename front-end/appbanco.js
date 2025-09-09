@@ -1,29 +1,28 @@
-const express = require('express');//isso é pra criar um servidor web rm node (sarah)
-const app = express();//onde vc configura rotas e servidor e app é uma variavel (sarah)
-const mysql2 = require('mysql2');//isso é a biblioteca para conectar o banco (sarah)
-const path = require('path');//nativo do node para trabalhar com os arquivos (sarah)
+const express = require('express');
+const app = express();
+const mysql2 = require('mysql2');
+const path = require('path');
 
-app.use(express.static('public')); //permite servir os aruivos(html,css e o js da pasta public por isso tem que colocar numa pasta publico) (sarah)
-app.use(express.json());//permite que os dados dos usuario chegam no fetch (sarah)
-app.use(express.urlencoded({ extended: true })); // necessario para funcionar com <form> e permite ler oq o usuario colocou no cadastro (sarah) 
-// dando erro linha 13 (maria)
-const connection = mysql2.createConnection({//isso tudo só é conexao com o banco, ai aqui vai a senha de vcs do banco e o nome da tabela, isso vai mudando (sarah)
-  host: 'localhost',
+app.use(express.static('public')); 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
+
+const connection = mysql2.createConnection({
   user: 'root',
   password: 'Glsarah25!',
-  database: 'pi_bbd'//o nome do nosso banco
+  database: 'pi_bbd'
 });
 
-connection.connect((err) => {//verificaçao com banco, vai tentar conectar com o bando se der errado mostra no terminar vc code e ser der certo tbm mostra maas mostar com as informacções 
+connection.connect((err) => {
   if (err) {
-    console.error('Erro ao conectar no banco de dados:', err);//tipo se o usuario colocar algo vai aparecer essa mensagem (sarah)
+    console.error('Erro ao conectar no banco de dados:', err);
     return;
   }
-  console.log('Conectado ao banco de dados MySQL!');// e esse comentario se estiver tudo certo, isso aparece no terminal ta (sarah)
+  console.log('Conectado ao banco de dados MySQL!');
   console.log('Tabela usuarios verificada/criada com sucesso!');
 });
-// envia o arquivo indexhtml oara a pasta public (maria)
-app.get('/', (req, res) => {//GET que envia o HTML pro navegador (maria)
+
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname,'public', 'index.html'));
 });
 
@@ -43,18 +42,16 @@ app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao
       (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
     VALUES (?, ?, ?, ?, ?, ?, '', '')`;//isso so ta mostrando que vai ser adicionado novas informacoes na tabela (sarah)
 
-
-
-  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {//isso ta executando no banco (sarah)
-    if (error) {//isso verefica se tem algum erro ai vai aparecer essa mensagem (sarah)
+  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
+    if (error) {
       console.error('Erro ao inserir no banco:', error);
-      if (error.code === 'ER_DUP_ENTRY') {//isso vai vereficar se ja tem o email ou spf ja cadastrado no banco (sarah)
+      if (error.code === 'ER_DUP_ENTRY') {
         return res.status(400).json({
           success: false,
           message: 'Email ou CPF já cadastrado!'
         });
       }
-      return res.status(500).json({//ai aqui vai ser outro tipo de erro ((sarah)
+      return res.status(500).json({
         success: false,
         message: 'Erro ao cadastrar usuario'
       });
@@ -62,10 +59,32 @@ app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao
     console.log('Usuário cadastrado com sucesso!');
     res.json({
       success: true,
-      message: 'Usuário cadastrado com sucesso!'// aqui mostra se deu certo so (maria)
+      message: 'Usuário cadastrado com sucesso!'
     });
   });
 });
+//LOGIN
+app.post('/login', (req, res) => {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({ message: "Email e senha são obrigatórios." });
+    }
+
+    const sql = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
+    connection.query(sql, [email, senha], (erro, resultados) => {
+        if (erro) {
+            console.error("Erro ao buscar usuário:", erro);
+            return res.status(500).json({ message: "Erro no servidor." });
+        }
+
+        if (resultados.length > 0) {
+            return res.status(200).json({ message: "Login bem-sucedido!" });
+        } else {
+            return res.status(401).json({ message: "Email ou senha incorretos." });
+        }
+    });
+  });
 
 //rota para testar se o servidor esta funcionando (sarah)
 app.get('/teste', (req, res) => {
