@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao esvrever em todos os campos  (sarah)
+app.post('/cadastro', (req, res) => {
   const { nome, telefone, cpf, cidade, email, senha } = req.body;
 
   if (!nome || !telefone || !cpf || !cidade || !email || !senha) {
@@ -40,7 +40,7 @@ app.post('/cadastro', (req, res) => {// isso vai ser usando quando o usuario nao
   const query = `
     INSERT INTO usuario 
       (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
-    VALUES (?, ?, ?, ?, ?, ?, '', '')`;//isso so ta mostrando que vai ser adicionado novas informacoes na tabela (sarah)
+    VALUES (?, ?, ?, ?, ?, ?, '', '')`;
 
   connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
     if (error) {

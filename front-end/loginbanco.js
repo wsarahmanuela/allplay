@@ -3,20 +3,20 @@ const app = express();
 const mysql2 = require('mysql2');
 const path = require('path');
 
-// Configurar middlewares
+
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Conexão com o banco
+
 const connection = mysql2.createConnection({
-    host: 'localhost', // Adicione isso
+    host: 'localhost', 
     user: 'root',
     password: 'Glsarah25!',
     database: 'pi_bbd'
 });
 
-// Rota de login
+
 app.post('/login', (req, res) => {
     const { email, senha } = req.body;
 
