@@ -4,6 +4,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   const email = document.getElementById('email').value;
   const senha = document.getElementById('senha').value;
 
+  console.log(email);
+
   try {
     const resposta = await fetch('/login', {
       method: 'POST',
@@ -15,11 +17,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     document.getElementById('mensagem').innerText = resultado.message;
 
     if (resposta.ok) {
-      // Redireciona se login for bem-sucedido
+      //aqui é quando o usuario entar no feed com login
       window.location.href = 'feed.html';
     }
   } catch (error) {
-    console.error('Erro ao fazer login:', error);
-    document.getElementById('mensagem').innerText = 'Erro ao conectar com o servidor.';
+    const msg = document.getElementById('mensagem');
+       if (msg) msg.innerText = resultado.message;
   }
 });

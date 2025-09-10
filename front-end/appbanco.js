@@ -71,7 +71,7 @@ app.post('/login', (req, res) => {
         return res.status(400).json({ message: "Email e senha são obrigatórios." });
     }
 
-    const sql = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
+    const sql = "SELECT * FROM usuario WHERE email = ? AND senha = ?";
     connection.query(sql, [email, senha], (erro, resultados) => {
         if (erro) {
             console.error("Erro ao buscar usuário:", erro);
@@ -84,7 +84,7 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ message: "Email ou senha incorretos." });
         }
     });
-  });
+})
 
 //rota para testar se o servidor esta funcionando (sarah)
 app.get('/teste', (req, res) => {
