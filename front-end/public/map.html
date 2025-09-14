@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/83a13259ee.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/> 
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <link rel="stylesheet" href="map.css">
 
     <title>Mapa</title>
 </head>
+
 <body>
-    <div class="button"> <!-- DIV do botão de voltar (natan)-->
-        <i class="fa-solid fa-arrow-left"></i>
-    </div> 
 
-    <div id="map"></div> <!--DIV do Mapa-->
+    <div id="map"> <!--DIV do Mapa-->
+        <div class="button"> <!-- DIV do botão de voltar (natan)-->
+            <a href="index.html" class="Voltar"><i class="fa-solid fa-arrow-left"></i></a>
+        </div>
 
-    <div class="container"> <!--DIV de onde estarão os usuarios proximos e locais populares (natan)-->
+        <div class="container"> <!--DIV de onde estarão os usuarios proximos e locais populares (natan)-->
         <div>
             <h1>Usuários Proximos</h1>
             <i class="fa-solid fa-users"></i>
@@ -34,7 +34,9 @@
             <i class="fa-solid fa-map-location-dot"></i>
         </div>
     </div>
+    </div>
 
     <script src="map.js"></script>
 </body>
+
 </html>

@@ -4,10 +4,10 @@ function sucesso(posicao) {
     console.log(posicao.coords.latitude, posicao.coords.longitude); //Pega as cordenadas de latitude e longitude (natan)
     
     if(map ===  undefined){
-        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 13);
+        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 25);
     }else{
         map.remove();
-        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 13);
+        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 25);
     }
     
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { //mostra as imagens do mapa propriamente
@@ -17,6 +17,9 @@ function sucesso(posicao) {
     L.marker([posicao.coords.latitude, posicao.coords.longitude]).addTo(map) 
         .bindPopup('Vc está por aqui')
         .openPopup(); //point de localização
+
+    map.zoomControl.setPosition('bottomleft');
+
 }
 
 function CasoNãoDeixePegarLocalização() {
