@@ -1,24 +1,32 @@
 var map;
+var circle;
 
 function sucesso(posicao) {
     console.log(posicao.coords.latitude, posicao.coords.longitude); //Pega as cordenadas de latitude e longitude (natan)
-    
-    if(map ===  undefined){
+
+    if (map === undefined) {
         map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 25);
-    }else{
+    } else {
         map.remove();
         map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 25);
     }
-    
+
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { //mostra as imagens do mapa propriamente
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' //creditos ao site
     }).addTo(map);
 
-    L.marker([posicao.coords.latitude, posicao.coords.longitude]).addTo(map) 
+    L.marker([posicao.coords.latitude, posicao.coords.longitude]).addTo(map)
         .bindPopup('Vc está por aqui')
         .openPopup(); //point de localização
 
     map.zoomControl.setPosition('bottomleft');
+
+    circle = L.circle([posicao.coords.latitude, posicao.coords.longitude], {
+        color: 'green',
+        fillColor: '#0f9800',
+        fillOpacity: 0.5,
+        radius: 200
+    }).addTo(map);
 
 }
 

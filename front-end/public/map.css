@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 #map {
-  height: 100vh;     /* mapa ocupa a tela toda */
+  height: 837px;     /* mapa ocupa a tela toda */
   width: 100%;
   position: relative; /* referência para os filhos com position absolute */
 }
@@ -15,8 +15,8 @@
 }
 
 .button a {
-  background: white;
-  color: black;
+  background: #0f9800;
+  color: white;
   padding: 10px 12px;
   border-radius: 50%; /* deixa redondo */
   text-decoration: none;
@@ -36,7 +36,7 @@
   box-shadow: -2px 0 58px rgba(0,0,0,0.3);
   z-index: 1000;          /* garante que fique sobre o mapa */
   overflow-y: auto;       /* ativa rolagem se o conteúdo for maior que a tela */
-  border-radius: 12px 12px 12px 12px; /* borda arredondada só do lado esquerdo */
+  border-radius: 12px 12px 12px 12px; /
 }
 
 .container h1 {
