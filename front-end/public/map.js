@@ -5,15 +5,17 @@ function sucesso(posicao) {
     console.log(posicao.coords.latitude, posicao.coords.longitude); //Pega as cordenadas de latitude e longitude (natan)
 
     if (map === undefined) {
-        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 2500);
+        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 16);
     } else {
         map.remove();
-        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 2500);
+        map = L.map('map').setView([posicao.coords.latitude, posicao.coords.longitude], 16);
     }
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { //mostra as imagens do mapa propriamente
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' //creditos ao site
     }).addTo(map);
+
+   //map.setMinZoom(-100);
 
     L.marker([posicao.coords.latitude, posicao.coords.longitude]).addTo(map)
         .bindPopup('Vc está por aqui')
@@ -25,7 +27,7 @@ function sucesso(posicao) {
         color: 'green',
         fillColor: '#0f9800',
         fillOpacity: 0.5,
-        radius: 100
+        radius: 200
     }).addTo(map);
 
 }
