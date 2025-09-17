@@ -97,6 +97,7 @@ nav {
     justify-content: space-between;
     padding: 13px 5%;
     margin-top: 90px; /* para não ficar atrás do nav */
+    
 }
 
 .left-sidebar {
@@ -104,6 +105,7 @@ nav {
     position: sticky;
     top: 70px;
     align-self: flex-start;
+    
 }
 
 .right-sidebar {
@@ -152,4 +154,28 @@ nav {
     margin: 25px 0;
     color: #626262;
     font-weight: 500;
+}
+
+#container-meio{
+    background-color: white;
+    width: 900px;
+    height: 300px;
+    margin-top:-20px;
+    border-radius:10px ;
+    
+}
+
+#container-direita{
+    background-color: white;
+    width: 350px;
+    height: 800px;
+    margin-top: -20px;
+    border-radius: 10px;
+}
+
+#container-baixo{
+    width: 400px;
+    height: 100px;
+    margin-top: -400px;
+    margin-left: 750px;
 }
