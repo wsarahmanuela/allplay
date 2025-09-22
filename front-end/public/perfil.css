@@ -159,10 +159,18 @@ nav {
 #container-meio{
     background-color: white;
     width: 900px;
-    height: 300px;
+    height: 200px;
     margin-top:-20px;
     border-radius:10px ;
     
+}
+
+.usuario-foto img{
+    width: 170px;
+    height: 200px;
+    margin-top: 60px;
+    margin-left: 10px;
+    border-radius: 1000px;
 }
 
 #container-direita{
@@ -173,9 +181,16 @@ nav {
     border-radius: 10px;
 }
 
-#container-baixo{
-    width: 400px;
-    height: 100px;
-    margin-top: -400px;
-    margin-left: 750px;
+#container-baixo {
+    text-align: center;
+    margin-top:-300px;
+    margin-left: 100px;
+   
+}
+
+.foto img {
+    width: 100px;
+    height: 150px;
+    width: 150px;
+    
 }
