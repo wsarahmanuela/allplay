@@ -1,36 +1,88 @@
-function criarPost() {
-    let texto = document.getElementById("post-text").value.trim();
-    // se o campo estiver vazio, sai da função (maria)
-    if (texto === "") return;
+// Função para criar e enviar um post
+async function criarPost() {
+    const texto = document.getElementById("post-text").value.trim();
+    if (!texto) return; // se vazio, não faz nada
 
-    //seleciona onde vai ficar o post (maria)
-    let feed = document.querySelector(".main-content");
+    // Objeto do post
+    const novoPost = {
+        autor_CPF: 'localStorage/session', // ou pegar do login
+        conteudo: texto,
+        fotoDePerfil: 'imagens/profile.picture.jpg',
+        nome: 'Usuário sem nome',
+        data_publicacao: new Date().toLocaleString()
+    };
 
-    // cria uma div-classe p novo post (maria)
-    let novoPost = document.createElement("div");
-    novoPost.className = "conteudo-post";
+    try {
+        // envia para o backend
+        const resposta = await fetch('/publicacao', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(novoPost)
+        });
 
-        // modelo do post provisorio (maria)
-        // inner = sintaxe do ngc
-    novoPost.innerHTML = `
-        <div class="perfil-usuario">
-            <img src="imagens/profile.picture.jpg">
-            <div>
-                <p>Usuário sem nome</p>
-                <small>Agora mesmo</small>
-            </div>
-        </div>
-        <p style="margin-top:10px; color:#333;">${texto}</p>`;
+        const dados = await resposta.json();
 
-    // só p aparecer no container (por isso vai la pra baixo) - adiciona no final (maria)
-    // mudar p cima dps do feed estatico (sarah)
-    feed.appendChild(novoPost);
+        if (dados.success) {
+            // limpa o campo
+            document.getElementById("post-text").value = "";
 
-    // limpa o campo antes d postar (maria)
-    document.getElementById("post-text").value = "";
+            // adiciona o post no feed dinamicamente
+            const feed = document.getElementById('feed');
+            const div = document.createElement('div');
+            div.classList.add('post');
+
+            div.innerHTML = `
+                <div class="post-header">
+                  <img src="${novoPost.fotoDePerfil}" class="foto-perfil">
+                  <strong>${novoPost.nome}</strong>
+                </div>
+                <p class="conteudo">${novoPost.conteudo}</p>
+                <small class="data">${novoPost.data_publicacao}</small>
+            `;
+
+            feed.prepend(div); // adiciona no topo do feed
+        } else {
+            alert(dados.message || "Erro ao publicar.");
+        }
+    } catch (erro) {
+        console.error("Erro na postagem:", erro);
+        alert("Erro no servidor. Tente novamente.");
+    }
 }
+
+// Configurações do menu
 var configmenu = document.querySelector(".config-menu");
 function configuracoesMenuAlter(){
-    // toggle = alternar - comando de alternar entre 2 estados (maria)
     configmenu.classList.toggle("config-menu-height");
 }
+
+// Função para carregar o feed
+async function carregarFeed() {
+  try {
+    const resposta = await fetch('/publicacoes');
+    const publicacoes = await resposta.json();
+
+    const feed = document.getElementById('feed');
+    feed.innerHTML = '';
+
+    publicacoes.forEach(pub => {
+      const div = document.createElement('div');
+      div.classList.add('post');
+
+      div.innerHTML = `
+        <div class="post-header">
+          <img src="${pub.fotoDePerfil || 'default.png'}" class="foto-perfil">
+          <strong>${pub.nome}</strong>
+        </div>
+        <p class="conteudo">${pub.conteudo}</p>
+        <small class="data">${pub.data_publicacao}</small>
+      `;
+      feed.appendChild(div);
+    });
+  } catch (erro) {
+    console.error("Erro ao carregar feed:", erro);
+  }
+}
+
+// Carrega feed ao abrir a página
+document.addEventListener("DOMContentLoaded", carregarFeed);

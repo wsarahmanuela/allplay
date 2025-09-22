@@ -12,19 +12,16 @@
 <body>
     <!-- barra verde --> 
    <nav>
-    <!-- dividir a classe da coluna da esquerda -->
     <div class="nav-left">
         <div class="logo"> 
             <h1>ALL PLAY</h1>
         </div>
-        <!-- ícones do app - n mudar as imagens de pasta (maria)-->
         <ul>
             <li><img src="imagens/Notificacao.png.png" alt="Notificação"></li>
         </ul>
     </div>
 
     <div class="nav-right">
-        <!--Classe de barra de pesquisa provisoria n funcional (maria)-->
         <div class="search-box">
             <img src="imagens/search.image.png">
             <input type="text" placeholder="Search">
@@ -32,14 +29,10 @@
         <div class="nav-user-icon online" onclick="configuracoesMenuAlter()">
             <img src="imagens/profile.picture.jpg">
         </div>
-
-
     </div>
 
-    <!-- Abrir painel de config -->
-     <div class="config-menu">
+    <div class="config-menu">
         <div class="config-menu-inner">
-
             <div class="perfil-usuario">
                 <img src="imagens/profile.picture.jpg">
                 <div>
@@ -53,33 +46,27 @@
                 <div>
                     <p>Feedback</p>
                     <a href="#">Deixe suas considerações sobre o site</a>
-                        </div>
-                    </div>
-
+                </div>
+            </div>
             <hr>
             <div class="config-links">
-                <i class="fa-solid fa-gear" class="config-icon"></i>
+                <i class="fa-solid fa-gear"></i>
                 <a href="#">Configurações e Privacidade </a>
             </div>
             <div class="config-links">
-                <i class="fa-solid fa-circle-info" class="config-icon"></i>
+                <i class="fa-solid fa-circle-info"></i>
                 <a href="#">Ajuda e Suporte</a>
             </div>
             <div class="config-links">
-                <i class="fa-solid fa-circle-info" class="config-icon"></i>
+                <i class="fa-solid fa-circle-info"></i>
                 <a href="#">Acessibilidade</a>
             </div>
-            <!--ICONE DE SAIR -->
-             <div class="config-links">
-                <i class="fa-solid fa-right-from-bracket" class="config-icon"></i>
-                <!--MUDAR A TELA AQUI PARA A TELA DE LOGIN!!! -->
+            <div class="config-links">
+                <i class="fa-solid fa-right-from-bracket"></i>
                 <a href="index.html">Sair</a>
             </div>
-            
-                </div>
-
-             </div>
-
+        </div>
+    </div>
 </nav>
 
 <!--Três colunas-->
@@ -90,14 +77,14 @@
             <a href="#"><img src="imagens/news.png">Notícias recentes</a>
             <a href="#"><img src="imagens/friends.png">Amigos</a>
             <a href="#"><img src="imagens/club.png">Clubes</a>  
-            <a href="map.html"> <img src="imagens/Design_sem_nome__3_-removebg-preview.png">Localização</a>
+            <a href="map.html"><img src="imagens/Design_sem_nome__3_-removebg-preview.png">Localização</a>
         </div>
         <div class="shortcut-links">
             <p>Seus esportes</p>
-            <a href="#"> <img src="imagens/basket.png">Basquete</a>
-            <a href="#"> <img src="imagens/volei.png">Vôlei</a>
-            <a href="#"> <img src="imagens/futbol.png">Futebol</a>
-            <a href="#"> <img src="imagens/tenisdmesa.png">Tênis de mesa</a>
+            <a href="#"><img src="imagens/basket.png">Basquete</a>
+            <a href="#"><img src="imagens/volei.png">Vôlei</a>
+            <a href="#"><img src="imagens/futbol.png">Futebol</a>
+            <a href="#"><img src="imagens/tenisdmesa.png">Tênis de mesa</a>
         </div>
     </div>
 
@@ -114,111 +101,18 @@
 
             <div class="post-input-container">
                 <textarea id="post-text" rows="3" placeholder="O que deseja compartilhar?"></textarea>
-
                 <div class="add-post-links">
                     <a href="#"><i class="fa-solid fa-images" style="color: #0d7000;"></i>Imagem</a>
-                    <a href="#"></a>
-                    <a href="#"></a>
-                    <!--Botão de postagem-->
                     <button type="button" class="post-btn" onClick="criarPost()">Postar</button>
                 </div>
             </div>
         </div>
 
-            <div class="post-container">
-                <div class="post-row">
-                    <div class="perfil-usuario">
-                <img src="imagens/profile.picture.jpg">
-                <div>
-                    <p>Yago</p>
-                    <small>Basquete <i class="fa-solid fa-square-arrow-up-right"></i></small>
-                    <span>24 de Junho, 2025, 13:40 pm</span>
-                </div>
-                </div>
-            </div>
-            <p class="post-text2">Um bom jogo com meus amigos, não tem como negar não é? <a href="#">#Basquete</a></p>
-            <img src="imagens/amigos.jpg" class="post-img">
-
-            <div class="post-row">
-                <!-- 2 colunas -->
-                 <div class="icons-atividade">
-                    <!--Like-->
-                    <div><i class="fa-solid fa-heart" style="color: #ce2222;"></i></i>120</div>
-                    <!--Comentário-->
-                    <div><i class="fa-solid fa-comment"></i>20</div>
-                    <!--Compartilhamento-->
-                    <div><i class="fa-solid fa-share"></i>2</div>
-                 </div>
-                 <!--<div class="post-usuario-icone">
-                 </div>!-->
-            </div>
-
-            </div>
-
-            <!-- POST 2 DO FEED-->
-             <div class="post-container">
-                <div class="post-row">
-                    <div class="perfil-usuario">
-                <img src="imagens/natan.webp">
-                <div>
-                    <p>Natan</p>
-                    <small>Vôlei<i class="fa-solid fa-square-arrow-up-right"></i></small>
-                    <span>24 de Junho, 2025, 13:40 pm</span>
-                </div>
-                </div>
-            </div>
-            <p class="post-text2">Seeeempre por aqui! <a href="#">#Vôlei</a></p>
-            <img src="imagens/voleifeed.jpg" class="post-img">
-
-            <div class="post-row">
-                <!-- 2 colunas -->
-                 <div class="icons-atividade">
-                    <!--Like-->
-                    <div><i class="fa-solid fa-heart"></i></i>300</div>
-                    <!--Comentário-->
-                    <div><i class="fa-solid fa-comment"></i>20</div>
-                    <!--Compartilhamento-->
-                    <div><i class="fa-solid fa-share"></i>10</div>
-                 </div>
-                 <!--<div class="post-usuario-icone">
-                 </div>!-->
-            </div>
-                <!--FIM DO POST 2-->
-
-            </div>
-                <!--POST 3 -->
-             <div class="post-container">
-                <div class="post-row">
-                    <div class="perfil-usuario">
-                <img src="imagens/iconmebro1.png">
-                <div>
-                    <p>Sarah Manuela</p>
-                    <small>Futebol<i class="fa-solid fa-square-arrow-up-right"></i></small>
-                    <span>27 de Julho, 2025, 15:34 pm</span>
-                </div>
-                </div>
-            </div>
-            <p class="post-text2">Nunca me canso <a href="#">#Futebol</a></p>
-            <img src="imagens/amigos2.jpg" class="post-img">
-            <!--COMENTARIOS, LIKES E COMP-->
-            <div class="post-row">
-                <!-- 2 colunas -->
-                 <div class="icons-atividade">
-                    <!--Like-->
-                    <div><i class="fa-solid fa-heart"></i></i>300</div>
-                    <!--Comentário-->
-                    <div><i class="fa-solid fa-comment"></i>20</div>
-                    <!--Compartilhamento-->
-                    <div><i class="fa-solid fa-share"></i>10</div>
-                 </div>
-                 <!--<div class="post-usuario-icone">
-                 </div>!-->
-            </div>
-
-            </div>
-
+        <!-- FEED DINÂMICO -->
+        <div id="feed">
+            <!-- Aqui o JS vai adicionar os posts -->
+        </div>
     </div>
-            <!--FIM DO POST 3 -->
 
     <!-- COLUNA DIREITA -->
     <div class="right-sidebar">
@@ -226,8 +120,7 @@
             <h4>Eventos</h4>
             <a href="#">Ver tudo</a>
         </div>
-        
-<!-- Coluna de eventos --> <!-- Título do evento -->
+
         <div class="event">
             <div class="left-event">
                 <h3>18</h3>
@@ -259,32 +152,21 @@
         <p class="sidebar-text">Matricule seus filhos na escolinha de futebol mais próxima: </p>
         <img src="imagens/criancas.jpg" class="sidebar-ads">
 
-
-        <!--COLUNA DAS MENSAGENS-->
         <div class="sidebar-titulo">
             <h4>Mensagens</h4>
             <a href="#">Ver mais</a>
         </div>
-        <!--LISTA DE PESSOAS ONLINE-->
         <div class="online-list">
-            <!--CLASSE PARA A BOLINHA VERDE ONLINE-->
-            <div class="online">
-                <!--PESSOA 1-->
-                <img src="imagens/iconmebro1.png">
-            </div>
+            <div class="online"><img src="imagens/iconmebro1.png"></div>
             <p>Sarah Manuela</p>
         </div>
         <div class="online-list">
-            <div class="online">
-                <img src="imagens/iconmembro2.png">
-            </div>
-            <!--PESSOA 2-->
+            <div class="online"><img src="imagens/iconmembro2.png"></div>
             <p>Ana Julia</p>
         </div>
     </div>
 </div>
-<!-- JVASCRIPT PRECISA ESTAR AQ EMBAIXO! (maria)-->
- <!-- pq n tem como carregar o js antes do html -->
+
 <script src="JavaScript/feed.js"></script>
 </body>
 </html>

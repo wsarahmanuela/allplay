@@ -143,10 +143,56 @@ app.get('/teste-banco', (req, res) => {
   });
 });
 
+// ESCOLHA DE ESPORTE 
+
+
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');
   console.log('Acesse http://localhost:3000 para ver o formulario');
   console.log('Teste: http://localhost:3000/teste');
   console.log('Teste banco: http://localhost:3000/teste-banco');
 });
+
+// PUBLICACOES ----------------------------
+app.post('/publicacao', (req, res) => {
+  const { autor_cpf, conteudo} = req.body;
+
+  if(!autor_cpf || !conteudo ) {
+    return res.status(400).json({ success: false, message: 'Autor e conteúdo são obrigatórios!' })  
+
+  }
+
+  const query = `
+    INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
+    VALUES (CURDATE(), ?, ?)
+  `;
+
+  connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
+    if (erro) {
+      console.error('Erro ao inserir publicação:', erro);
+      return res.status(500).json({ success: false, message: 'Erro ao salvar publicação' });
+    }
+    res.json({ success: true, message: 'Publicação criada com sucesso!', id: resultado.insertId });
+  });
+});
+
+// PARA BUSCAR PUBLICAÇÕES DO FEED -----------------------------------------------
+app.get('/publicacoes', req, res => {
+  const query = `
+    SELECT p.IDpublicacao, p.conteudo, p.data_publicacao, u.nome, u.fotoDePerfil
+    FROM publicacao p
+    JOIN usuario u ON p.autor_CPF = u.CPF
+    ORDER BY p.data_publicacao DESC
+  `;
+
+  connection.query(query, (erro, resultados) => {
+    if(erro) {
+      console.error('Erro ao buscar publicações:', erro);
+      return res.status(500).json({
+      succes: false, message: 'Erro ao buscar publicações'
+      });
+    }
+    res.json(resultados);
+  })
+})
 
