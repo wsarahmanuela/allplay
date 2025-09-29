@@ -91,28 +91,32 @@ nav {
     right: 0;
 }
 .container{
+    background-color: #e1e1e1;
     display: flex;
+    flex-wrap: nowrap;
     justify-content: space-between;
     padding: 13px 5%;
+    gap: 20px;
 }
 .left-sidebar{
-    flex-basis: 25%;
+    flex: 1;
     position: sticky;
     top: 70px;
     align-self: flex-start;
 }
 .right-sidebar{
-    flex-basis: 25%;
+    background-color: #ffffff;
+    flex: 1;
     position: sticky;
     top: 70px;
     align-self: flex-start;
-    background: #fff;
     padding: 20px;
     border-radius: 4px;
-    color: #626262;
 }
 .main-content{
-    flex-basis: 47%;
+    flex: 5;
+    max-width: 700px;
+    margin: 0 20px;
 
 }
 .imp-links a, .shortcut-links a, i{
@@ -224,10 +228,9 @@ nav {
 }
 .conteudo-post{
     width: 100%;
-    background: #ffff;
+    background: #ffffff;
     border-radius: 6px;
     padding: 20px;
-    columns: #626262;
 }
 .perfil-usuario{
     display: flex;
