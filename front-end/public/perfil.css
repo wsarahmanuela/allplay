@@ -27,11 +27,7 @@ nav {
     color: white;
 }
 
-.notificacao-icon{
-    
-    
-    
-}
+
 
 .nav-left {
     display: flex;
@@ -156,38 +152,36 @@ nav {
     font-weight: 500;
 }
 
-#container-meio{
+#container-meio {
     background-color: white;
-    width: 900px;
-    height: 200px;
-    margin-top:-20px;
-    border-radius:10px ;
-    
+    width: 100vw;
+    max-width: 45vw;
+    height: 25vh;
+    border-radius: 10px;
 }
 
 .usuario-foto img{
-    width: 170px;
-    height: 200px;
-    margin-top: 60px;
-    margin-left: 10px;
-    border-radius: 1000px;
+    width: 10vw;
+    height: 20vh;
+    margin-top: 4%;
+    padding: 2%;
+    border-radius: 50%;
 }
 
 #container-direita{
     background-color: white;
-    width: 350px;
-    height: 800px;
-    margin-top: -20px;
+    width: 18vw;
+    height: 80vh;
+    margin-top: 0%;
     border-radius: 10px;
 }
 
 #container-baixo {
     text-align: center;
-    margin-top:-300px;
-    margin-left: 100px;
-   
+    position: relative;
+    top: -30vh; /* empurra para cima */
+    padding: 0;
 }
-
 .foto img {
     width: 100px;
     height: 150px;
