@@ -46,4 +46,17 @@ document.addEventListener("DOMContentLoaded", () => {
         // Redireciona para o feed.html
         window.location.href = "feed.html";
     });
+
+    //escolha de esporte para o feed 
+        async function salvar() {
+        const cpf = document.getElementById('cpf').value;
+        const esportes = Array.from(document.querySelectorAll('input[name="esporte"]:checked')).map(e => e.value);
+
+        await fetch('http://localhost:3000/esportes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf, esportes })
+    });
+        window.location.href = "feed.html?cpf=" + cpf;
+    } 
 });

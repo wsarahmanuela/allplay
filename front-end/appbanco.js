@@ -145,12 +145,40 @@ app.get('/teste-banco', (req, res) => {
 });
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
-  console.log('Acesse http://localhost:3000 para ver o formulario');
-  console.log('Teste: http://localhost:3000/teste');
-  console.log('Teste banco: http://localhost:3000/teste-banco');
+app.get('/esporets', async(req, res) =>{
+  const{ cpf, esportes } = req.body;
+
+  if (!cpf || !esportes || esportes.length === 0) {
+    return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
+  }
+  try{
+    await db.query("DELETE FROM esportes WHERE CPF_usuario = ?", [cpf]);
+
+    for (const esportes of esportes){
+      await db.query("INSERT INTO esportes (CPF_usuarios, nome_esporte) VALUE (?, ?", [cpf, esporte]);
+    }
+
+    res.json({mensagem: "Esportes salvos com sucesso"});
+  }catch(error){
+    console.error(error);
+    console.error(error);
+    res.status(500).json({mensagem: "Erro ao salvar no banco"})
+  }
 });
+
+app.get("/esportes/:cpf", async (req, res) => {
+  const cpf = req.params.cpf;
+
+  try{
+    const [rows] = await db.query("SELECT nome_esporte FROM  esportes WHERE  CPF_usuario = ?",[cpf]);
+    const esporets = rows.map(r => r.nome_esporte);
+    res.json(esportes);
+  }
+  catch(error){
+    console.error(error);
+    res.status(500).json({mensagem: "Erro ao buscar esportes "})
+  }
+})
 
 // PUBLICACOES -------------------------------------------------------------
 app.post('/publicacao', (req, res) => {
