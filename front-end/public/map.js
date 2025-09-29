@@ -28,7 +28,7 @@ function sucesso(posicao) {
         color: 'green',
         fillColor: '#0f9800',
         fillOpacity: 0.5,
-        radius: 200
+        radius: 250
     }).addTo(map);
 
     const pontosfixos= [
