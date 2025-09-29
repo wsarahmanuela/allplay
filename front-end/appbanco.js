@@ -1,3 +1,4 @@
+//CADASTRO --------------------------------------------
 const express = require('express');
 const app = express();
 const mysql2 = require('mysql2');
@@ -79,7 +80,7 @@ app.post('/cadastro', (req, res) => {
   });
 });
 
-// LOGIN
+// LOGIN ------------------------------------------------
 app.post('/login', (req, res) => {
   const { email, senha } = req.body;
 
@@ -143,9 +144,7 @@ app.get('/teste-banco', (req, res) => {
   });
 });
 
-// ESCOLHA DE ESPORTE 
-
-
+// ESCOLHA DE ESPORTE --------------------------------------------------------
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');
   console.log('Acesse http://localhost:3000 para ver o formulario');
@@ -153,7 +152,7 @@ app.listen(3000, () => {
   console.log('Teste banco: http://localhost:3000/teste-banco');
 });
 
-// PUBLICACOES ----------------------------
+// PUBLICACOES -------------------------------------------------------------
 app.post('/publicacao', (req, res) => {
   const { autor_cpf, conteudo} = req.body;
 
