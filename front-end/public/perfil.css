@@ -160,14 +160,23 @@ nav {
     height: 25vh;
     border-radius: 10px;
     
+    display: flex;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826); 
 }
 
+
 .usuario-foto img{
-    width: 10vw;
-    height: 20vh;
-    margin-top: 15%;
-    padding: 2%;
+    width: 11vw;
+    height: 22vh;
+    object-fit:cover;
+    padding: 1%;
     border-radius: 50%;
+    position: absolute;
+    bottom: -36%;
+    left: 38%;
+    
 }
 
 #container-direita{
@@ -181,12 +190,22 @@ nav {
 #container-baixo {
     text-align: center;
     position: relative;
-    top: -30vh; /* empurra para cima */
-    padding: 0;
+    width: 25vw;
+    top: -30vh; 
+    padding: 0%;
+    left: 40%;
+    
 }
 .foto img {
-    width: 100px;
     height: 150px;
     width: 150px;
     
 }
+
+#container-segue {
+    width: 100vw;
+    height: 10vh;
+    background-color: blue;
+    
+}
+
