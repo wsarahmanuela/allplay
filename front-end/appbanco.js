@@ -109,7 +109,7 @@ app.post('/login', (req, res) => {
   });
 });
 
-app.get('/usuarios', (req, res) => {
+app.get('/usuario', (req, res) => {
   connection.query('SELECT id, nome, email FROM usuario', (erro, resultados) => {
     if (erro) {
       console.error('Erro ao buscar usuários:', erro);
@@ -145,40 +145,54 @@ app.get('/teste-banco', (req, res) => {
 });
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
-app.post('/esportes', async (req, res) => {
+app.post('/esportes', (req, res) => {
   const { cpf, esportes } = req.body;
 
   if (!cpf || !esportes || esportes.length === 0) {
     return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
   }
 
-  try {
-    await db.query("DELETE FROM esportes WHERE CPF_usuario = ?", [cpf]);
-
-    // novos esportes
-    for (const esporte of esportes) {
-      await db.query("INSERT INTO esportes (CPF_usuario, nome_esporte) VALUES (?, ?)", [cpf, esporte]);
+  // Deleta os esportes antigos do usuário
+  connection.query("DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?", [cpf], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ mensagem: "Erro ao deletar esportes antigos" });
     }
 
-    res.json({ mensagem: "Esportes salvos com sucesso" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensagem: "Erro ao salvar no banco" });
-  }
+    // Insere os novos esportes
+    const valores = esportes.map(e => [cpf, e]); // array de arrays para inserir vários
+    connection.query(
+      "INSERT INTO usuario_esportesdeinteresse (CPF_usuario, nome_esporte) VALUES ?",
+      [valores],
+      (err2) => {
+        if (err2) {
+          console.error(err2);
+          return res.status(500).json({ mensagem: "Erro ao salvar no banco" });
+        }
+
+        res.json({ mensagem: "Esportes salvos com sucesso" });
+      }
+    );
+  });
 });
 
-// buscar esportes do usuario pelo CPF
-app.get("/esportes/:cpf", async (req, res) => {
+// Buscar esportes do usuário pelo CPF
+app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
-  try {
-    const [rows] = await db.query("SELECT nome_esporte FROM esportes WHERE CPF_usuario = ?", [cpf]);
-    const esportes = rows.map(r => r.nome_esporte); // pega apenas os nomes
-    res.json(esportes);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensagem: "Erro ao buscar esportes" });
-  }
+  connection.query(
+    "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
+    [cpf],
+    (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
+      }
+
+      const esportes = rows.map(r => r.nome_esporte);
+      res.json(esportes);
+    }
+  );
 });
 
 // PUBLICACOES -------------------------------------------------------------
