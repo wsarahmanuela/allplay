@@ -101,7 +101,11 @@ app.post('/login', (req, res) => {
 
     if (resultados.length > 0) {
       console.log('Login bem-sucedido para:', email);
-      return res.status(200).json({ message: "Login bem-sucedido!" });
+
+      const usuario = resultados[0];
+      return res.status(200).json({ 
+        message: "Login bem-sucedido!",
+      usuarioCPF: usuario.cpf });
     } else {
       console.log('Usuario nao encontrado ou senha incorreta para:', email);
       return res.status(401).json({ message: "Email ou senha incorretos." });
@@ -196,44 +200,55 @@ app.get("/esportes/:cpf", (req, res) => {
 });
 
 // PUBLICACOES -------------------------------------------------------------
+// ROTA: app.post('/publicacao') - Recebe e salva uma nova postagem.
 app.post('/publicacao', (req, res) => {
-    // 1. Recebe os dados. Usaremos autorCpf (camelCase) no código JS/Node
-    const { autor_cpf, conteudo } = req.body; 
+    
+    // 1. EXTRAÇÃO DOS DADOS (Do Pacote JSON enviado pelo navegador)
+    //    'autor_cpf' e 'conteudo' são os nomes das chaves esperadas no JSON.
+    const { autor_CPF, conteudo } = req.body; 
 
-    // 2. Validação básica (garantir que não estão vazios)
-    if (!autor_cpf || !conteudo) {
+    // 2. VALIDAÇÃO (Checa se os dados essenciais estão presentes)
+    if (!autor_CPF || !conteudo) {
+        // Se faltar CPF (provavelmente o erro 400 anterior) ou conteúdo, retorna erro.
         return res.status(400).json({ 
             success: false, 
             message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!' 
         });
     }
 
-    // 3. Query de Inserção (usando o nome da coluna do seu BD: autor_CPF)
+    // 3. DEFINIÇÃO DA QUERY SQL
+    //    Usamos 'autor_CPF' (maiusculo) para corresponder ao nome da coluna no seu banco.
+    //    CURDATE() insere a data atual automaticamente.
     const query = `
         INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
         VALUES (CURDATE(), ?, ?)
     `;
 
-    // 4. Executa a query, passando o 'autor_cpf' como parâmetro
-    connection.query(query, [conteudo, autor_cpf], (erro, resultado) => {
+    // 4. EXECUÇÃO DA QUERY (Insere os dados no MySQL)
+    //    Os valores [conteudo, autor_cpf] são colocados nos '?' da query.
+    connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
+        
+        // 5. TRATAMENTO DE ERROS DO BANCO DE DADOS
         if (erro) {
-            console.error('Erro ao inserir publicação:', erro);
+            console.error('ERRO NO SQL ao inserir publicação:', erro);
             
-            // Tratamento de erro comum: Chave Estrangeira (CPF não existe)
+            // Tratamento específico: Chave Estrangeira (O CPF no 'autor_cpf' não existe na tabela 'usuario')
             if (erro.code === 'ER_NO_REFERENCED_ROW_2') {
-                return res.status(400).json({
+                return res.status(400).json({ // Retorna 400 pois a culpa é do dado inválido
                     success: false,
                     message: 'Erro de Autor: O CPF fornecido não está cadastrado.'
                 });
             }
 
+            // Tratamento genérico: Qualquer outro erro de servidor/banco
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro interno ao salvar publicação. Verifique o console do servidor.' 
             });
         }
         
-        console.log('Publicação criada com sucesso pelo CPF:', autor_cpf);
+        // 6. RESPOSTA DE SUCESSO
+        console.log('Publicação criada com sucesso pelo CPF:', autor_CPF);
         res.json({ success: true, message: 'Publicação criada com sucesso!', id: resultado.insertId });
     });
 });
