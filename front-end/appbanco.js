@@ -93,7 +93,7 @@ app.post('/login', (req, res) => {
   const sql = "SELECT * FROM usuario WHERE email = ? AND senha = ?";
   connection.query(sql, [email, senha], (erro, resultados) => {
     if (erro) {
-      console.error("Erro ao buscar usuário:", erro);
+      console.error('Erro ao buscar usuário:', erro);
       return res.status(500).json({ message: "Erro no servidor." });
     }
 
@@ -155,56 +155,67 @@ app.listen(3000, () => {
   console.log('Teste: http://localhost:3000/teste');
   console.log('Teste banco: http://localhost:3000/teste-banco');
 });
+// CARREGAR FEED
+// essa func é importante p carregar as proximas postagens
+async function carregarFeed() {
+ async function carregarFeed() {
+    console.log("Tentando carregar o feed...");
+    
+    try {
+        const response = await fetch('/publicacoes');
+
+        if (!response.ok) {
+            throw new Error(`Erro HTTP ao buscar posts! Status: ${response.status}`);
+        }
+
+        const posts = await response.json(); 
+        
+        console.log("✅ Posts recebidos com sucesso. Total:", posts.length);
+        
+        // exibirPostsNoHTML(posts); 
+
+    } catch (erro) {
+        console.error("Erro fatal ao carregar o feed:", erro);
+    }
+}
+}
 
 // PUBLICACOES -------------------------------------------------------------
-// ROTA: app.post('/publicacao') - Recebe e salva uma nova postagem.
 app.post('/publicacao', (req, res) => {
-    
-    // 1. EXTRAÇÃO DOS DADOS (Do Pacote JSON enviado pelo navegador)
-    //    'autor_cpf' e 'conteudo' são os nomes das chaves esperadas no JSON.
+  
     const { autor_CPF, conteudo } = req.body; 
 
-    // 2. VALIDAÇÃO (Checa se os dados essenciais estão presentes)
     if (!autor_CPF || !conteudo) {
-        // Se faltar CPF (provavelmente o erro 400 anterior) ou conteúdo, retorna erro.
+
         return res.status(400).json({ 
             success: false, 
             message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!' 
         });
     }
 
-    // 3. DEFINIÇÃO DA QUERY SQL
-    //    Usamos 'autor_CPF' (maiusculo) para corresponder ao nome da coluna no seu banco.
-    //    CURDATE() insere a data atual automaticamente.
     const query = `
         INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
         VALUES (CURDATE(), ?, ?)
     `;
 
-    // 4. EXECUÇÃO DA QUERY (Insere os dados no MySQL)
-    //    Os valores [conteudo, autor_cpf] são colocados nos '?' da query.
     connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
         
-        // 5. TRATAMENTO DE ERROS DO BANCO DE DADOS
         if (erro) {
             console.error('ERRO NO SQL ao inserir publicação:', erro);
             
-            // Tratamento específico: Chave Estrangeira (O CPF no 'autor_cpf' não existe na tabela 'usuario')
             if (erro.code === 'ER_NO_REFERENCED_ROW_2') {
-                return res.status(400).json({ // Retorna 400 pois a culpa é do dado inválido
+                return res.status(400).json({ 
                     success: false,
                     message: 'Erro de Autor: O CPF fornecido não está cadastrado.'
                 });
             }
 
-            // Tratamento genérico: Qualquer outro erro de servidor/banco
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro interno ao salvar publicação. Verifique o console do servidor.' 
             });
         }
         
-        // 6. RESPOSTA DE SUCESSO
         console.log('Publicação criada com sucesso pelo CPF:', autor_CPF);
         res.json({ success: true, message: 'Publicação criada com sucesso!', id: resultado.insertId });
     });
