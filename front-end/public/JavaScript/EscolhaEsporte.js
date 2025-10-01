@@ -46,17 +46,34 @@ document.addEventListener("DOMContentLoaded", () => {
         // Redireciona para o feed.html
         window.location.href = "feed.html";
     });
+form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // evita envio padrão
 
-    //escolha de esporte para o feed 
-        async function salvar() {
-        const cpf = document.getElementById('cpf').value;
-        const esportes = Array.from(document.querySelectorAll('input[name="esporte"]:checked')).map(e => e.value);
+        const cpf = document.getElementById('cpf').value.trim();
+        if (!cpf) {
+            alert("Digite seu CPF!");
+            return;
+        }
+        if (selecionados.length === 0) {
+            alert("Selecione pelo menos 1 esporte!");
+            return;
+        }
 
-        await fetch('http://localhost:3000/esportes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cpf, esportes })
+        try {
+            const res = await fetch('http://localhost:3000/esportes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cpf, esportes: selecionados })
+            });
+
+            const data = await res.json();
+            console.log(data);
+
+            // Redireciona para o feed passando o CPF
+            window.location.href = "feed.html?cpf=" + cpf;
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao salvar os esportes no banco!");
+        }
     });
-        window.location.href = "feed.html?cpf=" + cpf;
-    } 
 });

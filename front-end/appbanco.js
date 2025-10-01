@@ -145,40 +145,41 @@ app.get('/teste-banco', (req, res) => {
 });
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
-app.get('/esporets', async(req, res) =>{
-  const{ cpf, esportes } = req.body;
+app.post('/esportes', async (req, res) => {
+  const { cpf, esportes } = req.body;
 
   if (!cpf || !esportes || esportes.length === 0) {
     return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
   }
-  try{
+
+  try {
     await db.query("DELETE FROM esportes WHERE CPF_usuario = ?", [cpf]);
 
-    for (const esportes of esportes){
-      await db.query("INSERT INTO esportes (CPF_usuarios, nome_esporte) VALUE (?, ?", [cpf, esporte]);
+    // novos esportes
+    for (const esporte of esportes) {
+      await db.query("INSERT INTO esportes (CPF_usuario, nome_esporte) VALUES (?, ?)", [cpf, esporte]);
     }
 
-    res.json({mensagem: "Esportes salvos com sucesso"});
-  }catch(error){
+    res.json({ mensagem: "Esportes salvos com sucesso" });
+  } catch (error) {
     console.error(error);
-    console.error(error);
-    res.status(500).json({mensagem: "Erro ao salvar no banco"})
+    res.status(500).json({ mensagem: "Erro ao salvar no banco" });
   }
 });
 
+// buscar esportes do usuario pelo CPF
 app.get("/esportes/:cpf", async (req, res) => {
   const cpf = req.params.cpf;
 
-  try{
-    const [rows] = await db.query("SELECT nome_esporte FROM  esportes WHERE  CPF_usuario = ?",[cpf]);
-    const esporets = rows.map(r => r.nome_esporte);
+  try {
+    const [rows] = await db.query("SELECT nome_esporte FROM esportes WHERE CPF_usuario = ?", [cpf]);
+    const esportes = rows.map(r => r.nome_esporte); // pega apenas os nomes
     res.json(esportes);
-  }
-  catch(error){
+  } catch (error) {
     console.error(error);
-    res.status(500).json({mensagem: "Erro ao buscar esportes "})
+    res.status(500).json({ mensagem: "Erro ao buscar esportes" });
   }
-})
+});
 
 // PUBLICACOES -------------------------------------------------------------
 app.post('/publicacao', (req, res) => {
