@@ -183,44 +183,44 @@ app.get("/esportes/:cpf", async (req, res) => {
 
 // PUBLICACOES -------------------------------------------------------------
 app.post('/publicacao', (req, res) => {
-  const { autor_cpf, conteudo} = req.body;
+    // 1. Recebe os dados. Usaremos autorCpf (camelCase) no código JS/Node
+    const { autor_cpf, conteudo } = req.body; 
 
-  if(!autor_cpf || !conteudo ) {
-    return res.status(400).json({ success: false, message: 'Autor e conteúdo são obrigatórios!' })  
-
-  }
-
-  const query = `
-    INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
-    VALUES (CURDATE(), ?, ?)
-  `;
-
-  connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
-    if (erro) {
-      console.error('Erro ao inserir publicação:', erro);
-      return res.status(500).json({ success: false, message: 'Erro ao salvar publicação' });
+    // 2. Validação básica (garantir que não estão vazios)
+    if (!autor_cpf || !conteudo) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!' 
+        });
     }
-    res.json({ success: true, message: 'Publicação criada com sucesso!', id: resultado.insertId });
-  });
+
+    // 3. Query de Inserção (usando o nome da coluna do seu BD: autor_CPF)
+    const query = `
+        INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
+        VALUES (CURDATE(), ?, ?)
+    `;
+
+    // 4. Executa a query, passando o 'autor_cpf' como parâmetro
+    connection.query(query, [conteudo, autor_cpf], (erro, resultado) => {
+        if (erro) {
+            console.error('Erro ao inserir publicação:', erro);
+            
+            // Tratamento de erro comum: Chave Estrangeira (CPF não existe)
+            if (erro.code === 'ER_NO_REFERENCED_ROW_2') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Erro de Autor: O CPF fornecido não está cadastrado.'
+                });
+            }
+
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno ao salvar publicação. Verifique o console do servidor.' 
+            });
+        }
+        
+        console.log('Publicação criada com sucesso pelo CPF:', autor_cpf);
+        res.json({ success: true, message: 'Publicação criada com sucesso!', id: resultado.insertId });
+    });
 });
-
-// PARA BUSCAR PUBLICAÇÕES DO FEED -----------------------------------------------
-app.get('/publicacoes', req, res => {
-  const query = `
-    SELECT p.IDpublicacao, p.conteudo, p.data_publicacao, u.nome, u.fotoDePerfil
-    FROM publicacao p
-    JOIN usuario u ON p.autor_CPF = u.CPF
-    ORDER BY p.data_publicacao DESC
-  `;
-
-  connection.query(query, (erro, resultados) => {
-    if(erro) {
-      console.error('Erro ao buscar publicações:', erro);
-      return res.status(500).json({
-      succes: false, message: 'Erro ao buscar publicações'
-      });
-    }
-    res.json(resultados);
-  })
-})
 
