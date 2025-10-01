@@ -139,6 +139,7 @@ nav {
 
 .imp-links {
     border-bottom: 1px solid #ccc;
+    width: 15vw;
 }
 
 .shortcut-links a img {
@@ -158,12 +159,13 @@ nav {
     max-width: 45vw;
     height: 25vh;
     border-radius: 10px;
+    
 }
 
 .usuario-foto img{
     width: 10vw;
     height: 20vh;
-    margin-top: 4%;
+    margin-top: 15%;
     padding: 2%;
     border-radius: 50%;
 }

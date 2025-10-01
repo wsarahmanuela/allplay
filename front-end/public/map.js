@@ -21,15 +21,30 @@ function sucesso(posicao) {
         .bindPopup('Vc está por aqui')
         .openPopup(); //point de localização
 
+
     map.zoomControl.setPosition('bottomleft');
 
     circle = L.circle([posicao.coords.latitude, posicao.coords.longitude], {
         color: 'green',
         fillColor: '#0f9800',
         fillOpacity: 0.5,
-        radius: 200
+        radius: 250
     }).addTo(map);
 
+    const pontosfixos= [
+    { latitude: -26.899, longitude: -49.013, nome: "Bela Vista Country Club" }, 
+    { latitude: -26.896, longitude: -49.010, nome: "Ginásio Wilmar Sully Pereira (Bela Vista)" },
+    { latitude: -26.897, longitude: -49.011, nome: "Parque Natural Municipal dos Bugios" }, 
+    { latitude: -26.898, longitude: -49.012, nome: "Parque Municipal do Bela Vista" }, 
+    { latitude: -26.91019366521823, longitude: -48.933948188079384, nome: "Ginásio Prefeito João dos Santos (Poço Grande)" }, 
+    { latitude: -26.900, longitude: -49.020, nome: "Arena Multiuso – Margem Esquerda"}
+    ];
+
+    pontosfixos.forEach(local => {
+    L.marker([local.latitude, local.longitude])
+        .addTo(map)
+        .bindPopup(`<b>${local.nome}</b>`);
+});
 }
 
 function CasoNãoDeixePegarLocalização() {
