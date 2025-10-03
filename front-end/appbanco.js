@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const mysql2 = require('mysql2');
 const path = require('path');
+const { json } = require('stream/consumers');
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -103,9 +104,9 @@ app.post('/login', (req, res) => {
       console.log('Login bem-sucedido para:', email);
 
       const usuario = resultados[0];
-      return res.status(200).json({ 
-        message: "Login bem-sucedido!",
-      usuarioCPF: usuario.cpf });
+
+      return res.status(200).json({cpf: usuario.CPF,
+        message: "Login bem-sucedido!"})
     } else {
       console.log('Usuario nao encontrado ou senha incorreta para:', email);
       return res.status(401).json({ message: "Email ou senha incorretos." });
@@ -155,14 +156,16 @@ app.listen(3000, () => {
   console.log('Teste: http://localhost:3000/teste');
   console.log('Teste banco: http://localhost:3000/teste-banco');
 });
-// CARREGAR FEED
+// CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
 async function carregarFeed() {
  async function carregarFeed() {
     console.log("Tentando carregar o feed...");
     
     try {
-        const response = await fetch('/publicacoes');
+        const response = await fetch('/publicacoes', {
+          method: "GET"
+        });
 
         if (!response.ok) {
             throw new Error(`Erro HTTP ao buscar posts! Status: ${response.status}`);
@@ -181,9 +184,14 @@ async function carregarFeed() {
 }
 
 // PUBLICACOES -------------------------------------------------------------
-app.post('/publicacao', (req, res) => {
+app.post('/publicacoes', (req, res) => { 
+  console.log("POST PUBLICACOES");
   
     const { autor_CPF, conteudo } = req.body; 
+
+    console.log(req.body)
+
+    console.log(conteudo, autor_CPF)
 
     if (!autor_CPF || !conteudo) {
 
@@ -221,3 +229,8 @@ app.post('/publicacao', (req, res) => {
     });
 });
 
+app.get('/publicacoes', (req, res) => {   
+  console.log("GET PUBLICACOES");
+
+  
+});
