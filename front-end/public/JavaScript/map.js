@@ -20,7 +20,6 @@ function sucesso(posicao) {
     L.marker([posicao.coords.latitude, posicao.coords.longitude]).addTo(map)
         .bindPopup('Vc está por aqui')
         .openPopup(); //point de localização
-
     map.zoomControl.setPosition('bottomleft');
 
     circle = L.circle([posicao.coords.latitude, posicao.coords.longitude], {
@@ -30,7 +29,24 @@ function sucesso(posicao) {
         radius: 200
     }).addTo(map);
 
-}
+        radius: 250
+    }).addTo(map);
+
+    const pontosfixos= [
+    { latitude: -26.899, longitude: -49.013, nome: "Bela Vista Country Club" }, 
+    //{ latitude: , longitude: , nome: ""},
+    //{ latitude: , longitude: , nome: ""}, 
+    //{ latitude: , longitude: , nome: ""}, 
+    //{ latitude: , longitude: , nome: ""}, 
+    //{ latitude: , longitude: , nome: ""}
+    ];
+
+    pontosfixos.forEach(local => {
+    L.marker([local.latitude, local.longitude])
+        .addTo(map)
+        .bindPopup(`<b>${local.nome}</b>`);
+});
+
 
 function CasoNãoDeixePegarLocalização() {
     alert("Não foi permitido o acesso a localização!"); //Aviso de que nn foi possivel pegar as cordenadas (natan)

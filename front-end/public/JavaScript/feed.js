@@ -1,11 +1,14 @@
 // Função para criar e enviar um post
 async function criarPost() {
+  console.log("criar post cahmado")
     const texto = document.getElementById("post-text").value.trim();
     if (!texto) return; // se vazio, não faz nada
 
+    console.log("cpf: ", localStorage.getItem("cpf"))
+
     // Objeto do post
     const novoPost = {
-        autor_CPF: 'localStorage/session', // ou pegar do login
+        autor_CPF: localStorage.getItem("cpf"), // ou pegar do login
         conteudo: texto,
         fotoDePerfil: 'imagens/profile.picture.jpg',
         nome: 'Usuário sem nome',
@@ -14,11 +17,14 @@ async function criarPost() {
 
     try {
         // envia para o backend
-        const resposta = await fetch('/publicacao', {
+        const resposta = await fetch('/publicacoes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(novoPost)
         });
+
+        console.log("status: " + resposta.status)
+        console.log("body: " + resposta.body)
 
         const dados = await resposta.json();
 
@@ -58,8 +64,16 @@ function configuracoesMenuAlter(){
 
 // Função para carregar o feed
 async function carregarFeed() {
+  console.log("carregar feed chamado")
   try {
-    const resposta = await fetch('/publicacoes');
+    const resposta = await fetch('/publicacoes', {
+      method: "GET",
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    console.log("status: " + resposta.status)
+    console.log("body: " + resposta.body)
+
     const publicacoes = await resposta.json();
 
     const feed = document.getElementById('feed');

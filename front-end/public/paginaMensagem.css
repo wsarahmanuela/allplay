@@ -4,7 +4,6 @@
     font-family: 'Poppins', sans-serif;
     box-sizing: border-box;
 }
-
 body {
     background: #f0f2f5;
     min-height: 100vh;
@@ -89,8 +88,8 @@ nav {
 }
 
 .container {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 2fr 5fr;
     padding: 13px 5%;
     margin-top: 90px; /* para não ficar atrás do nav */
     
@@ -160,70 +159,55 @@ nav {
     height: 25vh;
     border-radius: 10px;
     
-    display: flex;
-    justify-content: center;
-    position: relative;
-    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826); 
 }
-
-
+.containerChat h1{
+    margin-top: 2vh;
+    margin-left: 3vh;
+}
 .usuario-foto img{
-    width: 11vw;
-    height: 22vh;
-    object-fit:cover;
-    padding: 1%;
-    border-radius: 50%;
-    position: absolute;
-    bottom: -36%;
-    left: 38%;
-    
-}
-
-#container-direita{
-    background-color: white;
-    width: 18vw;
-    height: 80vh;
-    margin-top: 0%;
-    border-radius: 10px;
-}
-
-#container-baixo {
-    text-align: center;
-    position: relative;
-    width: 25vw;
-    top: -30vh; 
-    padding: 0%;
-    left: 40%;
-    
-}
-.foto img {
-    height: 150px;
-    width: 150px;
-    
-}
-
-#container-segue {
-    width: 100vw;
+    width: 10vh;
     height: 10vh;
-    background-color: blue;
-    margin-top: 27%;
-    
+    margin-top: 15%;
+    padding: 2%;
+    border-radius: 50%;
+}
+.usuario-foto-chat img{
+       width: 10vh;
+    height: 10vh;
+    margin-top: 15%;
+    margin-left: 10%;
+    border-radius: 50%;
+}
+.titulo-link {
+  color: inherit;         /* mantém a cor do h1 */
+  text-decoration: none;  /* remove o sublinhado */
 }
 
-.seguindo{
-    width: 8vw;
-    height: 2vh;
-    background-color: white;
-    border-radius:5px;
-    text-align: center;
-    margin-left: 50%;
+.titulo-link:hover {
+  color: inherit;         /* evita mudar cor ao passar o mouse */
+  text-decoration: none;  /* evita voltar o sublinhado */
 }
+.containerChat{
+       border: 2px solid black; 
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 3fr 6fr;
+}
+.containerConversa{
+ 
+}
+.containerPessoas{
 
-.seguidores{
-    width: 8vw;
-    height: 2vh;
-    background-color: white;
-    border-radius:5px;
-    text-align: center;
-
+    border-right: 2px solid black;
+}
+.Pessoa{
+  display: flex;
+  justify-content: space-around;
+     align-items: center; 
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 30px;
+}
+.resposta{
+    margin-right: 30px;
 }

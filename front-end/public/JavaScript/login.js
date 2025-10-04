@@ -37,9 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const resultado = await resposta.json();
                 console.log('Resposta do servidor:', resultado);
-                
+
                 if (resposta.ok && resultado.message === "Login bem-sucedido!") {
                     console.log('Login bem-sucedido! Redirecionando...');
+                    localStorage.setItem("cpf", resultado.cpf)
                     window.location.href = 'feed.html';
                 } else {
                     alert('Erro no login: ' + (resultado.message || 'Email ou senha incorretos'));
