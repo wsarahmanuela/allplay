@@ -20,14 +20,15 @@ function sucesso(posicao) {
     L.marker([posicao.coords.latitude, posicao.coords.longitude]).addTo(map)
         .bindPopup('Vc está por aqui')
         .openPopup(); //point de localização
-
-
     map.zoomControl.setPosition('bottomleft');
 
     circle = L.circle([posicao.coords.latitude, posicao.coords.longitude], {
         color: 'green',
         fillColor: '#0f9800',
         fillOpacity: 0.5,
+        radius: 200
+    }).addTo(map);
+
         radius: 250
     }).addTo(map);
 
@@ -45,7 +46,7 @@ function sucesso(posicao) {
         .addTo(map)
         .bindPopup(`<b>${local.nome}</b>`);
 });
-}
+
 
 function CasoNãoDeixePegarLocalização() {
     alert("Não foi permitido o acesso a localização!"); //Aviso de que nn foi possivel pegar as cordenadas (natan)

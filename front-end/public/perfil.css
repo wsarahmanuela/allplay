@@ -18,7 +18,7 @@ nav {
     background: #0f9800;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* logo esquerda, itens direita */
+    justify-content: space-between;
     padding: 0 5%;
     position: fixed;
     top: 0;
@@ -27,12 +27,10 @@ nav {
     color: white;
 }
 
-
-
 .nav-left {
     display: flex;
     align-items: center;
-    gap: 15px; /* espaçamento entre logo e notificação */
+    gap: 15px;
 }
 
 .logo {
@@ -49,14 +47,14 @@ nav {
 }
 
 .nav-left ul li img {
-    width: 25px; /* reduzindo o tamanho da notificação */
+    width: 25px;
     cursor: pointer;
 }
 
 .nav-right {
     display: flex;
     align-items: center;
-    gap: 20px; /* distância entre search e foto do usuário */
+    gap: 20px;
 }
 
 .nav-user-icon img {
@@ -92,8 +90,7 @@ nav {
     display: flex;
     justify-content: space-between;
     padding: 13px 5%;
-    margin-top: 90px; /* para não ficar atrás do nav */
-    
+    margin-top: 90px; 
 }
 
 .left-sidebar {
@@ -101,7 +98,13 @@ nav {
     position: sticky;
     top: 70px;
     align-self: flex-start;
-    
+}
+
+.main-content {
+    flex-basis: 47%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .right-sidebar {
@@ -115,20 +118,17 @@ nav {
     color: #626262;
 }
 
-.main-content {
-    flex-basis: 47%;
-}
-
 .imp-links a, .shortcut-links a {
     text-decoration: none;
     display: flex;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     color: #626262;
     width: fit-content;
 }
 
-.imp-links a img {
+.imp-links a img,
+.shortcut-links a img {
     width: 25px;
     margin-right: 15px;
 }
@@ -139,91 +139,103 @@ nav {
 
 .imp-links {
     border-bottom: 1px solid #ccc;
-    width: 15vw;
-}
-
-.shortcut-links a img {
-    width: 30px;
-    margin-right: 15px;
+    width: 100%;
 }
 
 .shortcut-links p {
-    margin: 25px 0;
+    margin: 15px 0;
     color: #626262;
     font-weight: 500;
 }
 
-#container-meio {
-    background-color: white;
-    width: 100vw;
-    max-width: 45vw;
-    height: 25vh;
-    border-radius: 10px;
-    
+/* PERFIL */
+#perfil-wrapper {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+#container-meio {
+    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
+    border-radius: 10px;
+    width: 100%;
+    height: 25vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* foto à esquerda */
+    padding: 1rem;
     position: relative;
-    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826); 
 }
 
-
-.usuario-foto img{
-    width: 11vw;
-    height: 22vh;
-    object-fit:cover;
-    padding: 1%;
+.usuario-foto img {
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
-    position: absolute;
-    bottom: -36%;
-    left: 38%;
-    
+    object-fit: cover;
+    margin-top: 250px;
 }
 
-#container-direita{
+/* Container-segue sempre abaixo da foto */
+#container-segue {
+    display: flex;
+    flex-wrap: wrap;           /* quebra a linha em telas pequenas */
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.nome h3 {
+    margin-left:170px;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+.seguir h3 {
+    margin: 0;
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    background-color: #40c75f;
+    padding: 0.3rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+
+#container-direita {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     background-color: white;
     width: 18vw;
+    min-width: 200px;
     height: 80vh;
-    margin-top: 0%;
     border-radius: 10px;
+    padding: 1rem;
+}
+
+.seguindo, .seguidores {
+    padding: 0 1rem; /* espaço interno */
+    height: 30px;
+    line-height: 30px; /* centraliza o texto verticalmente */
+    background-color: #2BA848;
+    text-align: center;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
 }
 
 #container-baixo {
     text-align: center;
-    position: relative;
-    width: 25vw;
-    top: -30vh; 
-    padding: 0%;
-    left: 40%;
-    
+    width: 100%;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 9rem;
 }
+
 .foto img {
     height: 150px;
     width: 150px;
-    
-}
-
-#container-segue {
-    width: 100vw;
-    height: 10vh;
-    background-color: blue;
-    margin-top: 27%;
-    
-}
-
-.seguindo{
-    width: 8vw;
-    height: 2vh;
-    background-color: white;
-    border-radius:5px;
-    text-align: center;
-    margin-left: 50%;
-}
-
-.seguidores{
-    width: 8vw;
-    height: 2vh;
-    background-color: white;
-    border-radius:5px;
-    text-align: center;
-
 }
