@@ -67,9 +67,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const resultado = await response.json();
             console.log('Resposta do servidor:', resultado);
+
             if (resultado.success) {
                 alert('Cadastro realizado com sucesso!');
-                
+
+                // ✅ Salva o CPF no localStorage (para usar na tela de esportes)
+                localStorage.setItem("cpf", dados.cpf);
+
                 // Redirecionamento para a página de escolha de esporte
                 setTimeout(() => {
                     window.location.href = 'EscolhaEsporte.html';
@@ -87,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    //Formatação do telefone
+    // Formatação do telefone
     document.getElementById('telefone').addEventListener('input', function (e) {
         let valor = e.target.value.replace(/\D/g, '');
         if (valor.length > 11) valor = valor.slice(0, 11);
@@ -95,11 +99,12 @@ document.addEventListener('DOMContentLoaded', function () {
         e.target.value = valor.trim();
     });
 
-    //Formatação do CPF
+    // Formatação do CPF
     document.getElementById('cpf').addEventListener('input', function (e) {
         let valor = e.target.value.replace(/\D/g, '');
         if (valor.length > 11) valor = valor.slice(0, 11);
         valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4');
         e.target.value = valor.trim();
     });
+
 });

@@ -198,6 +198,15 @@ app.get("/esportes/:cpf", (req, res) => {
       res.json(esportes);
     }
   );
+});//aqui mai mostrar no feed 
+app.get("/esportes/:cpf", (req, res) => {
+  const cpf = req.params.cpf;
+  const sql = "SELECT esporte FROM esportes WHERE cpf = ?";
+  db.query(sql, [cpf], (erro, resultado) => {
+    if (erro) return res.status(500).json({ erro });
+    const esportes = resultado.map(r => r.esporte);
+    res.json(esportes);
+  });
 });
 // CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
@@ -216,7 +225,7 @@ async function carregarFeed() {
 
         const posts = await response.json(); 
         
-        console.log("✅ Posts recebidos com sucesso. Total:", posts.length);
+        console.log(" Posts recebidos com sucesso. Total:", posts.length);
         
         // exibirPostsNoHTML(posts); 
 
@@ -275,5 +284,9 @@ app.post('/publicacoes', (req, res) => {
 app.get('/publicacoes', (req, res) => {   
   console.log("GET PUBLICACOES");
 
-  
 });
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
+
