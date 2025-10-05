@@ -38,12 +38,14 @@ async function criarPost() {
             div.classList.add('post');
 
             div.innerHTML = `
+            <div class="post">
                 <div class="post-header">
                   <img src="${novoPost.fotoDePerfil}" class="foto-perfil">
                   <strong>${novoPost.nome}</strong>
                 </div>
                 <p class="conteudo">${novoPost.conteudo}</p>
                 <small class="data">${novoPost.data_publicacao}</small>
+                </div>
             `;
 
             feed.prepend(div); // adiciona no topo do feed
@@ -84,12 +86,14 @@ async function carregarFeed() {
       div.classList.add('post');
 
       div.innerHTML = `
+      <div class="post">
         <div class="post-header">
           <img src="${pub.fotoDePerfil || 'default.png'}" class="foto-perfil">
           <strong>${pub.nome}</strong>
         </div>
         <p class="conteudo">${pub.conteudo}</p>
         <small class="data">${pub.data_publicacao}</small>
+        </div>
       `;
       feed.appendChild(div);
     });
