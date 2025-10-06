@@ -27,14 +27,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Envio para Node e redirecionamento
     form.addEventListener("submit", async (e) => {
-        e.preventDefault(); // evita envio padrão
+        e.preventDefault();
 
-        const cpf = document.getElementById('cpf').value.trim();
+        const cpf = localStorage.getItem("cpf");
 
+        // Se não tiver CPF, só mostra erro no console (sem alert chato)
         if (!cpf) {
-            alert("Digite seu CPF!");
+            console.error("Nenhum CPF encontrado no localStorage!");
             return;
         }
+
         if (selecionados.length === 0) {
             alert("Você precisa selecionar pelo menos 1 esporte!");
             return;
@@ -50,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
             console.log(data);
 
-            // Redireciona para o feed passando o CPF
             window.location.href = "feed.html?cpf=" + cpf;
 
         } catch (err) {

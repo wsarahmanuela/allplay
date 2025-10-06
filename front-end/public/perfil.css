@@ -201,41 +201,144 @@ nav {
     cursor: pointer;
 }
 
-
-
-#container-direita {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    background-color: white;
-    width: 18vw;
-    min-width: 200px;
-    height: 80vh;
-    border-radius: 10px;
-    padding: 1rem;
-}
-
-.seguindo, .seguidores {
-    padding: 0 1rem; /* espaço interno */
-    height: 30px;
-    line-height: 30px; /* centraliza o texto verticalmente */
-    background-color: #2BA848;
-    text-align: center;
-    border-radius: 10px;
-    color: white;
-    font-weight: bold;
-}
-
 #container-baixo {
     text-align: center;
     width: 100%;
     padding: 1rem;
     background-color: white;
     border-radius: 10px;
-    margin-top: 9rem;
+    margin-top: 15rem;
 }
 
 .foto img {
     height: 150px;
     width: 150px;
+}
+
+#container-direita {
+  display: flex;
+  flex-direction: column; /* mantém esportes abaixo */
+  gap: 12px;
+  background-color: white;
+  width: 18vw;
+  min-width: 200px;
+  height: 80vh;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+/* wrapper que coloca os dois lado a lado */
+.seguindo-seguidores {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* estilos dos botões (fixos, não crescem verticalmente) */
+.seguindo, .seguidores {
+  flex: 0 0 48%;       /* ocupam ~metade cada uma da largura do wrapper */
+  height: 40px;        /* altura fixa */
+  display: flex;       /* para centralizar texto */
+  align-items: center;
+  justify-content: center;
+  background-color: #2BA848;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+/* tira margem padrão do h4 */
+.seguindo h4, .seguidores h4 {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* esportes abaixo */
+.esportes {
+  display: flex;
+  flex-direction: column; /* ou row com wrap, se preferir */
+  gap: 8px;
+}
+
+.esporte {
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid #2BA848;
+  color: #2BA848;
+  font-weight: bold;
+  background: transparent;
+}
+
+.infos-geral {
+  width: 100%;
+  padding: 20px;
+  border-radius: 12px;
+
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Biografia */
+.biografia h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #2BA848;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.biografia p {
+  font-size: 16px;
+  color: #555;
+  margin: 5px 0;
+}
+
+.biografia p strong {
+  color: #000;
+}
+
+/* Clubes */
+.clubes {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+  box-sizing: border-box;
+}
+
+.clubes h2 {
+  grid-column: 1 / -1; /* título ocupa toda a largura */
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #2BA848;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+/* Cards de clubes responsivos */
+.clube-card {
+  width: 100%; /* sempre dentro do grid */
+  padding: 15px 10px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+
+
+.clube-card p {
+  font-size: 14px;
+  color: #555;
+  margin: 5px 0;
+}
+
+.clube-card p strong {
+  color: #000;
 }

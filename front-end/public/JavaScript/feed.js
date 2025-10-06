@@ -104,3 +104,60 @@ async function carregarFeed() {
 
 // Carrega feed ao abrir a página
 document.addEventListener("DOMContentLoaded", carregarFeed);
+
+// ================== MOSTRAR ESPORTES DO USUÁRIO NO FEED ==================
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const container = document.getElementById("atalhos-esportes");
+  if (!container) return; // se não existir essa div no HTML, sai
+
+  const cpf = localStorage.getItem("cpf");
+  if (!cpf) {
+    container.innerHTML += "<p>CPF não encontrado. Faça login novamente.</p>";
+    return;
+  }
+
+  try {
+    // Busca os esportes do usuário no backend
+    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
+    if (!resposta.ok) throw new Error("Erro ao buscar esportes.");
+
+    const esportes = await resposta.json();
+
+    // Caminho base das imagens
+    const caminhoImagens = "ImagensEscolhaEsportes/";
+
+    // Limpa e adiciona o título
+    container.innerHTML = "<p>Seus esportes</p>";
+
+    if (esportes.length === 0) {
+      container.innerHTML += "<p>Você ainda não escolheu esportes.</p>";
+      return;
+    }
+
+    // Cria os elementos dinamicamente
+    esportes.forEach(nome => {
+      const a = document.createElement("a");
+      a.href = "#";
+
+      // Substitui espaços por nada e letras maiúsculas/minúsculas
+      const nomeArquivo = nome
+        .normalize("NFD") // remove acentos
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "")
+        .toLowerCase();
+
+      const img = document.createElement("img");
+      img.src = `${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png`;
+      img.alt = nome;
+
+      a.appendChild(img);
+      a.appendChild(document.createTextNode(nome));
+      container.appendChild(a);
+    });
+
+  } catch (erro) {
+    console.error("Erro ao carregar esportes:", erro);
+    container.innerHTML += "<p>Erro ao carregar seus esportes.</p>";
+  }
+});
