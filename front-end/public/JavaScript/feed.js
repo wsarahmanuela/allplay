@@ -73,8 +73,9 @@ async function carregarFeed() {
 
     console.log("status: " + resposta.status)
     console.log("body: " + resposta.body)
-
+ 
     const publicacoes = await resposta.json();
+   console.log("publicacoes: " + publicacoes.length); 
 
     const feed = document.getElementById('feed');
     feed.innerHTML = '';
