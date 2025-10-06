@@ -1,49 +1,62 @@
 document.addEventListener("DOMContentLoaded", () => {
     const esportes = document.querySelectorAll(".esporte"); 
     const contador = document.querySelector("#contador h3"); 
+    const form = document.getElementById("cadastroForm");
     let selecionados = [];
 
+    // Seleção de esportes
     esportes.forEach(card => {
         card.addEventListener("click", () => {
             const nomeEsporte = card.querySelector(".cardText").innerText;
 
-            // Se já está selecionado desseleciona
             if (selecionados.includes(nomeEsporte)) {
                 selecionados = selecionados.filter(e => e !== nomeEsporte);
-                card.style.border = "2px solid #838186"; // volta para o padrão
+                card.style.border = "2px solid #838186";
                 card.style.background = "white";
-            } 
-            // Se ainda não foi selecionado e ainda tem espaço
-            else if (selecionados.length < 5) {
+            } else if (selecionados.length < 5) {
                 selecionados.push(nomeEsporte);
-                card.style.border = "2px solid #2BA848"; 
-                card.style.background = "#d8f5df"; 
-            } 
-            // Se já tiver 5 impede
-            else {
+                card.style.border = "2px solid #2BA848";
+                card.style.background = "#d8f5df";
+            } else {
                 alert("Você só pode selecionar até 5 esportes.");
             }
 
-            // Atualiza o contador
             contador.innerText = `${selecionados.length}/5 Selecionados`;
         });
     });
 
-    // Captura o botão de finalizar cadastro
-    const form = document.getElementById("cadastroForm");
-    form.addEventListener("submit", (e) => {
-        e.preventDefault(); // Evita enviar direto
+    // Envio para Node e redirecionamento
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-        if (selecionados.length === 0) {
-            alert("Selecione pelo menos 1 esporte!");
+        const cpf = localStorage.getItem("cpf");
+
+        // Se não tiver CPF, só mostra erro no console (sem alert chato)
+        if (!cpf) {
+            console.error("Nenhum CPF encontrado no localStorage!");
             return;
         }
 
-        // Aqui você poderia mandar para o back-end (PHP, Node, etc)
-        // Por enquanto vamos salvar no localStorage (simulação)
-        localStorage.setItem("esportesSelecionados", JSON.stringify(selecionados));
+        if (selecionados.length === 0) {
+            alert("Você precisa selecionar pelo menos 1 esporte!");
+            return;
+        }
 
-        // Redireciona para o feed.html
-        window.location.href = "feed.html";
+        try {
+            const res = await fetch('http://localhost:3000/esportes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cpf, esportes: selecionados })
+            });
+
+            const data = await res.json();
+            console.log(data);
+
+            window.location.href = "feed.html?cpf=" + cpf;
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao salvar os esportes no banco!");
+        }
     });
 });

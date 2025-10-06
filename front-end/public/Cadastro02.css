@@ -1,0 +1,140 @@
+/* Fundo geral */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f0f0f0; /* fundo cinza */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Painel central */
+.conteiner {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 40px;
+  width: 380px;
+  text-align: center;
+}
+
+/* Título e subtítulo */
+.TITULO {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.Subtitulo {
+  font-size: 14px;
+  color: #555;
+  margin-top: 8px;
+  margin-bottom: 35px; /* distância até o ícone de foto */
+}
+
+/* Área da foto de perfil */
+.foto-perfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+/* Círculo da foto */
+.foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #f9f9f9;
+  border: 2px solid #00c853; /* borda verde */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #aaa;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Ícone de upload menor e sobreposto */
+.upload-imagen {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background-color: #00c853;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 13px;
+  border: 2px solid #fff;
+}
+
+/* Ícone de usuário */
+.foto i {
+  font-size: 42px;
+  color: #aaa;
+}
+
+/* Texto abaixo da foto */
+.texto-foto {
+  font-size: 13px;
+  color: #777;
+  margin-top: 10px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+/* Campo de texto */
+.campo {
+  text-align: left;
+  margin-top: 20px;
+}
+
+label {
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.dica {
+  font-size: 12px;
+  color: #777;
+  margin-top: 3px;
+}
+
+/* Botão */
+.butao {
+  background-color: #00c853;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  margin-top: 25px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+}
+
+.butao:hover {
+  background-color: #00b34a;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/83a13259ee.js" crossorigin="anonymous"></script>
+    <title>Conclusão de Cadastro</title>
+    <link rel="stylesheet" href="Cadastro02.css">
+</head>
+<body>
+   
+   <div class="conteiner">
+        <h1 class="TITULO">COMPLETE O SEU PERFIL</h1>
+        <p class="Subtitulo">Falta pouco para começar a mergulhar no mundo do esporte</p>
+
+        <div class="foto-perfil">
+            <label for="foto-perfil">
+                <div class="foto" id="foto-preview">
+                    <samp id="icone"><i class="fa-solid fa-user"></i></samp>
+                    <div class="upload-imagen"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+                </div>
+            </label>
+            <input type="file" id="upload-foto" accept="image/*"/>
+            <p class="texto-foto">Clique no ícone para adicionar sua foto</p>
+        </div>
+
+        <div class="campo">
+            <label for="usuario">Defina o seu @:</label>
+            <input type="text" id="usuario" placeholder="@nome"/>
+            <p class="dica">O seu nome de usuário deve ser único</p>
+        </div>
+
+        <button class="butao">FINALIZAR CADASTRO</button>
+   </div>
+   
+   <script src="JavaScript/Cadastro02.js"></script>
+
+</body>
+</html>

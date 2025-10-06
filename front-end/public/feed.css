@@ -94,19 +94,22 @@ nav {
     background-color: #e1e1e1;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    padding: 13px 5%;
-    gap: 20px;
+    justify-content: space-between; 
+    align-items: flex-start;
+    gap: 20px; /* controla a distância entre as colunas */
+    padding: 15px 5%;
 }
-.left-sidebar{
-    flex: 1;
+.left-sidebar {
+    flex: none;
+    width: 200px; /* tamanho fixo */
     position: sticky;
     top: 70px;
     align-self: flex-start;
 }
 .right-sidebar{
     background-color: #ffffff;
-    flex: 1;
+    flex: none;
+    width: 500px;       /* largura reduzida e fixa */
     position: sticky;
     top: 70px;
     align-self: flex-start;
@@ -114,9 +117,9 @@ nav {
     border-radius: 4px;
 }
 .main-content{
-    flex: 5;
-    max-width: 700px;
-    margin: 0 20px;
+    flex: 1;            /* ocupa todo o espaço restante */
+    max-width: 900px;   /* mais largo que antes (era 700px) */
+    margin: 0;  
 
 }
 .imp-links a, .shortcut-links a, i{
@@ -393,4 +396,51 @@ nav {
     text-decoration: none;
     color: #626262;
 
+}
+
+/*------ Post ------ */
+
+.post {
+  background: #fff;            /* fundo branco */
+  padding: 15px;
+  border-radius: 10px;         /* bordas arredondadas */
+  margin: 15px 0;              /* espaço entre posts */
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.foto-perfil {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  border: 2px solid #4CAF50;
+}
+
+.post-info {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* espaço entre nome e data */
+}
+
+.post-info strong {
+  font-size: 16px;
+  color: #222;
+}
+
+.data {
+  font-size: 13px;
+  color: #777;
+}
+
+.conteudo {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.4;
 }

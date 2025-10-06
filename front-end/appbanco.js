@@ -150,11 +150,63 @@ app.get('/teste-banco', (req, res) => {
 });
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
-app.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
-  console.log('Acesse http://localhost:3000 para ver o formulario');
-  console.log('Teste: http://localhost:3000/teste');
-  console.log('Teste banco: http://localhost:3000/teste-banco');
+app.post('/esportes', (req, res) => {
+  const { cpf, esportes } = req.body;
+
+  if (!cpf || !esportes || esportes.length === 0) {
+    return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
+  }
+
+  // Deleta os esportes antigos do usuário
+  connection.query("DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?", [cpf], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ mensagem: "Erro ao deletar esportes antigos" });
+    }
+
+    // Insere os novos esportes
+    const valores = esportes.map(e => [cpf, e]); // array de arrays para inserir vários
+    connection.query(
+      "INSERT INTO usuario_esportesdeinteresse (CPF_usuario, nome_esporte) VALUES ?",
+      [valores],
+      (err2) => {
+        if (err2) {
+          console.error(err2);
+          return res.status(500).json({ mensagem: "Erro ao salvar no banco" });
+        }
+
+        res.json({ mensagem: "Esportes salvos com sucesso" });
+      }
+    );
+  });
+});
+
+// Buscar esportes do usuário pelo CPF
+app.get("/esportes/:cpf", (req, res) => {
+  const cpf = req.params.cpf;
+
+  connection.query(
+    "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
+    [cpf],
+    (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
+      }
+
+      const esportes = rows.map(r => r.nome_esporte);
+      res.json(esportes);
+    }
+  );
+});//aqui mai mostrar no feed 
+app.get("/esportes/:cpf", (req, res) => {
+  const cpf = req.params.cpf;
+  const sql = "SELECT esporte FROM esportes WHERE cpf = ?";
+  db.query(sql, [cpf], (erro, resultado) => {
+    if (erro) return res.status(500).json({ erro });
+    const esportes = resultado.map(r => r.esporte);
+    res.json(esportes);
+  });
 });
 // CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
@@ -173,7 +225,7 @@ async function carregarFeed() {
 
         const posts = await response.json(); 
         
-        console.log("✅ Posts recebidos com sucesso. Total:", posts.length);
+        console.log(" Posts recebidos com sucesso. Total:", posts.length);
         
         // exibirPostsNoHTML(posts); 
 
@@ -232,5 +284,9 @@ app.post('/publicacoes', (req, res) => {
 app.get('/publicacoes', (req, res) => {   
   console.log("GET PUBLICACOES");
 
-  
 });
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
+
