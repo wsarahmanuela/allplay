@@ -381,7 +381,7 @@ nav {
 .config-links{
     display: flex;
     align-items: center;
-    margin: 15px 0;
+    margin: 2px 0;
 }
 .config-links .config-icon{
     width: 38px;
