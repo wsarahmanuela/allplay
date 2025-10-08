@@ -1,20 +1,26 @@
-const inputFoto = document.getElementById("upload-foto"); //campo onde o usuário escolhe a foto
-const preView = document.getElementById("foto-preview"); //campo onde a foto vai ficar
+const inputFoto = document.getElementById("upload-foto");
+const fotoPreview = document.getElementById("foto-preview");
+const icone = document.getElementById("icone");
 
-inputFoto.addEventListener("change", function(){
-    const file =  this.files[0];
+// Quando o usuário escolhe uma imagem
+inputFoto.addEventListener("change", function () {
+  const arquivo = this.files[0];
 
-    if(file){
-        const reader = new FileReader(); //objeto que serve para ler o contéudo de arquivos, no caso a foto
-        
-        reader.onload = function(e) {
-        preview.innerHTML = `
-        <img src="${e.target.result}" alt="Foto de perfil"
-         style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-        <div class="upload-imagen"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-         `;
-        };
-    };
+  if (arquivo) {
+    const leitor = new FileReader();
 
-    reader.readAsDataURL(file);
+    leitor.addEventListener("load", function () {
+      // Esconde o ícone e mostra a imagem escolhida
+      icone.style.display = "none";
+      fotoPreview.style.backgroundImage = `url(${this.result})`;
+      fotoPreview.style.backgroundSize = "cover";
+      fotoPreview.style.backgroundPosition = "center";
+    });
+
+    leitor.readAsDataURL(arquivo);
+  } else {
+    // Se o usuário cancelar, volta ao estado original
+    icone.style.display = "flex";
+    fotoPreview.style.backgroundImage = "none";
+  }
 });

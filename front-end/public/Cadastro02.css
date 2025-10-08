@@ -1,7 +1,10 @@
-/* Fundo geral */
+/* ====================== */
+/* 🌟 ESTILOS GERAIS 🌟 */
+/* ====================== */
+
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #f0f0f0; /* fundo cinza */
+  background-color: #f0f0f0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,12 +17,16 @@ body {
   background-color: #fff;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  padding: 40px;
+  padding: 40px 30px;
   width: 380px;
   text-align: center;
+  box-sizing: border-box; /* 🔧 evita quebra de layout */
 }
 
-/* Título e subtítulo */
+/* ====================== */
+/* 🏷️ TÍTULO E SUBTÍTULO */
+/* ====================== */
+
 .TITULO {
   font-size: 22px;
   font-weight: 700;
@@ -31,10 +38,14 @@ body {
   font-size: 14px;
   color: #555;
   margin-top: 8px;
-  margin-bottom: 35px; /* distância até o ícone de foto */
+  margin-bottom: 35px;
+  line-height: 1.4;
 }
 
-/* Área da foto de perfil */
+/* ====================== */
+/* 📸 FOTO DE PERFIL */
+/* ====================== */
+
 .foto-perfil {
   display: flex;
   flex-direction: column;
@@ -42,13 +53,13 @@ body {
   margin-bottom: 25px;
 }
 
-/* Círculo da foto */
+/* Círculo principal da foto */
 .foto {
   width: 100px;
   height: 100px;
   border-radius: 50%;
   background-color: #f9f9f9;
-  border: 2px solid #00c853; /* borda verde */
+  border: 2px solid #00c853;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,9 +68,21 @@ body {
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  transition: 0.2s;
+
+  /* 🔥 ESSENCIAL para o preview funcionar */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Ícone de upload menor e sobreposto */
+/* Efeito ao passar o mouse */
+.foto:hover {
+  background-color: #f2fff5;
+  border-color: #00b34a;
+}
+
+/* Ícone de upload sobreposto */
 .upload-imagen {
   position: absolute;
   bottom: 4px;
@@ -74,26 +97,36 @@ body {
   color: white;
   font-size: 13px;
   border: 2px solid #fff;
+  transition: 0.2s;
 }
 
-/* Ícone de usuário */
+.upload-imagen:hover {
+  background-color: #00b34a;
+}
+
+/* Ícone central de perfil */
 .foto i {
   font-size: 42px;
   color: #aaa;
+  pointer-events: none; /* 🔧 garante clique no label */
 }
 
-/* Texto abaixo da foto */
+/* Texto abaixo */
 .texto-foto {
   font-size: 13px;
   color: #777;
   margin-top: 10px;
 }
 
+/* Esconde o input de arquivo */
 input[type="file"] {
   display: none;
 }
 
-/* Campo de texto */
+/* ====================== */
+/* ✏️ CAMPO DE TEXTO */
+/* ====================== */
+
 .campo {
   text-align: left;
   margin-top: 20px;
@@ -112,6 +145,13 @@ input[type="text"] {
   border-radius: 8px;
   margin-top: 5px;
   font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+  border-color: #00c853;
 }
 
 .dica {
@@ -120,7 +160,10 @@ input[type="text"] {
   margin-top: 3px;
 }
 
-/* Botão */
+/* ====================== */
+/* 🔘 BOTÃO FINAL */
+/* ====================== */
+
 .butao {
   background-color: #00c853;
   color: white;
@@ -131,10 +174,15 @@ input[type="text"] {
   font-size: 15px;
   margin-top: 25px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
   font-weight: 600;
 }
 
 .butao:hover {
   background-color: #00b34a;
+  transform: scale(1.02);
+}
+
+.butao:active {
+  transform: scale(0.98);
 }
