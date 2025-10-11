@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Redirecionamento para a página de escolha de esporte
                 setTimeout(() => {
-                    window.location.href = 'EscolhaEsporte.html';
+                    window.location.href = 'Cadastro02.html';
                 }, 1500); 
             } else {
                 alert('Erro: ' + resultado.message);
