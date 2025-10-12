@@ -4,7 +4,10 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  background-image: url("./ImagensCadastro/fundoCadastro02.png");
   background-color: #f0f0f0;
+  background-size: cover;
+  background-attachment: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,9 +19,9 @@ body {
 .conteiner {
   background-color: #fff;
   border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
   padding: 40px 30px;
-  width: 380px;
+  width: 500px;
   text-align: center;
   box-sizing: border-box; /* 🔧 evita quebra de layout */
 }
@@ -55,6 +58,7 @@ body {
 
 /* Círculo principal da foto */
 .foto {
+  position: relative;
   width: 100px;
   height: 100px;
   border-radius: 50%;
@@ -66,11 +70,8 @@ body {
   font-size: 40px;
   color: #aaa;
   position: relative;
-  overflow: hidden;
   cursor: pointer;
   transition: 0.2s;
-
-  /* 🔥 ESSENCIAL para o preview funcionar */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -82,23 +83,6 @@ body {
   border-color: #00b34a;
 }
 
-/* Ícone de upload sobreposto */
-.upload-imagen {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background-color: #00c853;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 13px;
-  border: 2px solid #fff;
-  transition: 0.2s;
-}
 
 .upload-imagen:hover {
   background-color: #00b34a;
@@ -123,13 +107,48 @@ input[type="file"] {
   display: none;
 }
 
-/* ====================== */
-/* ✏️ CAMPO DE TEXTO */
-/* ====================== */
-
-.campo {
+.nomeUsuario{
   text-align: left;
   margin-top: 20px;
+}
+
+.bio {
+  text-align: left;
+  margin-top: 15px;
+}
+
+.bio label {
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.bio textarea {
+  width: 100%;
+  height: 120px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  resize: none;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s;
+  font-family: "Poppins", sans-serif;
+}
+
+.bio textarea:focus {
+  border-color: #00c853;
+}
+
+.contador {
+  font-size: 12px;
+  color: #777;
+  text-align: right;
+  margin-top: 4px;
 }
 
 label {
@@ -159,10 +178,6 @@ input[type="text"]:focus {
   color: #777;
   margin-top: 3px;
 }
-
-/* ====================== */
-/* 🔘 BOTÃO FINAL */
-/* ====================== */
 
 .butao {
   background-color: #00c853;

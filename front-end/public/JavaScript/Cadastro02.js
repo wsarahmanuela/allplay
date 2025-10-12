@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (resultado.success) {
         alert("Cadastro finalizado com sucesso!");
-        window.location.href = "EscolhaEsporte.html"; 
+        window.location.href = "EscolhaEsporte.html";
       } else {
         alert("Erro: " + resultado.message);
       }
@@ -71,4 +71,31 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Erro de conexão com o servidor.");
     }
   });
+
+});
+
+const bio = document.getElementById('bio');
+const contador = document.getElementById('contador');
+const limite = 200;
+
+bio.addEventListener('input', () => {
+  const tamanho = bio.value.length;
+  contador.textContent = `${tamanho}/${limite}`;
+
+  // Se passar do limite, muda a cor e impede digitação extra
+  if (tamanho > limite) {
+    contador.style.color = 'red';
+    bio.value = bio.value.substring(0, limite); // corta o excesso
+    contador.textContent = `${limite}/${limite}`;
+  } else {
+    contador.style.color = '#777';
+  }
+});
+
+const usuario = document.getElementById('usuario');
+
+usuario.addEventListener('input', () => {
+  if (usuario.value && !usuario.value.startsWith('@')) {
+    usuario.value = '@' + usuario.value.replace(/^@+/, '');
+  }
 });

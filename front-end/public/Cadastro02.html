@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,38 +8,43 @@
     <title>Conclusão de Cadastro</title>
     <link rel="stylesheet" href="Cadastro02.css">
 </head>
+
 <body>
-   
+
 
     <form action="EscolhaEsporte.html" method="POST" id="cadastroForm">
         <div class="conteiner">
-        <h1 class="TITULO">COMPLETE O SEU PERFIL</h1>
-        <p class="Subtitulo">Falta pouco para começar a mergulhar no mundo do esporte</p>
+            <h1 class="TITULO">COMPLETE O SEU PERFIL</h1>
+            <p class="Subtitulo">Falta pouco para começar a mergulhar no mundo do esporte</p>
 
-        <div class="foto-perfil">
-            <label for="upload-foto">
-                <div class="foto" id="foto-preview">
-                    <samp id="icone"><i class="fa-solid fa-user"></i></samp>
-                    <div class="upload-imagen">
-                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+            <div class="foto-perfil">
+                <label for="upload-foto">
+                    <div class="foto" id="foto-preview">
+                        <span id="icone"><i class="fa-solid fa-user"></i></span>
                     </div>
-                </div>
-            </label>
-            <input type="file" id="upload-foto" accept="image/*"/>
-            <p class="texto-foto">Clique no ícone para adicionar sua foto</p>
-        </div>
+                </label>
+                <input type="file" id="upload-foto" accept="image/*" />
+                <p class="texto-foto">Clique no ícone para adicionar sua foto</p>
+            </div>
 
-        <div class="campo">
-            <label for="usuario">Defina o seu @:</label>
-            <input type="text" id="usuario" placeholder="@nome"/>
-            <p class="dica">O seu nome de usuário deve ser único</p>
-        </div>
+            <div class="nomeUsuario">
+                <label for="usuario">Defina o seu @:</label>
+                <input type="text" id="usuario" placeholder="@nome" />
+                <p class="dica">O seu nome de usuário deve ser único</p>
+            </div>
 
-        <button class="butao">FINALIZAR CADASTRO</button>
+            <div class="bio">
+                <label for="bio">Escreva um pouco sobre você na sua bio:</label>
+                <textarea id="bio" placeholder="Escreva sobre você!"></textarea>
+                <div class="contador" id="contador">0/200</div>
+            </div>
+
+            <button class="butao">FINALIZAR CADASTRO</button>
         </div>
     </form>
-   
-   <script src="JavaScript/Cadastro02.js"></script>
+
+    <script src="JavaScript/Cadastro02.js"></script>
 
 </body>
+
 </html>
