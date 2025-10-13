@@ -149,6 +149,31 @@ app.get('/teste-banco', (req, res) => {
   });
 });
 
+//CADASTRO02 -----------------------------------------------------------------
+const multer = require("multer"); // ← Adiciona isso se ainda não tiver no topo
+
+const upload = multer({ dest: "uploads/" });
+
+app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
+  const { cpf, bio } = req.body;
+  const foto = req.file ? req.file.filename : null;
+
+  if (!cpf || !bio || !foto) {
+    return res.status(400).json({ success: false, message: "Dados incompletos." });
+  }
+
+  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ? WHERE cpf = ?";
+  connection.query(sql, [bio, foto, cpf], (erro) => {
+    if (erro) {
+      console.error(erro);
+      return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
+    }
+    res.json({ success: true });
+  });
+});
+
+
+
 // ESCOLHA DE ESPORTE --------------------------------------------------------
 app.post('/esportes', (req, res) => {
   const { cpf, esportes } = req.body;
