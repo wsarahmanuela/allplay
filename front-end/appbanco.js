@@ -181,6 +181,22 @@ app.post('/esportes', (req, res) => {
   });
 });
 
+// MOSTRAR NOME DO USUARIO NO FEED
+function mostrarNomeUsuario(){
+  const cpf = sessionStorage.getItem("cpf");
+  if(!cpf) return;
+
+  fetch(`/usuario/${cpf}`)
+        .then(res => res.json())
+        .then(usuario => {
+            const nomeDiv = document.getElementById("nome-usuario");
+            nomeDiv.textContent = usuario.nome;
+        })
+        .catch(err => console.error(err));
+}
+
+window.onload = mostrarNomeUsuario;
+
 // Buscar esportes do usuário pelo CPF
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
@@ -210,7 +226,6 @@ app.get("/esportes/:cpf", (req, res) => {
 });
 // CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
-async function carregarFeed() {
  async function carregarFeed() {
     console.log("Tentando carregar o feed...");
     
@@ -232,7 +247,6 @@ async function carregarFeed() {
     } catch (erro) {
         console.error("Erro fatal ao carregar o feed:", erro);
     }
-}
 }
 
 // PUBLICACOES -------------------------------------------------------------
