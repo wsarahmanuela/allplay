@@ -207,6 +207,7 @@ app.post('/esportes', (req, res) => {
   });
 });
 
+
 // Buscar esportes do ususrio pelo CPF
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
@@ -225,6 +226,8 @@ app.get("/esportes/:cpf", (req, res) => {
     }
   );
 });//aqui mai mostrar no feed 
+///aqui mai mostrar no feed 
+
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
   const sql = "SELECT esporte FROM esportes WHERE cpf = ?";
@@ -236,7 +239,6 @@ app.get("/esportes/:cpf", (req, res) => {
 });
 // CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
-async function carregarFeed() {
  async function carregarFeed() {
     console.log("Tentando carregar o feed...");
     
@@ -258,7 +260,6 @@ async function carregarFeed() {
     } catch (erro) {
         console.error("Erro fatal ao carregar o feed:", erro);
     }
-}
 }
 
 // PUBLICACOES -------------------------------------------------------------
