@@ -56,8 +56,8 @@ app.post('/cadastro', (req, res) => {
 
   const query = `
     INSERT INTO usuario 
-    (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
-    VALUES (?, ?, ?, ?, ?, ?, '', '')`;
+    (nome, telefone, cpf, cidade, email, senha) 
+    VALUES (?, ?, ?, ?, ?, ?)`;
 
   connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
     if (error) {
