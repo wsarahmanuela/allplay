@@ -206,40 +206,7 @@ app.post('/esportes', (req, res) => {
   });
 });
 
-// MOSTRAR NOME DO USUARIO NO FEED
-function mostrarNomeUsuario(){
-  const cpf = sessionStorage.getItem("cpf");
-  if(!cpf) return;
-
-  fetch(`/usuario/${cpf}`)
-        .then(res => res.json())
-        .then(usuario => {
-            const nomeDiv = document.getElementById("nome-usuario");
-            nomeDiv.textContent = usuario.nome;
-        })
-        .catch(err => console.error(err));
-}
-
-window.onload = mostrarNomeUsuario;
-
-// Buscar esportes do usuário pelo CPF
-app.get("/esportes/:cpf", (req, res) => {
-  const cpf = req.params.cpf;
-
-  connection.query(
-    "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
-    [cpf],
-    (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
-      }
-
-      const esportes = rows.map(r => r.nome_esporte);
-      res.json(esportes);
-    }
-  );
-});//aqui mai mostrar no feed 
+///aqui mai mostrar no feed 
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
   const sql = "SELECT esporte FROM esportes WHERE cpf = ?";
