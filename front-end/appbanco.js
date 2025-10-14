@@ -339,3 +339,59 @@ app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
 
+//================     ================
+//================ MAP ================
+//================     ================
+
+app.post('/api/usuarios-proximos', (req, res) => {
+    const { latitude, longitude, cpf } = req.body;
+    const raio_metros = 200; // Raio de busca
+
+    if (!cpf || !latitude || !longitude) {
+        return res.status(400).json({ success: false, message: 'Dados incompletos.' });
+    }
+
+    // 1. ATUALIZA a localização do usuário logado
+    const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
+    connection.query(updateSql, [latitude, longitude, cpf], (err) => {
+        // Se houver erro, apenas logamos, mas continuamos a busca
+        if (err) console.error('Erro ao atualizar localização:', err); 
+
+        // 2. BUSCA com a Fórmula de Haversine
+        const haversineQuery = `
+            SELECT
+                u.nome,
+                u.fotoDePerfil,
+                ( 6371000 * acos(
+                    cos( radians(?) ) * cos( radians( latitude ) )
+                    * cos( radians( longitude ) - radians(?) )
+                    + sin( radians(?) ) * sin( radians( latitude ) )
+                ) ) AS distancia_m
+            FROM
+                usuario u
+            WHERE
+                u.cpf != ?
+            HAVING
+                distancia_m < ?
+            ORDER BY
+                distancia_m
+            LIMIT 10
+        `;
+        
+        const params = [latitude, longitude, latitude, cpf, raio_metros];
+
+        connection.query(haversineQuery, params, (erroBusca, resultados) => {
+            if (erroBusca) {
+                console.error('Erro na busca Haversine:', erroBusca);
+                return res.status(500).json({ success: false, message: 'Erro ao buscar usuários próximos.' });
+            }
+
+            const usuariosProximos = resultados.map(usuario => ({
+                nome: usuario.nome,
+                distancia: Math.round(usuario.distancia_m)
+            }));
+            
+            res.json({ success: true, usuarios: usuariosProximos });
+        });
+    });
+});

@@ -4,7 +4,14 @@ var circle;
 function sucesso(posicao) {
     const lat = posicao.coords.latitude;
     const lon = posicao.coords.longitude;
+    const usuarioCpf = localStorage.getItem('cpf');
 
+    if (usuarioCpf) {
+        buscarEExibirUsuariosProximos(lat, lon, usuarioCpf);
+    } else {
+        document.getElementById('usuarios-proximos-lista').innerHTML = `<p>Faça login para ver usuários próximos.</p>`;
+    }
+    
     console.log(lat, lon); // Pega as coordenadas (Natan)
 
     // Se o mapa ainda não foi criado
