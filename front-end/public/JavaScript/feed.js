@@ -162,3 +162,83 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML += "<p>Erro ao carregar seus esportes.</p>";
   }
 });
+//onde o usuario vai postar 
+function preencherPerfil() {
+    const perfilDiv = document.querySelector(".perfil-usuario div");
+    const imgPerfil = document.querySelector(".perfil-usuario img");
+
+    imgPerfil.src = usuarioLogado.foto;
+    perfilDiv.innerHTML = `
+        <p>${usuarioLogado.nome}</p>
+        <small>${usuarioLogado.username} <i class="fa-solid fa-square-arrow-up-right"></i></small>
+    `;
+}
+
+// Chamar a função ao carregar a página
+window.addEventListener("DOMContentLoaded", preencherPerfil);
+
+
+
+//VAI BUSCAR O NOME NO BANCO E MOSTRAR NA TELA
+document.addEventListener("DOMContentLoaded", async () => {
+  const cpf = localStorage.getItem("cpf");
+
+  if (!cpf) {
+    alert("Erro: CPF não encontrado. Faça login novamente.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(`http://localhost:3000/usuario/${cpf}`);
+    const dados = await resposta.json();
+
+    if (dados.success) {
+      const usuario = dados.usuario;
+
+      // Atualiza o nome e o @ na tela
+      document.getElementById("nomeUsuarioFeed").textContent = usuario.nome;
+      document.getElementById("arrobaFeed").textContent = usuario.nomeUsuario;
+
+      // Atualiza a foto de perfil
+      const caminhoFoto = `uploads/${usuario.fotoDePerfil}`;
+      document.getElementById("fotoPerfilFeed").src = caminhoFoto;
+    } else {
+      console.error("Erro:", dados.message);
+    }
+  } catch (erro) {
+    console.error("Erro ao carregar dados do usuário:", erro);
+  }
+});
+
+async function carregarFeed() {
+    try {
+        const resposta = await fetch('/publicacoes');
+        const posts = await resposta.json();
+
+        const feed = document.getElementById("feed");
+        feed.innerHTML = ""; // limpa antes de adicionar
+
+        posts.forEach(post => {
+            const postDiv = document.createElement("div");
+            postDiv.classList.add("post");
+            postDiv.innerHTML = `
+                <div class="perfil-usuario">
+                    <img src="uploads/${post.fotoDePerfil}" alt="Foto de perfil">
+                    <div>
+                        <p>${post.nome}</p>
+                        <small>${post.nomeUsuario} <i class="fa-solid fa-square-arrow-up-right"></i></small>
+                    </div>
+                </div>
+                <div class="post-texto">
+                    <p>${post.conteudo}</p>
+                </div>
+            `;
+            feed.appendChild(postDiv);
+        });
+    } catch (erro) {
+        console.error("Erro ao carregar o feed:", erro);
+    }
+}
+
+window.addEventListener("DOMContentLoaded", carregarFeed);

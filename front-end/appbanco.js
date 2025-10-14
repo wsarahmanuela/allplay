@@ -56,8 +56,8 @@ app.post('/cadastro', (req, res) => {
 
   const query = `
     INSERT INTO usuario 
-    (nome, telefone, cpf, cidade, email, senha, bio, fotoDePerfil) 
-    VALUES (?, ?, ?, ?, ?, ?, '', '')`;
+    (nome, telefone, cpf, cidade, email, senha) 
+    VALUES (?, ?, ?, ?, ?, ?)`;
 
   connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
     if (error) {
@@ -150,20 +150,21 @@ app.get('/teste-banco', (req, res) => {
 });
 
 //CADASTRO02 -----------------------------------------------------------------
-const multer = require("multer"); // ← Adiciona isso se ainda não tiver no topo
+const multer = require("multer"); 
 
 const upload = multer({ dest: "uploads/" });
 
 app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
-  const { cpf, bio } = req.body;
+  const { cpf, bio, nomeUsuario} = req.body;
   const foto = req.file ? req.file.filename : null;
 
   if (!cpf || !bio || !foto) {
     return res.status(400).json({ success: false, message: "Dados incompletos." });
   }
 
-  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ? WHERE cpf = ?";
-  connection.query(sql, [bio, foto, cpf], (erro) => {
+  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ?, nomeUsuario = ? WHERE cpf = ?";
+  connection.query(sql, [bio, foto, nomeUsuario, cpf], (erro) => {
+
     if (erro) {
       console.error(erro);
       return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
@@ -206,7 +207,8 @@ app.post('/esportes', (req, res) => {
   });
 });
 
-// Buscar esportes do usuário pelo CPF
+
+// Buscar esportes do ususrio pelo CPF
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
@@ -224,6 +226,8 @@ app.get("/esportes/:cpf", (req, res) => {
     }
   );
 });//aqui mai mostrar no feed 
+///aqui mai mostrar no feed 
+
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
   const sql = "SELECT esporte FROM esportes WHERE cpf = ?";
@@ -235,7 +239,6 @@ app.get("/esportes/:cpf", (req, res) => {
 });
 // CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
-async function carregarFeed() {
  async function carregarFeed() {
     console.log("Tentando carregar o feed...");
     
@@ -257,7 +260,6 @@ async function carregarFeed() {
     } catch (erro) {
         console.error("Erro fatal ao carregar o feed:", erro);
     }
-}
 }
 
 // PUBLICACOES -------------------------------------------------------------
@@ -314,6 +316,7 @@ app.get('/publicacoes', (req, res) => {
       p.conteudo,
       p.data_publicacao,
       u.nome,
+      u.nomeUsuario,
       u.fotoDePerfil
     FROM publicacao p
     JOIN usuario u ON p.autor_CPF = u.CPF
@@ -333,6 +336,7 @@ app.get('/publicacoes', (req, res) => {
     res.json(resultados);
   });
 });
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
@@ -394,4 +398,26 @@ app.post('/api/usuarios-proximos', (req, res) => {
             res.json({ success: true, usuarios: usuariosProximos });
         });
     });
+});
+
+//NOME DE USUARIO ---------------------------------------------------
+app.get("/usuario/:cpf", (req, res) => {
+  const cpf = req.params.cpf;
+
+  const sql = "SELECT nome, nomeUsuario, fotoDePerfil FROM usuario WHERE cpf = ?";
+  connection.query(sql, [cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar dados do usuário:", erro);
+      return res.status(500).json({ success: false, message: "Erro no servidor." });
+    }
+
+    if (resultados.length === 0) {
+      return res.status(404).json({ success: false, message: "Usuário não encontrado." });
+    }
+
+    res.json({
+      success: true,
+      usuario: resultados[0]
+    });
+  });
 });

@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (resultado.success) {
                 alert('Cadastro realizado com sucesso!');
 
-                // ✅ Salva o CPF no localStorage (para usar na tela de esportes)
+                // salva o CPF no localStorage (para usar na tela de esportes)
                 localStorage.setItem("cpf", dados.cpf);
 
                 // Redirecionamento para a página de escolha de esporte

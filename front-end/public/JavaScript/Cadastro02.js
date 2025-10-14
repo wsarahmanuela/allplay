@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === PARTE 2: Envio do formulário para o servidor ===
-  const form = document.getElementById("cadastroFotoForm");
+  const form = document.getElementById("cadastroForm");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -40,8 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const foto = document.getElementById("upload-foto").files[0];
     const bio = document.getElementById("bio").value.trim();
+    const nomeUsuario = document.getElementById("usuario").value.trim();
 
-    if (!foto || !bio) {
+    if (!foto || !bio || !nomeUsuario) {
       alert("Preencha todos os campos!");
       return;
     }
@@ -50,6 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("cpf", cpf);
     formData.append("bio", bio);
     formData.append("foto", foto);
+    formData.append("nomeUsuario", nomeUsuario);
+    console.log("Dados enviados:", cpf, bio, nomeUsuario, foto);
+
 
     try {
       const resposta = await fetch("http://localhost:3000/cadastro/foto", {
@@ -71,9 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Erro de conexão com o servidor.");
     }
   });
-
 });
 
+// === CONTADOR DE BIOGRAFIA ===
 const bio = document.getElementById('bio');
 const contador = document.getElementById('contador');
 const limite = 200;
@@ -92,6 +96,7 @@ bio.addEventListener('input', () => {
   }
 });
 
+// === AJUSTE AUTOMÁTICO DO NOME DE USUÁRIO (adiciona @) ===
 const usuario = document.getElementById('usuario');
 
 usuario.addEventListener('input', () => {
