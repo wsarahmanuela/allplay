@@ -338,18 +338,14 @@ app.get('/publicacoes', (req, res) => {
 });
 
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
 
 //================     ================
 //================ MAP ================
 //================     ================
-
+// ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
 app.post('/api/usuarios-proximos', (req, res) => {
     const { latitude, longitude, cpf } = req.body;
-    const raio_metros = 200; // Raio de busca
+    const raio_metros = 20000; // Raio de busca
 
     if (!cpf || !latitude || !longitude) {
         return res.status(400).json({ success: false, message: 'Dados incompletos.' });
@@ -400,24 +396,67 @@ app.post('/api/usuarios-proximos', (req, res) => {
     });
 });
 
+// ROTA 2: BUSCA TODOS OS USUÁRIOS PARA O MAPA (Rota GET que estava dando 404)
+app.get('/api/todos-usuarios-mapa', (req, res) => {
+    
+    // SQL: Seleciona nome, latitude e longitude da tabela 'usuario'.
+    const sql = `
+        SELECT CPF, nome, latitude, longitude
+        FROM usuario
+        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+    `;
+
+    connection.query(sql, (erro, resultados) => {
+        if (erro) {
+            console.error('Erro ao buscar todos os usuários do MySQL:', erro);
+            return res.status(500).json({ 
+                success: false, 
+                message: "Erro interno do servidor ao consultar o banco de dados." 
+            });
+        }
+
+        const usuariosParaMapa = resultados.map(u => ({
+            cpf: u.CPF,
+            nome: u.nome, 
+            latitude: parseFloat(u.latitude), 
+            longitude: parseFloat(u.longitude)
+        }));
+        
+        console.log(`[API] Retornando ${usuariosParaMapa.length} usuários para o mapa.`);
+
+        res.json({
+            success: true,
+            message: "Lista de todos os usuários para o mapa obtida com sucesso.",
+            usuarios: usuariosParaMapa
+        });
+    });
+});
+
+
 //NOME DE USUARIO ---------------------------------------------------
 app.get("/usuario/:cpf", (req, res) => {
-  const cpf = req.params.cpf;
+  const cpf = req.params.cpf;
 
-  const sql = "SELECT nome, nomeUsuario, fotoDePerfil FROM usuario WHERE cpf = ?";
-  connection.query(sql, [cpf], (erro, resultados) => {
-    if (erro) {
-      console.error("Erro ao buscar dados do usuário:", erro);
-      return res.status(500).json({ success: false, message: "Erro no servidor." });
-    }
+  const sql = "SELECT nome, nomeUsuario, fotoDePerfil FROM usuario WHERE cpf = ?";
+  connection.query(sql, [cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar dados do usuário:", erro);
+      return res.status(500).json({ success: false, message: "Erro no servidor." });
+    }
 
-    if (resultados.length === 0) {
-      return res.status(404).json({ success: false, message: "Usuário não encontrado." });
-    }
+    if (resultados.length === 0) {
+      return res.status(404).json({ success: false, message: "Usuário não encontrado." });
+    }
 
-    res.json({
-      success: true,
-      usuario: resultados[0]
-    });
-  });
+    res.json({
+      success: true,
+      usuario: resultados[0]
+    });
+  });
+});
+
+// A LINHA app.listen DEVE SER A ÚLTIMA!
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
