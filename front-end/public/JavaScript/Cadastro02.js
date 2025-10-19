@@ -97,10 +97,6 @@ bio.addEventListener('input', () => {
 });
 
 // === AJUSTE AUTOMÁTICO DO NOME DE USUÁRIO (adiciona @) ===
-const usuario = document.getElementById('usuario');
 
-usuario.addEventListener('input', () => {
-  if (usuario.value && !usuario.value.startsWith('@')) {
-    usuario.value = '@' + usuario.value.replace(/^@+/, '');
-  }
-});
+
+

@@ -1,13 +1,16 @@
-//CADASTRO --------------------------------------------
-const express = require('express');
+const express = require("express");
 const app = express();
-const mysql2 = require('mysql2');
-const path = require('path');
-const { json } = require('stream/consumers');
+const path = require("path");
+const multer = require("multer");
+const mysql2 = require("mysql2");
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const uploadDir = path.join(__dirname, "uploads");
+const upload = multer({ dest: uploadDir }); 
 
 const connection = mysql2.createConnection({
   host: 'localhost',
@@ -149,31 +152,30 @@ app.get('/teste-banco', (req, res) => {
   });
 });
 
+
+
 //CADASTRO02 -----------------------------------------------------------------
-const multer = require("multer"); 
-
-const upload = multer({ dest: "uploads/" });
-
 app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
-  const { cpf, bio, nomeUsuario} = req.body;
+  const { cpf, bio, nomeUsuario } = req.body;
   const foto = req.file ? req.file.filename : null;
 
-  if (!cpf || !bio || !foto) {
-    return res.status(400).json({ success: false, message: "Dados incompletos." });
+  if (!cpf || !bio || !nomeUsuario || !foto) {
+    // Incluído nomeUsuario na validação, para ter certeza que é enviado
+    return res.status(400).json({
+      success: false,
+      message: "Dados incompletos (CPF, Bio, Nome de Usuário ou Foto de Perfil faltando)."
+    });
   }
 
   const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ?, nomeUsuario = ? WHERE cpf = ?";
   connection.query(sql, [bio, foto, nomeUsuario, cpf], (erro) => {
-
     if (erro) {
-      console.error(erro);
+      console.error("Erro ao salvar perfil no banco:", erro);
       return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
     }
-    res.json({ success: true });
+    res.json({ success: true, message: "Perfil atualizado com sucesso." });
   });
 });
-
-
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
 app.post('/esportes', (req, res) => {
@@ -183,15 +185,13 @@ app.post('/esportes', (req, res) => {
     return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
   }
 
-  // Deleta os esportes antigos do usuário
   connection.query("DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?", [cpf], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ mensagem: "Erro ao deletar esportes antigos" });
     }
 
-    // Insere os novos esportes
-    const valores = esportes.map(e => [cpf, e]); // array de arrays para inserir vários
+    const valores = esportes.map(e => [cpf, e]); 
     connection.query(
       "INSERT INTO usuario_esportesdeinteresse (CPF_usuario, nome_esporte) VALUES ?",
       [valores],
@@ -207,9 +207,7 @@ app.post('/esportes', (req, res) => {
   });
 });
 
-
-// Buscar esportes do ususrio pelo CPF
-app.get("/esportes/:cpf", (req, res) => {
+app.get("/esportes/:cpf", (req, res) => {// Buscar esportes do ususrio pelo CPF
   const cpf = req.params.cpf;
 
   connection.query(
@@ -226,7 +224,6 @@ app.get("/esportes/:cpf", (req, res) => {
     }
   );
 });//aqui mai mostrar no feed 
-///aqui mai mostrar no feed 
 
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
@@ -237,6 +234,8 @@ app.get("/esportes/:cpf", (req, res) => {
     res.json(esportes);
   });
 });
+
+
 // CARREGAR FEED  
 // essa func é importante p carregar as proximas postagens
  async function carregarFeed() {
@@ -263,58 +262,40 @@ app.get("/esportes/:cpf", (req, res) => {
 }
 
 // PUBLICACOES -------------------------------------------------------------
-app.post('/publicacoes', (req, res) => { 
+app.post('/publicacoes', (req, res) => {
   console.log("POST PUBLICACOES");
-  
-    const { autor_CPF, conteudo } = req.body; 
 
-    console.log(req.body)
+  const { autor_CPF, conteudo } = req.body;
 
-    console.log(conteudo, autor_CPF)
+  if (!autor_CPF || !conteudo) {
+    return res.status(400).json({
+      success: false,
+      message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!'
+    });
+  }
 
-    if (!autor_CPF || !conteudo) {
+  const query = `
+    INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
+    VALUES (NOW(), ?, ?)
+  `;
 
-        return res.status(400).json({ 
-            success: false, 
-            message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!' 
-        });
+  connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
+    if (erro) {
+      console.error('Erro ao inserir publicação:', erro);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
     }
 
-    const query = `
-        INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
-        VALUES (CURDATE(), ?, ?)
-    `;
-
-    connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
-        
-        if (erro) {
-            console.error('ERRO NO SQL ao inserir publicação:', erro);
-            
-            if (erro.code === 'ER_NO_REFERENCED_ROW_2') {
-                return res.status(400).json({ 
-                    success: false,
-                    message: 'Erro de Autor: O CPF fornecido não está cadastrado.'
-                });
-            }
-
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Erro interno ao salvar publicação. Verifique o console do servidor.' 
-            });
-        }
-        
-        console.log('Publicação criada com sucesso pelo CPF:', autor_CPF);
-        res.json({ success: true, message: 'Publicação criada com sucesso!', id: resultado.insertId });
-    });
+    res.json({ success: true, id: resultado.insertId });
+  });
 });
 
-app.get('/publicacoes', (req, res) => {   
+app.get('/publicacoes', (req, res) => {
   console.log("GET PUBLICACOES");
 
   const query = `
     SELECT 
       p.conteudo,
-      p.data_publicacao,
+      DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
       u.nome,
       u.nomeUsuario,
       u.fotoDePerfil
@@ -326,18 +307,13 @@ app.get('/publicacoes', (req, res) => {
   connection.query(query, (erro, resultados) => {
     if (erro) {
       console.error('Erro ao buscar publicações:', erro);
-      return res.status(500).json({
-        success: false,
-        message: 'Erro ao carregar publicações'
-      });
+      return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
     }
 
-    console.log("Publicações retornadas:", resultados.length);
+
     res.json(resultados);
   });
 });
-
-
 
 //================     ================
 //================ MAP ================
@@ -458,5 +434,5 @@ app.get("/usuario/:cpf", (req, res) => {
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

@@ -399,48 +399,58 @@ nav {
 }
 
 /*------ Post ------ */
-
 .post {
-  background: #fff;            /* fundo branco */
+  background-color: #fff;
   padding: 15px;
-  border-radius: 10px;         /* bordas arredondadas */
-  margin: 15px 0;              /* espaço entre posts */
+  margin-bottom: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  font-family: "Poppins", sans-serif;
 }
 
 .post-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 10px;
+  gap: 10px;
 }
 
 .foto-perfil {
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 10px;
-  border: 2px solid #4CAF50;
 }
 
 .post-info {
   display: flex;
-  align-items: center;
-  gap: 8px; /* espaço entre nome e data */
+  flex-direction: column;
+  line-height: 1.2;
 }
 
-.post-info strong {
-  font-size: 16px;
-  color: #222;
+.post-info .nome {
+  font-weight: 600;
+  font-size: 15px;
+  color: #000;
+}
+
+.post-info .usuario {
+  font-size: 14px;
+  color: #555;
+}
+
+.conteudo {
+  margin-top: 10px;
+  font-size: 15px;
+  color: #111;
+  white-space: pre-wrap;
 }
 
 .data {
+  margin-top: 6px;
   font-size: 13px;
   color: #777;
 }
 
-.conteudo {
-  font-size: 15px;
-  color: #333;
-  line-height: 1.4;
-}
+
+
