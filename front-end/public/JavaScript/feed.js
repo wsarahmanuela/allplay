@@ -162,7 +162,11 @@ async function carregarEsportes() {
     console.error("Erro ao carregar esportes:", erro);
   }
 }
-
+var configmenu = document.querySelector(".config-menu");
+function configuracoesMenuAlter(){
+    // toggle = alternar - comando de alternar entre 2 estados (maria)
+    configmenu.classList.toggle("config-menu-height");
+}
 // ================== INICIALIZAÇÃO ==================
 document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();
