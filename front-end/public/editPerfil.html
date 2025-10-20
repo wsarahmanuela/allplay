@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="bt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/83a13259ee.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="editPerfil.CSS">
+    <title>EDITAR PERFIL</title>
+</head>
+<body>
+     <main class="container">
+        <header class="topo">
+            <h2>Editar Perfil</h2>
+            <div class="botoes-topo">
+                <button class="btn-cancelar">Cancelar</button>
+                <button class="btn-salvar">Salvar Alterações</button>
+            </div>
+        </header>
+
+        <section class="perfil">
+            <div class="foto-perfil">
+                <div class="foto" id="foto-preview">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <label for="upload-foto" class="btn-foto">Alterar banner</label>
+                <input type="file" id="upload-foto" accept="image/*" hidden>
+            </div>
+
+            <div class="dados">
+                <div class="input-grupo">
+                    <label>Nome de usuário</label>
+                    <input type="text" id="nome-usuario" placeholder="@nome_usuario">
+                </div>
+
+                <div class="input-grupo">
+                    <label>Nome completo</label>
+                    <input type="text" id="nome-completo" placeholder="Nome Sobrenome">
+                </div>
+
+                <div class="input-grupo">
+                    <label>Localização</label>
+                    <input type="text" id="localizacao" placeholder="Cidade - UF">
+                </div>
+            </div>
+        </section>
+
+        <section class="esportes">
+            <h3>Esportes Favoritos</h3>
+            <div class="tags">
+                <span class="tag">Futebol</span>
+                <span class="tag">Vôlei</span>
+                <span class="tag">Basquete</span>
+                <span class="tag">Tênis de mesa</span>
+                <span class="tag">Natação</span>
+                <span class="tag">Ciclismo</span>
+            </div>
+            <div class="add-esporte">
+                <input type="text" id="novo-esporte" placeholder="Adicionar outro esporte...">
+                <button id="btn-adicionar-esporte">Adicionar</button>
+            </div>
+        </section>
+
+        <section class="clubes">
+            <h3>Clubes que frequento</h3>
+            <div class="lista-clubes" id="lista-clubes">
+                <div class="clube">
+                    <p><strong>Tupi Gaspar</strong><br><small>Futebol</small></p>
+                    <button class="remover">&times;</button>
+                </div>
+                <div class="clube">
+                    <p><strong>AESC</strong><br><small>Vôlei</small></p>
+                    <button class="remover">&times;</button>
+                </div>
+            </div>
+            <button class="btn-adicionar">Adicionar clube</button>
+        </section>
+
+        <section class="estatisticas">
+            <h3>Estatísticas do Perfil</h3>
+            <div class="cards-estatisticas">
+                <div class="card">
+                    <h4>0</h4>
+                    <p>Seguindo</p>
+                </div>
+                <div class="card">
+                    <h4>0</h4>
+                    <p>Seguidores</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
