@@ -179,33 +179,32 @@ nav {
 /* Container-segue sempre abaixo da foto */
 #container-segue {
     display: flex;
-    flex-wrap: wrap;           /* quebra a linha em telas pequenas */
-    justify-content: flex-start;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1rem;
-    width: 100%;
+    align-items: center;    /* centraliza verticalmente */
+    gap: 1rem;              /* espaço entre foto e nome */
+    position: relative;
+    margin-left: 180px;     /* desloca o texto para a direita da foto */
 }
 
 .nome h3 {
-    margin-left:170px;
-    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
 }
 
 .seguir h3 {
-    margin: 0;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-    background-color: #40c75f;
+    margin-left: 220px;
+    background-color: #41db51;
     padding: 0.3rem 0.8rem;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 1rem;
+
 }
 
 #container-baixo {
     text-align: center;
     width: 100%;
     padding: 1rem;
-    background-color: white;
     border-radius: 10px;
     margin-top: 15rem;
 }
@@ -330,9 +329,6 @@ nav {
   text-align: center;
   box-sizing: border-box;
 }
-
-
-
 .clube-card p {
   font-size: 14px;
   color: #555;
@@ -341,4 +337,91 @@ nav {
 
 .clube-card p strong {
   color: #000;
+}
+/* ==== AJUSTES PARA DEIXAR IGUAL AO FEED ==== */
+
+/* Fundo geral */
+body {
+    background: #efefef;
+}
+
+/* Container */
+.container {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 15px 5%;
+}
+
+/* Sidebar esquerda */
+.left-sidebar {
+    flex: none;
+    width: 200px;
+    position: sticky;
+    top: 70px;
+    align-self: flex-start;
+}
+
+/* Links importantes */
+.imp-links a, .shortcut-links a {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    color: #626262;
+    width: fit-content;
+}
+
+.imp-links a img,
+.shortcut-links a img {
+    width: 25px;
+    margin-right: 15px;
+}
+
+.imp-links a:last-child {
+    color: #41db51;
+}
+
+/* Linha divisória */
+.imp-links {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+/* Título "Seus esportes" */
+.shortcut-links p {
+    margin: 25px 0;
+    color: #626262;
+    font-weight: 900;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Imagens dos esportes */
+.shortcut-links a img {
+    width: 30px;
+    margin-right: 15px;
+}
+
+/* ===== Mantém o resto do layout do perfil ===== */
+
+/* Fundo direito (caixa branca dos esportes) */
+#container-direita {
+
+    border-radius: 10px;
+    padding: 1rem;
+}
+.nome h3 {
+  display: flex;
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: bold;
+}
+.nome h5 {
+  display: flex;
+    margin: 0;
+    color: #333;
+    font-weight: 500;
+    font-size: 1rem;
 }

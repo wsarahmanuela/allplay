@@ -281,14 +281,7 @@ nav {
     margin-right: 30px;
     font-size: 13px;
 }
-.esporte_escolhido{
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    color: #626262;
-    margin-right: 30px;
-    font-size: 13px;
-}
+
 .post-btn {
     background: #0f9800;
     color: white;
@@ -304,7 +297,7 @@ nav {
 }
 
 .post-btn:hover {
-    background: #0d7000;
+    background: #41db51;
 }
 .post-container{
     width: 100%;
