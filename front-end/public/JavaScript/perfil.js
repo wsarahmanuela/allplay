@@ -1,4 +1,26 @@
-//---------------- MOSTRAR OS ESPORTES --------------------------------
+// perfil.js completo
+
+// ===== util =====
+function escapeHtml(text) {
+  if (text === null || text === undefined) return "";
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+    .replace(/\n/g, "<br>"); // preserva quebras de linha
+}
+
+// retorna caminho correto da foto de perfil (ajuste conforme necessário)
+function caminhoFoto(fotoDePerfil) {
+  if (!fotoDePerfil) return "imagens/profile.picture.jpg";
+  if (fotoDePerfil.startsWith("http") || fotoDePerfil.startsWith("/")) return fotoDePerfil;
+  // assume que backend salva só o filename e expõe em /uploads
+  return `/uploads/${fotoDePerfil}`;
+}
+
+// ===== ESCOLHA DE ESPORTES =====
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
   if (!container) return;
@@ -14,7 +36,7 @@ async function carregarEsportes() {
     if (!resposta.ok) throw new Error("Erro ao buscar esportes.");
 
     const dados = await resposta.json();
-    const esportes = Array.isArray(dados) ? dados : dados.esportes || [];
+    const esportes = Array.isArray(dados) ? dados : (dados.esportes || []);
     const caminhoImagens = "ImagensEscolhaEsportes/";
 
     container.innerHTML = "<p>Seus esportes</p>";
@@ -27,6 +49,10 @@ async function carregarEsportes() {
     esportes.forEach(nome => {
       const a = document.createElement("a");
       a.href = "#";
+      a.style.display = "flex";
+      a.style.alignItems = "center";
+      a.style.gap = "8px";
+      a.style.marginBottom = "12px";
 
       const nomeArquivo = nome
         .normalize("NFD")
@@ -37,20 +63,24 @@ async function carregarEsportes() {
       const img = document.createElement("img");
       img.src = `${caminhoImagens}${nomeArquivo}.png`;
       img.alt = nome;
-      img.onerror = () => (img.style.display = "none"); // evita erro 404 travando o carregamento
+      img.style.width = "30px";
+      img.onerror = () => (img.style.display = "none"); // evita erro 404 travando
+
+      const texto = document.createElement("span");
+      texto.textContent = nome;
 
       a.appendChild(img);
-      a.appendChild(document.createTextNode(nome));
+      a.appendChild(texto);
       container.appendChild(a);
     });
 
   } catch (erro) {
     console.error("Erro ao carregar esportes:", erro);
-    container.innerHTML = `<p>Erro ao carregar seus esportes: ${erro.message}</p>`;
+    container.innerHTML = `<p>Erro ao carregar seus esportes: ${escapeHtml(erro.message || String(erro))}</p>`;
   }
 }
 
-//--------------- FOTO DE PERFIL, NOME E BIO ------------------------
+// ===== FOTO DE PERFIL, NOME E BIO =====
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");
   if (!cpf) {
@@ -60,49 +90,42 @@ async function preencherPerfil() {
 
   try {
     const resposta = await fetch(`http://localhost:3000/usuario/${encodeURIComponent(cpf)}`);
-    console.log("Status da resposta:", resposta.status);
+    console.log("Status da resposta (perfil):", resposta.status);
     const dados = await resposta.json();
-    console.log("Dados recebidos do servidor:", dados);
+    console.log("Dados recebidos do servidor (perfil):", dados);
 
-    if (!resposta.ok || !dados.success) {
-      console.error("Erro:", dados.message);
+    if (!resposta.ok) {
+      console.error("Erro HTTP ao buscar perfil:", resposta.status);
       return;
     }
 
-    const usuario = dados.usuario;
-    console.log("Bio recebida:", usuario.bio);
+    if (!dados || !dados.success) {
+      console.error("Erro nos dados do perfil:", dados && dados.message ? dados.message : dados);
+      return;
+    }
 
+    const usuario = dados.usuario || {};
     const nome = usuario.nome || "Usuário sem nome";
     const arroba = usuario.nomeUsuario ? `@${usuario.nomeUsuario}` : "@usuario";
-    const foto = usuario.fotoDePerfil
-      ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}`
-      : "imagens/profile.picture.jpg";
-    const bio = usuario.bio && usuario.bio.trim() !== "" 
-      ? usuario.bio 
-      : "Nenhuma biografia adicionada ainda.";
-
-    console.log("Bio final que será exibida:", bio);
+    const foto = caminhoFoto(usuario.fotoDePerfil);
+    const bio = (usuario.bio && usuario.bio.trim() !== "") ? usuario.bio : "Nenhuma biografia adicionada ainda.";
 
     const fotoPerfil = document.querySelector("#container-meio .usuario-foto img");
     const nomePerfil = document.querySelector("#container-segue .nome h3");
     const arrobaPerfil = document.querySelector("#container-segue .nome h5");
     const bioPerfil = document.getElementById("bio");
 
-    console.log("Elemento bio encontrado no DOM:", bioPerfil);
-
     if (fotoPerfil) fotoPerfil.src = foto;
     if (nomePerfil) nomePerfil.textContent = nome;
     if (arrobaPerfil) arrobaPerfil.textContent = arroba;
     if (bioPerfil) bioPerfil.textContent = bio;
-    else console.warn("Elemento com id='bio' não encontrado no HTML!");
 
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
   }
 }
 
-
-//--------------- FEED DE PUBLICAÇÕES ------------------------
+// ===== FEED DE PUBLICAÇÕES (perfil) =====
 async function carregarFeed() {
   const cpf = localStorage.getItem("cpf");
   if (!cpf) {
@@ -114,37 +137,76 @@ async function carregarFeed() {
     console.log("Buscando publicações para CPF:", cpf);
     const resposta = await fetch(`http://localhost:3000/publicacoes/${encodeURIComponent(cpf)}`);
     if (!resposta.ok) {
-      console.error("Resposta não OK", resposta.status);
+      console.error("Resposta não OK ao buscar publicações", resposta.status);
       return;
     }
 
     const posts = await resposta.json();
     console.log("Posts recebidos:", posts);
 
+    // garante que #container-baixo exista
     const containerBaixo = document.getElementById("container-baixo");
-    containerBaixo.innerHTML = "";
-
-    if (!posts || posts.length === 0) {
-      containerBaixo.innerHTML = `
-        <h2>Ainda não há nenhuma publicação</h2>
-        <div class="foto">
-          <img src="imagensPerfil/camera.png" alt="Ícone de câmera">
-        </div>`;
+    if (!containerBaixo) {
+      console.error("Elemento #container-baixo não encontrado no DOM.");
       return;
     }
 
+    // NÃO sobrescreve todo #container-baixo (pra não quebrar layout). 
+    // cria/usa um filho interno .publicacoes-container
+    let postsContainer = containerBaixo.querySelector(".publicacoes-container");
+    if (!postsContainer) {
+      postsContainer = document.createElement("div");
+      postsContainer.className = "publicacoes-container";
+      // opcional: garante um padding interno consistente
+      postsContainer.style.width = "100%";
+      postsContainer.style.boxSizing = "border-box";
+      // limpa somente o conteúdo antigo de publicações (mantém estrutura do container)
+      // se quiser limpar tudo: containerBaixo.innerHTML = '';
+      // aqui apenas garantimos que não haja duplicatas:
+      containerBaixo.appendChild(postsContainer);
+    } else {
+      postsContainer.innerHTML = "";
+    }
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      postsContainer.innerHTML = `
+        <div style="text-align:center; padding:40px; color:#666;">
+          <h3 style="margin-bottom:8px">Ainda não há nenhuma publicação</h3>
+          <img src="imagensPerfil/camera.png" alt="Ícone de câmera" style="width:120px; opacity:0.7">
+        </div>
+      `;
+      return;
+    }
+
+    // monta cada card sem afetar o resto do layout
     posts.forEach(post => {
-      const div = document.createElement("div");
-      div.classList.add("post-perfil");
+      const card = document.createElement("div");
+      card.className = "publicacao-card";
 
-      const data = post.data_publicacao ? post.data_publicacao : "";
+      // foto do autor (fallback)
+      const fotoPath = caminhoFoto(post.fotoDePerfil);
 
-      div.innerHTML = `
-        <div class="post-header">
-          <p>${escapeHtml(post.conteudo)}</p>
-          <span class="data">${data}</span>
-        </div>`;
-      containerBaixo.appendChild(div);
+      const nome = post.nome || "Usuário";
+      const username = post.nomeUsuario || "";
+      const conteudo = post.conteudo || "";
+      const data = post.data_publicacao || "";
+
+      card.innerHTML = `
+        <div class="publicacao-header">
+          <img src="${escapeHtml(fotoPath)}" alt="${escapeHtml(nome)}">
+          <div class="publicacao-info">
+            <div class="nome">${escapeHtml(nome)}</div>
+            <div class="username">@${escapeHtml(username)}</div>
+          </div>
+        </div>
+        <div class="publicacao-conteudo">${escapeHtml(conteudo)}</div>
+        <div class="publicacao-footer">
+          <div></div>
+          <div class="publicacao-data">${escapeHtml(data)}</div>
+        </div>
+      `;
+
+      postsContainer.appendChild(card);
     });
 
   } catch (erro) {
@@ -152,18 +214,7 @@ async function carregarFeed() {
   }
 }
 
-// Função para evitar injeção de HTML
-function escapeHtml(text) {
-  if (!text) return "";
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-// ================== INICIALIZAÇÃO ==================
+// ===== inicialização =====
 document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();
   carregarFeed();
