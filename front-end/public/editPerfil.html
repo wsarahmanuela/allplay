@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="bt-br">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/83a13259ee.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="editPerfil.CSS">
-    <title>EDITAR PERFIL</title>
+    <link rel="stylesheet" href="editPerfil.css">
+    <title>Editar Perfil</title>
 </head>
+
 <body>
-     <main class="container">
+    <main class="container">
         <header class="topo">
             <h2>Editar Perfil</h2>
             <div class="botoes-topo">
@@ -17,16 +19,19 @@
             </div>
         </header>
 
-        <section class="perfil">
-            <div class="foto-perfil">
-                <div class="foto" id="foto-preview">
-                    <i class="fa-solid fa-user"></i>
+        <div class="area-perfil-editavel">
+        
+            <section class="banner">
+                <button class="btn-alterar-banner">Alterar banner</button>
+                <img src="" alt="">
+                <div class="foto-perfil">
+                    <div class="foto" id="foto-preview">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
                 </div>
-                <label for="upload-foto" class="btn-foto">Alterar banner</label>
-                <input type="file" id="upload-foto" accept="image/*" hidden>
-            </div>
+            </section>
 
-            <div class="dados">
+            <section class="dados-perfil">
                 <div class="input-grupo">
                     <label>Nome de usuário</label>
                     <input type="text" id="nome-usuario" placeholder="@nome_usuario">
@@ -41,7 +46,11 @@
                     <label>Localização</label>
                     <input type="text" id="localizacao" placeholder="Cidade - UF">
                 </div>
-            </div>
+            </section>
+        
+        </div> <section class="biografia">
+            <h3>Biografia</h3>
+            <textarea rows="4" placeholder="Adicione sua biografia..."></textarea>
         </section>
 
         <section class="esportes">
@@ -51,18 +60,16 @@
                 <span class="tag">Vôlei</span>
                 <span class="tag">Basquete</span>
                 <span class="tag">Tênis de mesa</span>
-                <span class="tag">Natação</span>
-                <span class="tag">Ciclismo</span>
             </div>
             <div class="add-esporte">
-                <input type="text" id="novo-esporte" placeholder="Adicionar outro esporte...">
-                <button id="btn-adicionar-esporte">Adicionar</button>
+                <input type="text" placeholder="Adicionar outro esporte...">
+                <button>Adicionar</button>
             </div>
         </section>
 
         <section class="clubes">
             <h3>Clubes que frequento</h3>
-            <div class="lista-clubes" id="lista-clubes">
+            <div class="lista-clubes">
                 <div class="clube">
                     <p><strong>Tupi Gaspar</strong><br><small>Futebol</small></p>
                     <button class="remover">&times;</button>
@@ -74,20 +81,8 @@
             </div>
             <button class="btn-adicionar">Adicionar clube</button>
         </section>
-
-        <section class="estatisticas">
-            <h3>Estatísticas do Perfil</h3>
-            <div class="cards-estatisticas">
-                <div class="card">
-                    <h4>0</h4>
-                    <p>Seguindo</p>
-                </div>
-                <div class="card">
-                    <h4>0</h4>
-                    <p>Seguidores</p>
-                </div>
-            </div>
-        </section>
+        
     </main>
 </body>
+
 </html>
