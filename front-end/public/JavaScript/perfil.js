@@ -136,33 +136,40 @@ async function carregarFeed() {
   try {
     console.log("Buscando publicações para CPF:", cpf);
     const resposta = await fetch(`http://localhost:3000/publicacoes/${encodeURIComponent(cpf)}`);
-    if (!resposta.ok) {
-      console.error("Resposta não OK ao buscar publicações", resposta.status);
-      return;
-    }
+if (!resposta.ok) {
+  console.error("Resposta não OK ao buscar publicações", resposta.status);
+  return;
+}
+let dados = await resposta.json();
+console.log("Posts recebidos:", dados);
 
-    const posts = await resposta.json();
-    console.log("Posts recebidos:", posts);
+// Corrige estrutura para pegar os posts do backend
+let posts = [];
 
-    // garante que #container-baixo exista
+if (Array.isArray(dados)) {
+  posts = dados;
+} else if (dados && Array.isArray(dados.posts)) {
+  posts = dados.posts;
+} else if (dados && dados.success && typeof dados === "object") {
+  posts = dados.posts || [];
+} else {
+  console.warn("Formato inesperado de resposta do backend:", dados);
+  posts = [];
+}
+
+
     const containerBaixo = document.getElementById("container-baixo");
     if (!containerBaixo) {
       console.error("Elemento #container-baixo não encontrado no DOM.");
       return;
     }
 
-    // NÃO sobrescreve todo #container-baixo (pra não quebrar layout). 
-    // cria/usa um filho interno .publicacoes-container
     let postsContainer = containerBaixo.querySelector(".publicacoes-container");
     if (!postsContainer) {
       postsContainer = document.createElement("div");
       postsContainer.className = "publicacoes-container";
-      // opcional: garante um padding interno consistente
       postsContainer.style.width = "100%";
       postsContainer.style.boxSizing = "border-box";
-      // limpa somente o conteúdo antigo de publicações (mantém estrutura do container)
-      // se quiser limpar tudo: containerBaixo.innerHTML = '';
-      // aqui apenas garantimos que não haja duplicatas:
       containerBaixo.appendChild(postsContainer);
     } else {
       postsContainer.innerHTML = "";
@@ -178,12 +185,10 @@ async function carregarFeed() {
       return;
     }
 
-    // monta cada card sem afetar o resto do layout
     posts.forEach(post => {
       const card = document.createElement("div");
       card.className = "publicacao-card";
 
-      // foto do autor (fallback)
       const fotoPath = caminhoFoto(post.fotoDePerfil);
 
       const nome = post.nome || "Usuário";

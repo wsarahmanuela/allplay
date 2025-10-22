@@ -225,18 +225,93 @@ nav {
 
 /* ======================= ÁREA DE PUBLICAÇÕES ======================= */
 #container-baixo {
-    background: #f5f5f5;
-    padding: 1rem;
-    border-radius: 10px;
-    width: 100%;
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    margin-top: 2rem;
-    box-sizing: border-box;
+  background-color: #ffffff3c; /* branco sólido */
+  border-radius: 20px;
+  padding: 30px;
+  margin-top: 50px; /* distância da foto */
+  min-height: 500px; /* altura mínima */
+  width: 100%; /* ocupa o mesmo espaço da faixa verde */
+  max-width: 1000px; /* mesmo limite da faixa verde */
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
+    
+#container-baixo h2 {
+  color: #555;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+
+#container-baixo .foto img {
+  width: 80px;
+  opacity: 0.7;
+}
+
+/* garante que o gradiente e a área branca fiquem alinhados */
+#container-meio {
+  background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 1000px; /* mesmo tamanho do container abaixo */
+  height: 25vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#container-baixo h2 {
+  color: #555;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+#container-baixo .foto img {
+  width: 70px;
+  opacity: 0.7;
+}
+
+/* ======================= CONTAINER CENTRAL PERFIL ======================= */
+.perfil-container {
+    display: flex;
+    justify-content: center; /* deixa os blocos mais centrados */
+    align-items: flex-start;
+    background: transparent; /* remove fundo branco que estava juntando */
+    gap: 40px; /* aumenta a separação entre centro e direita */
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Garante que o conteúdo principal fique centralizado */
+.main-content {
+    flex: 1;
+    max-width: 1000px;
+}
+
+/* Define largura fixa para a lateral direita e espaçamento */
+#container-direita {
+    flex: none;
+    width: 280px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 2px 8px rgba(0, 0, 0, 0.08);
+    height: fit-content;
+    margin-top: 40px; /* afasta da faixa verde */
+}
+
+
+
 
 /* Publicação */
 .publicacao-card {
@@ -244,7 +319,7 @@ nav {
     width: 100%;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 15px 20px;
+    padding:  20px;
     text-align: left; 
     display: flex;
     flex-direction: column;

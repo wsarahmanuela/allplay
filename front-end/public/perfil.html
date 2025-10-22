@@ -9,6 +9,7 @@
 <body>
     <nav>
         <div class="nav-left">
+            <a href="feed.html"></a>
             <h2 class="logo">ALL PLAY</h2>
             <ul>
                 <li>
@@ -37,73 +38,72 @@
             </div>
             <div class="shortcut-links" id="atalhos-esportes">
                 <p>Seus esportes</p>
-           <!--AQUI VAI FICAR OS ESPORTES -->
+                <!--AQUI VAI FICAR OS ESPORTES -->
             </div>
         </div>
-        
 
-        <div class="main-content">
-            <div id="perfil-wrapper">
-                <div id="container-meio"> 
-                    <div class="usuario-foto">
-                        <img src="imagens/profile.picture.jpg" alt="usuario">
+        <!-- ✅ CONTAINER CENTRAL ADICIONADO -->
+        <div class="perfil-container">
+            <div class="main-content">
+                <div id="perfil-wrapper">
+                    <div id="container-meio"> 
+                        <div class="usuario-foto">
+                            <img src="imagens/profile.picture.jpg" alt="usuario">
+                        </div>
+                    </div>
+
+                    <div id="container-segue">
+                        <div class="nome">
+                            <h3>Nome Completo</h3>
+                            <h5>@nome_usuário</h5>
+                        </div>
+                        <div class="seguir">
+                            <h3>editar</h3>
+                        </div>   
                     </div>
                 </div>
 
-                <div id="container-segue">
-                    <div class="nome">
-                        <h3>Nome Completo</h3>
-                        <h5>@nome_usuário</h5>
-                    </div>
-                    <div class="seguir">
-                        <h3>editar</h3>
-                    </div>   
+                <div id="container-baixo">
+                    <!-- publicações -->
                 </div>
             </div>
 
-            <div id="container-baixo">
-                <h2>Ainda não há nenhuma publicação</h2>
-                <div class="foto">
-                    <img src="imagensPerfil/camera.png" alt="Ícone de câmera">
+            <div id="container-direita"> 
+                <div class="seguindo-seguidores">
+                    <div class="seguindo"><h4>0 seguindo</h4></div>
+                    <div class="seguidores"><h4>0 seguidores</h4></div>
+                </div>
+
+                <div class="esportes">
+                    <div class="esporte">Basquete</div>
+                    <div class="esporte">Vôlei</div>
+                    <div class="esporte">Futebol</div>
+                    <div class="esporte">Tênis de mesa</div>
+                </div>
+
+                <div class="infos-geral">
+                    <div class="biografia">
+                        <h2>Biografia</h2>
+                        <p id="bio">Carregando biografia...</p>
+                    </div>
+                </div>
+
+                <div class="clubes">
+                    <h2>Clubes que frequento</h2>
+                    <div class="clube-card">
+                        <p><strong>Tupi Gaspar</strong></p>
+                        <p>Futebol</p>
+                    </div>
+                    <div class="clube-card">
+                        <p><strong>AEEG</strong></p>
+                        <p>Vôlei</p>
+                    </div>
                 </div>
             </div>
         </div>
-       
-
-        <div id="container-direita"> 
-  <div class="seguindo-seguidores">
-    <div class="seguindo"><h4>0 seguindo</h4></div>
-    <div class="seguidores"><h4>0 seguidores</h4></div>
-  </div>
-
-  <div class="esportes">
-    <div class="esporte">Basquete</div>
-    <div class="esporte">Vôlei</div>
-    <div class="esporte">Futebol</div>
-    <div class="esporte">Tênis de mesa</div>
-  </div>
-
-<div class="infos-geral">
-  <div class="biografia">
-    <h2>Biografia</h2>
-    <p id="bio">Carregando biografia...</p>
-  </div>
-</div>
-
-
-<div class="clubes">
-  <h2>Clubes que frequento</h2>
-  <div class="clube-card">
-    <p><strong>Tupi Gaspar</strong></p>
-    <p>Futebol</p>
-  </div>
-  <div class="clube-card">
-    <p><strong>AEEG</strong></p>
-    <p>Vôlei</p>
-  </div>
-</div>
-
+        <!-- ✅ FIM DO CONTAINER CENTRAL -->
     </div>
-     <script src="JavaScript/perfil.js"></script>
+
+    <script src="JavaScript/perfil.js"></script>
 </body>
 </html>
