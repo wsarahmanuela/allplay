@@ -1,267 +1,345 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* ======== ESTILO GERAL ======== */
 body {
-    font-family: "Inter", sans-serif;
-    background: #f4f5f7;
-    margin: 0;
-    padding: 0;
+  font-family: "Inter", sans-serif;
+  background: #f4f5f7;
+  margin: 0;
+  padding: 0;
+  color: #333;
 }
 
-/* CONTAINER GERAL */
+/* ======== CONTAINER GERAL ======== */
 .container {
-    max-width: 900px;
-    margin: 30px auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    overflow: hidden;
+  max-width: 900px;
+  margin: 30px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-/* TOPO */
+/* ======== TOPO ======== */
 .topo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 25px;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  border-bottom: 1px solid #eee;
+}
+
+.topo h2 {
+  margin: 0;
+  font-weight: 600;
+  color: #0d7826;
 }
 
 .botoes-topo button {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s ease-in-out;
 }
 
 .btn-cancelar {
-    background-color: #ccc;
-    color: #333;
+  background-color: #ccc;
+  color: #333;
+}
+
+.btn-cancelar:hover {
+  background-color: #b3b3b3;
 }
 
 .btn-salvar {
-    background-color: #00c853;
-    color: #fff;
+  background-color: #00c853;
+  color: #fff;
 }
 
+.btn-salvar:hover {
+  background-color: #00b04a;
+}
+
+/* ======== ÁREA DE PERFIL EDITÁVEL ======== */
 .area-perfil-editavel {
-    background: #e3f6e9; /* Cor verde clara similar à imagem */
-    margin: 20px 25px 0 25px; /* Margem lateral */
-    border-radius: 12px;
-    position: relative;
-    padding-bottom: 25px; /* Espaço para o rodapé dos inputs */
+  background: #e3f6e9;
+  margin: 20px 25px 0;
+  border-radius: 12px;
+  position: relative;
+  padding-bottom: 25px;
 }
 
-/* BANNER */
+/* ======== BANNER ======== */
 .banner {
-    position: relative;
-    height: 180px;
-    /* Usando o degradê como fallback, mas você pode substituir por url('sua-imagem-banner.jpg') */
-    background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826); 
-    background-size: cover;
-    background-position: center;
+  position: relative;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(90deg, #fff, #a1ebc0, #58ef7b, #2ba848, #0d7826);
+}
+
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+  position: relative;
 }
 
 .btn-alterar-banner {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: #fff;
-    color: #00c853;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-weight: 500;
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: #fff;
+  color: #00c853;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 500;
+  z-index: 6;
+  transition: all 0.15s ease;
 }
 
-/* FOTO DE PERFIL */
+.btn-alterar-banner:hover {
+  background: #00c853;
+  color: #fff;
+}
+
+/* ======== FOTO DE PERFIL ======== */
 .foto-perfil {
-    position: absolute;
-    bottom: -45px;
-    left: 30px;
+  position: absolute;
+  bottom: -45px;
+  left: 25px;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .foto {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: #fff;
-    border: 3px solid #00c853;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    color: #00c853;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #00c853;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #00c853;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
 
-/* ---------------------------------------------------------------- */
-/* NOVO LAYOUT DE DUAS COLUNAS PARA ALINHAMENTO */
-/* ---------------------------------------------------------------- */
-.main-content-wrapper {
-    display: flex;
-    gap: 20px; /* Espaço entre as colunas (principal e sidebar) */
-    padding: 0 25px 25px 25px; /* Padding nas laterais e inferior do container */
-    margin-top: 65px; /* Ajusta o espaço abaixo da foto de perfil */
+.foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.main-content {
-    flex: 2.5; /* Ocupa a maior parte da largura (ex: 70%) */
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Espaço entre as seções DADOS e BIOGRAFIA */
-    min-width: 0;
+.foto:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
 }
 
-.sidebar {
-    flex: 1; /* Ocupa a menor parte da largura (ex: 30%) */
-    display: flex;
-    flex-direction: column; /* Empilha Esportes e Clubes */
-    gap: 20px;
+.btn-foto {
+  background: #00c853;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-/* Estilo base para as seções de conteúdo para dar um visual de card */
-.main-content section,
-.sidebar section {
-    background: #fff; 
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+.btn-foto:hover {
+  background: #019c41;
 }
 
-/* DADOS PERFIL (Inputs) */
+/* ======== DADOS DO PERFIL ======== */
 .dados-perfil {
-    margin-top: 70px; /* Espaçamento abaixo da foto de perfil */
-    display: flex; /* Alinha os inputs em uma linha */
-    justify-content: center; /* Centraliza o grupo de inputs no container pai */
-    flex-wrap: wrap; 
-    gap: 30px; /* Espaço entre os inputs (aumentado para distanciamento) */
-    padding: 0 20px; /* Padding interno, se necessário */
-    text-align: center;
+  margin-top: 70px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 0 20px;
 }
 
 .input-grupo {
-   display: flex;
-    flex-direction: column;
-    width: 250px;
+  display: flex;
+  flex-direction: column;
+  width: 250px;
 }
 
 .input-grupo label {
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #444;
-    text-align: center;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #000;
+  text-align: left;
+  font-weight: 500;
 }
 
-.input-grupo input {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
+/* ======== INPUTS ======== */
+.input-grupo input,
+.add-esporte input,
+textarea {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+  color: #333;
+  box-sizing: border-box;
 }
 
-/* BIOGRAFIA */
+.input-grupo input::placeholder,
+.add-esporte input::placeholder,
+textarea::placeholder {
+  color: #999;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ======== EFEITO DE FOCO ======== */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #00c853;
+  border-width: 1px;
+  box-shadow: 0 0 6px #00c85370;
+  background: #fafffb;
+}
+
+/* ======== BIOGRAFIA ======== */
 .biografia {
-    padding: 20px 25px; /* Padding ajustado para alinhamento lateral */
-    margin-top: 20px;
-    border-top: none; 
+  padding: 20px 25px;
+  margin-top: 20px;
 }
+
+.biografia h3 {
+  margin: 0 0 8px 0;
+  color: #0d7826;
+  font-weight: 600;
+}
+
 .biografia textarea {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    resize: vertical;
-    font-family: "Inter", sans-serif;
-    box-sizing: border-box;
+  width: 100%;
+  height: 120px;
+  resize: none;
+  min-height: 100px;
 }
 
-/* TAGS ESPORTES */
+/* ======== ESPORTES ======== */
+.esportes {
+  padding: 20px 25px;
+}
 
-.esportes, .clubes {
-    padding: 20px 25px;
-    margin-top: 0;
+.esportes h3 {
+  color: #0d7826;
+  font-weight: 600;
 }
 
 .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .tag {
-    background: #00c853;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 25px;
-    font-size: 14px;
+  background: #00c853;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 25px;
+  font-size: 14px;
 }
 
 .add-esporte {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.add-esporte input {
-    flex: 1;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 6px 8px;
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .add-esporte button {
-    background: #00c853;
-    border: none;
-    color: #fff;
-    border-radius: 8px;
-    padding: 6px 12px;
-    cursor: pointer;
+  background: #00c853;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
 }
 
-/* CLUBES */
+.add-esporte button:hover {
+  background: #00b04a;
+}
+
+/* ======== CLUBES ======== */
+.clubes {
+  padding: 20px 25px;
+}
+
 .clubes h3 {
-    margin-top: 0;
+  margin-top: 0;
+  color: #0d7826;
+  font-weight: 600;
 }
 
 .lista-clubes {
-    display: flex;
-    flex-direction: column; /* Empilha os clubes verticalmente na sidebar */
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .clube {
-    background: #f8f8f8;
-    border-radius: 10px;
-    padding: 10px 14px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    position: relative;
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #f8f8f8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .remover {
-    background: transparent;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    color: #777;
-    margin-left: 10px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #777;
+  margin-left: 10px;
+  transition: 0.2s;
+}
+
+.remover:hover {
+  color: #e53935;
 }
 
 .btn-adicionar {
-    background: #00c853;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    margin-top: 10px;
-    cursor: pointer;
+  background: #00c853;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s ease-in-out;
 }
 
-/* Removido o estilo .info-lateral, pois seu conteúdo foi movido para .sidebar */
-/* Removido o .estat antigo, pois não estava no HTML */
+.btn-adicionar:hover {
+  background: #00b04a;
+}

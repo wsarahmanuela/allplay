@@ -20,37 +20,47 @@
         </header>
 
         <div class="area-perfil-editavel">
-        
-            <section class="banner">
-                <button class="btn-alterar-banner">Alterar banner</button>
-                <img src="" alt="">
-                <div class="foto-perfil">
+
+            <section class="banner" id="banner">
+                <img id="banner-imagem" src="" alt="Banner do perfil">
+
+                <!-- input para trocar banner -->
+                <input type="file" id="upload-banner" accept="image/*" hidden>
+                <button class="btn-alterar-banner" id="btn-alterar-banner">Alterar banner</button>
+
+                <!-- área da foto de perfil no canto inferior esquerdo -->
+                <div class="foto-perfil" id="area-foto-perfil">
                     <div class="foto" id="foto-preview">
+                        <!-- ícone padrão; ao fazer upload será substituído por <img> -->
                         <i class="fa-solid fa-user"></i>
                     </div>
-                </div>
-            </section>
 
-            <section class="dados-perfil">
-                <div class="input-grupo">
-                    <label>Nome de usuário</label>
-                    <input type="text" id="nome-usuario" placeholder="@nome_usuario">
+                    <!-- input para trocar foto -->
+                    <input type="file" id="upload-foto" accept="image/*" hidden>
+                    <label for="upload-foto" class="btn-foto">Alterar foto</label>
                 </div>
 
-                <div class="input-grupo">
-                    <label>Nome completo</label>
-                    <input type="text" id="nome-completo" placeholder="Nome Sobrenome">
-                </div>
+                <section class="dados-perfil">
+                    <div class="input-grupo">
+                        <label>Nome de usuário</label>
+                        <input type="text" id="nome-usuario" placeholder="@nome_usuario">
+                    </div>
 
-                <div class="input-grupo">
-                    <label>Localização</label>
-                    <input type="text" id="localizacao" placeholder="Cidade - UF">
-                </div>
-            </section>
-        
-        </div> <section class="biografia">
+                    <div class="input-grupo">
+                        <label>Nome completo</label>
+                        <input type="text" id="nome-completo" placeholder="Nome Sobrenome">
+                    </div>
+
+                    <div class="input-grupo">
+                        <label>Localização</label>
+                        <input type="text" id="localizacao" placeholder="Cidade - UF">
+                    </div>
+                </section>
+
+        </div>
+        <section class="biografia">
             <h3>Biografia</h3>
-            <textarea rows="4" placeholder="Adicione sua biografia..."></textarea>
+            <textarea placeholder="Escreva sobre você!"></textarea>
         </section>
 
         <section class="esportes">
@@ -81,8 +91,10 @@
             </div>
             <button class="btn-adicionar">Adicionar clube</button>
         </section>
-        
+
     </main>
+
+    <script src="JavaScript/editarPerfil.js"></script>
 </body>
 
 </html>

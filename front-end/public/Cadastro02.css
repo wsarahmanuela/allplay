@@ -23,12 +23,9 @@ body {
   padding: 40px 30px;
   width: 500px;
   text-align: center;
-  box-sizing: border-box; /* 🔧 evita quebra de layout */
+  box-sizing: border-box;
 }
 
-/* ====================== */
-/* 🏷️ TÍTULO E SUBTÍTULO */
-/* ====================== */
 
 .TITULO {
   font-size: 22px;
