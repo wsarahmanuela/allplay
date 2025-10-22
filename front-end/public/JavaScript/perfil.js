@@ -219,6 +219,71 @@ if (Array.isArray(dados)) {
   }
 }
 
+// ================== UPLOAD DE IMAGEM + CRIAR POST ==================
+let imagemSelecionada = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnImagem = document.getElementById("btn-imagem");
+  const inputImagem = document.getElementById("input-imagem");
+
+  if (btnImagem && inputImagem) {
+    btnImagem.addEventListener("click", (e) => {
+      e.preventDefault();
+      inputImagem.click();
+    });
+
+    inputImagem.addEventListener("change", (e) => {
+      const arquivo = e.target.files[0];
+      if (arquivo) {
+        imagemSelecionada = arquivo;
+        console.log("Imagem selecionada:", arquivo.name);
+      }
+    });
+  }
+});
+
+async function criarPost() {
+  const texto = document.getElementById("post-text").value.trim();
+  const cpf = localStorage.getItem("cpf");
+
+  if (!cpf) {
+    alert("Erro: CPF não encontrado. Faça login novamente.");
+    return;
+  }
+
+  if (!texto && !imagemSelecionada) {
+    alert("Escreva algo ou selecione uma imagem para postar.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("autor_CPF", cpf);
+  formData.append("conteudo", texto || "");
+  if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
+
+  try {
+    const resposta = await fetch("http://localhost:3000/publicacoes/imagem", {
+      method: "POST",
+      body: formData,
+    });
+
+    const dados = await resposta.json();
+    console.log("Resposta do servidor:", dados);
+
+    if (dados.success) {
+      document.getElementById("post-text").value = "";
+      document.getElementById("input-imagem").value = "";
+      imagemSelecionada = null;
+      await carregarFeed();
+    } else {
+      alert(dados.message || "Erro ao publicar.");
+    }
+  } catch (erro) {
+    console.error("Erro ao criar post:", erro);
+    alert("Erro no servidor. Tente novamente.");
+  }
+}
+
 // ===== inicialização =====
 document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();

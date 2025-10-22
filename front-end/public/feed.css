@@ -365,7 +365,6 @@ nav {
     display: flex;
     align-items: center;
     color: #626262;
-    margin-right: 30px;
     font-size: 13px;
 }
 .config-menu-inner{
@@ -408,6 +407,14 @@ nav {
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   font-family: "Poppins", sans-serif;
 }
+.post-imagem {
+  width: 100%;
+  max-height: 400px;
+  border-radius: 10px;
+  margin-top: 10px;
+  object-fit: cover;
+}
+
 
 .post-header {
   display: flex;

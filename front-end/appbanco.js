@@ -10,7 +10,23 @@
   app.use(express.urlencoded({ extended: true }));
 
   const uploadDir = path.join(__dirname, "uploads");
-  const upload = multer({ dest: uploadDir }); 
+  // =================== CONFIGURAÇÃO DO MULTER ===================
+const fs = require("fs");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const dir = path.join(__dirname, "uploads");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    const nomeArquivo = Date.now() + path.extname(file.originalname);
+    cb(null, nomeArquivo);
+  }
+});
+
+const upload = multer({ storage });
+
 
   const connection = mysql2.createConnection({
     host: 'localhost',
@@ -307,8 +323,8 @@ app.get('/publicacoes/:cpf', (req, res) => {
     }
 
     const query = `
-      INSERT INTO publicacao (data_publicacao, conteudo, autor_CPF)
-      VALUES (NOW(), ?, ?)
+      INSERT INTO publicacao (autor_CPF, conteudo, imagem, data_publicacao)
+      VALUES (?, ?, ?, NOW())
     `;
 
     connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
@@ -326,16 +342,18 @@ app.get('/publicacoes/:cpf', (req, res) => {
     console.log("GET PUBLICACOES");
 
     const query = `
-      SELECT 
-        p.conteudo,
-        DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
-        u.nome,
-        u.nomeUsuario,
-        u.fotoDePerfil
-      FROM publicacao p
-      JOIN usuario u ON p.autor_CPF = u.CPF
-      ORDER BY p.data_publicacao DESC
-    `;
+  SELECT 
+    p.conteudo,
+    p.imagem,
+    DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
+    u.nome,
+    u.nomeUsuario,
+    u.fotoDePerfil
+  FROM publicacao p
+  JOIN usuario u ON p.autor_CPF = u.CPF
+  ORDER BY p.data_publicacao DESC
+`;
+
 
     connection.query(query, (erro, resultados) => {
       if (erro) {
@@ -347,6 +365,29 @@ app.get('/publicacoes/:cpf', (req, res) => {
       res.json(resultados);
     });
   });
+// =================== PUBLICAR POSTAGEM (com imagem ou texto) ===================
+app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
+  const { autor_CPF, conteudo } = req.body;
+  const imagem = req.file ? req.file.filename : null;
+
+  if (!autor_CPF) {
+    return res.status(400).json({ success: false, message: "CPF do autor não informado." });
+  }
+
+  const sql = `
+    INSERT INTO publicacao (autor_CPF, conteudo, imagem, data_publicacao)
+    VALUES (?, ?, ?, NOW())
+  `;
+
+  connection.query(sql, [autor_CPF, conteudo, imagem], (erro) => {
+    if (erro) {
+      console.error("Erro ao salvar publicação:", erro);
+      return res.status(500).json({ success: false, message: "Erro ao salvar publicação." });
+    }
+
+    res.json({ success: true, message: "Publicação criada com sucesso!" });
+  });
+});
 
 
   //================ MAP ================
@@ -439,6 +480,11 @@ app.get('/publicacoes/:cpf', (req, res) => {
           });
       });
   });
+
+
+
+
+
 // barra de pesquisa
 app.get("/search", (req, res) => {
   const termo = req.query.query;
