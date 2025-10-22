@@ -2,344 +2,380 @@
 
 /* ======== ESTILO GERAL ======== */
 body {
-  font-family: "Inter", sans-serif;
-  background: #f4f5f7;
-  margin: 0;
-  padding: 0;
-  color: #333;
+    font-family: "Inter", sans-serif;
+    background: #f4f5f7;
+    margin: 0;
+    padding: 0;
+    color: #333;
 }
 
 /* ======== CONTAINER GERAL ======== */
 .container {
-  max-width: 900px;
-  margin: 30px auto;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 /* ======== TOPO ======== */
 .topo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid #eee;
 }
 
 .topo h2 {
-  margin: 0;
-  font-weight: 600;
-  color: #0d7826;
+    margin: 0;
+    font-weight: 600;
+    color: #0d7826;
 }
 
 .botoes-topo button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s ease-in-out;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease-in-out;
 }
 
 .btn-cancelar {
-  background-color: #ccc;
-  color: #333;
+    background-color: #ccc;
+    color: #333;
 }
 
 .btn-cancelar:hover {
-  background-color: #b3b3b3;
+    background-color: #b3b3b3;
 }
 
 .btn-salvar {
-  background-color: #00c853;
-  color: #fff;
+    background-color: #00c853;
+    color: #fff;
 }
 
 .btn-salvar:hover {
-  background-color: #00b04a;
+    background-color: #00b04a;
 }
 
 /* ======== ÁREA DE PERFIL EDITÁVEL ======== */
 .area-perfil-editavel {
-  background: #e3f6e9;
-  margin: 20px 25px 0;
-  border-radius: 12px;
-  position: relative;
-  padding-bottom: 25px;
+    background: #e3f6e9;
+    margin: 20px 25px 0;
+    border-radius: 12px;
+    position: relative;
+    /* Removido padding-bottom desnecessário */
+    padding-bottom: 0; 
 }
 
 /* ======== BANNER ======== */
 .banner {
-  position: relative;
-  height: 180px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: linear-gradient(90deg, #fff, #a1ebc0, #58ef7b, #2ba848, #0d7826);
+    position: relative; /* garante que a foto use o banner como referência */
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(90deg, #fff, #a1ebc0, #58ef7b, #2ba848, #0d7826);
 }
 
 .banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  z-index: 1;
-  position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 1;
+    position: relative;
+    content: normal !important;
+    color: transparent;
+    visibility: hidden;
 }
 
+.banner img.loaded {
+    visibility: visible; /* Mostra a imagem quando o JS adiciona a classe */
+}
+
+.banner.loaded img {
+    visibility: visible; /* Torna a imagem visível */
+}
+
+
+
 .btn-alterar-banner {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  background: #fff;
-  color: #00c853;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-weight: 500;
-  z-index: 6;
-  transition: all 0.15s ease;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: #fff;
+    color: #00c853;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 500;
+    z-index: 6;
+    transition: all 0.15s ease;
 }
 
 .btn-alterar-banner:hover {
-  background: #00c853;
-  color: #fff;
+    background: #00c853;
+    color: #fff;
 }
 
-/* ======== FOTO DE PERFIL ======== */
+/* ======== FOTO DE PERFIL (MODIFICADO PARA SOBREPOSIÇÃO) ======== */
 .foto-perfil {
-  position: absolute;
-  bottom: -45px;
-  left: 25px;
-  z-index: 8;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+    position: absolute;
+    top: 120px; 
+    left: 30px;
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
 }
 
 .foto {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid #00c853;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  color: #00c853;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transition: transform .12s ease, box-shadow .12s ease;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #00c853;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #00c853;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transition: transform .12s ease, box-shadow .12s ease;
 }
 
 .foto img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.foto i {
+    display: flex; /* Garante que o ícone seja tratado como flex item */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    width: 100%; /* Ocupa 100% da largura do pai */
+    height: 100%; /* Ocupa 100% da altura do pai */
 }
 
 .foto:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
-}
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+} 
 
 .btn-foto {
-  background: #00c853;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 13px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
+    background: #00c853;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-left: -50;
+    margin-bottom: 5px;
 }
 
 .btn-foto:hover {
-  background: #019c41;
+    background: #019c41;
 }
 
-/* ======== DADOS DO PERFIL ======== */
+/* ======== DADOS DO PERFIL (MODIFICADO PARA ALINHAMENTO HORIZONTAL) ======== */
 .dados-perfil {
-  margin-top: 70px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 30px;
-  padding: 0 20px;
+    margin-top: 70px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; 
+    padding: 0 30px 25px;
 }
 
 .input-grupo {
-  display: flex;
-  flex-direction: column;
-  width: 250px;
+    display: flex;
+    flex-direction: column;
+    /* Permite que o input-grupo cresça e divida o espaço em 3 partes */
+    flex-grow: 1; 
+    min-width: 200px; /* Garante que não fiquem muito apertados */
 }
 
 .input-grupo label {
-  font-size: 14px;
-  margin-bottom: 5px;
-  color: #000;
-  text-align: left;
-  font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #000;
+    font-weight: 500;
 }
+
 
 /* ======== INPUTS ======== */
 .input-grupo input,
 .add-esporte input,
 textarea {
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  padding: 12px;
-  outline: none;
-  font-size: 14px;
-  transition: all 0.2s ease-in-out;
-  color: #333;
-  box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+    color: #333;
+    box-sizing: border-box;
 }
 
 .input-grupo input::placeholder,
 .add-esporte input::placeholder,
 textarea::placeholder {
-  color: #999;
-  font-style: italic;
-  opacity: 0.8;
+    color: #999;
+    font-style: italic;
+    opacity: 0.8;
 }
 
 /* ======== EFEITO DE FOCO ======== */
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: #00c853;
-  border-width: 1px;
-  box-shadow: 0 0 6px #00c85370;
-  background: #fafffb;
+    border-color: #00c853;
+    border-width: 1px;
+    box-shadow: 0 0 6px #00c85370;
+    background: #fafffb;
 }
 
 /* ======== BIOGRAFIA ======== */
 .biografia {
-  padding: 20px 25px;
-  margin-top: 20px;
+    padding: 20px 25px;
+    margin-top: 20px;
 }
 
 .biografia h3 {
-  margin: 0 0 8px 0;
-  color: #0d7826;
-  font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #0d7826;
+    font-weight: 600;
 }
 
 .biografia textarea {
-  width: 100%;
-  height: 120px;
-  resize: none;
-  min-height: 100px;
+    width: 100%;
+    height: 120px;
+    resize: none;
+    min-height: 100px;
+}
+
+.contador-bio {
+    display: block;
+    text-align: right;
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+}
+#bio-restante {
+    font-weight: 600;
+    color: #0d7826;
 }
 
 /* ======== ESPORTES ======== */
 .esportes {
-  padding: 20px 25px;
+    padding: 20px 25px;
 }
 
 .esportes h3 {
-  color: #0d7826;
-  font-weight: 600;
+    color: #0d7826;
+    font-weight: 600;
 }
 
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
 }
 
 .tag {
-  background: #00c853;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 25px;
-  font-size: 14px;
+    background: #00c853;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 25px;
+    font-size: 14px;
 }
 
 .add-esporte {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
 }
 
 .add-esporte button {
-  background: #00c853;
-  border: none;
-  color: #fff;
-  border-radius: 8px;
-  padding: 8px 14px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
+    background: #00c853;
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
 }
 
 .add-esporte button:hover {
-  background: #00b04a;
+    background: #00b04a;
 }
 
 /* ======== CLUBES ======== */
 .clubes {
-  padding: 20px 25px;
+    padding: 20px 25px;
 }
 
 .clubes h3 {
-  margin-top: 0;
-  color: #0d7826;
-  font-weight: 600;
+    margin-top: 0;
+    color: #0d7826;
+    font-weight: 600;
 }
 
 .lista-clubes {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .clube {
-  background: #f8f8f8;
-  border-radius: 10px;
-  padding: 10px 14px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  font-size: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    background: #f8f8f8;
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .remover {
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #777;
-  margin-left: 10px;
-  transition: 0.2s;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #777;
+    margin-left: 10px;
+    transition: 0.2s;
 }
 
 .remover:hover {
-  color: #e53935;
+    color: #e53935;
 }
 
 .btn-adicionar {
-  background: #00c853;
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  margin-top: 10px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s ease-in-out;
+    background: #00c853;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease-in-out;
 }
 
 .btn-adicionar:hover {
-  background: #00b04a;
+    background: #00b04a;
 }

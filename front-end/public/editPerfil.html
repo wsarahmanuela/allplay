@@ -11,6 +11,8 @@
 
 <body>
     <main class="container">
+
+        <!-- Cabeçalho -->
         <header class="topo">
             <h2>Editar Perfil</h2>
             <div class="botoes-topo">
@@ -19,50 +21,57 @@
             </div>
         </header>
 
+        <!-- Área de perfil editável -->
         <div class="area-perfil-editavel">
 
+            <!-- Foto de perfil no canto inferior esquerdo -->
+            <div class="foto-perfil" id="area-foto-perfil">
+                <div class="foto" id="foto-preview">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <input type="file" id="upload-foto" accept="image/*" hidden>
+                <label for="upload-foto" class="btn-foto">Alterar foto</label>
+            </div>
+
+            <!-- Banner -->
             <section class="banner" id="banner">
                 <img id="banner-imagem" src="" alt="Banner do perfil">
 
-                <!-- input para trocar banner -->
+                <!-- Input para trocar banner -->
                 <input type="file" id="upload-banner" accept="image/*" hidden>
                 <button class="btn-alterar-banner" id="btn-alterar-banner">Alterar banner</button>
 
-                <!-- área da foto de perfil no canto inferior esquerdo -->
-                <div class="foto-perfil" id="area-foto-perfil">
-                    <div class="foto" id="foto-preview">
-                        <!-- ícone padrão; ao fazer upload será substituído por <img> -->
-                        <i class="fa-solid fa-user"></i>
-                    </div>
+            </section> <!-- fecha banner -->
 
-                    <!-- input para trocar foto -->
-                    <input type="file" id="upload-foto" accept="image/*" hidden>
-                    <label for="upload-foto" class="btn-foto">Alterar foto</label>
+            <!-- Dados do perfil -->
+            <section class="dados-perfil">
+                <div class="input-grupo">
+                    <label>Nome de usuário</label>
+                    <input type="text" id="nome-usuario" placeholder="@nome_usuario">
                 </div>
+                <div class="input-grupo">
+                    <label>Nome completo</label>
+                    <input type="text" id="nome-completo" placeholder="Nome Sobrenome">
+                </div>
+                <div class="input-grupo">
+                    <label>Localização</label>
+                    <input type="text" id="localizacao" placeholder="Cidade - UF">
+                </div>
+            </section>
 
-                <section class="dados-perfil">
-                    <div class="input-grupo">
-                        <label>Nome de usuário</label>
-                        <input type="text" id="nome-usuario" placeholder="@nome_usuario">
-                    </div>
+        </div> <!-- fecha area-perfil-editavel -->
 
-                    <div class="input-grupo">
-                        <label>Nome completo</label>
-                        <input type="text" id="nome-completo" placeholder="Nome Sobrenome">
-                    </div>
-
-                    <div class="input-grupo">
-                        <label>Localização</label>
-                        <input type="text" id="localizacao" placeholder="Cidade - UF">
-                    </div>
-                </section>
-
-        </div>
+        <!-- Biografia -->
         <section class="biografia">
             <h3>Biografia</h3>
-            <textarea placeholder="Escreva sobre você!"></textarea>
+            <textarea id="bio-textarea" placeholder="Escreva sobre você!" maxlength="300"></textarea>
+
+            <span class="contador-bio">
+                <span id="bio-restante">300</span> caracteres restantes
+            </span>
         </section>
 
+        <!-- Esportes favoritos -->
         <section class="esportes">
             <h3>Esportes Favoritos</h3>
             <div class="tags">
@@ -77,6 +86,7 @@
             </div>
         </section>
 
+        <!-- Clubes que frequento -->
         <section class="clubes">
             <h3>Clubes que frequento</h3>
             <div class="lista-clubes">
@@ -94,6 +104,7 @@
 
     </main>
 
+    <!-- Script -->
     <script src="JavaScript/editarPerfil.js"></script>
 </body>
 
