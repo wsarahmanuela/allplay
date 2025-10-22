@@ -439,7 +439,48 @@ app.get('/publicacoes/:cpf', (req, res) => {
           });
       });
   });
+// barra de pesquisa
+app.get("/search", (req, res) => {
+  const termo = req.query.query;
 
+  if (!termo || termo.trim() === "") {
+    return res.json({ usuarios: [], posts: [] });
+  }
+
+  const termoLike = `%${termo}%`;
+
+  // 🔹 Buscar usuários
+  const queryUsuarios = `
+    SELECT nome, nomeUsuario, fotoDePerfil
+    FROM usuario
+    WHERE nome LIKE ? OR nomeUsuario LIKE ?
+  `;
+
+  // 🔹 Buscar posts
+  const queryPosts = `
+    SELECT p.conteudo, u.nome, u.nomeUsuario, u.fotoDePerfil
+    FROM publicacao p
+    JOIN usuario u ON p.autor_CPF = u.CPF
+    WHERE p.conteudo LIKE ?
+  `;
+
+  // Executar as duas buscas em paralelo
+  connection.query(queryUsuarios, [termoLike, termoLike], (errUsuarios, usuarios) => {
+    if (errUsuarios) {
+      console.error("Erro ao buscar usuários:", errUsuarios);
+      return res.status(500).json({ success: false, message: "Erro ao buscar usuários." });
+    }
+
+    connection.query(queryPosts, [termoLike], (errPosts, posts) => {
+      if (errPosts) {
+        console.error("Erro ao buscar posts:", errPosts);
+        return res.status(500).json({ success: false, message: "Erro ao buscar posts." });
+      }
+
+      res.json({ usuarios, posts });
+    });
+  });
+});
 
   //NOME DE USUARIO ---------------------------------------------------
   app.get("/usuario/:cpf", (req, res) => {
