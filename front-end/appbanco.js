@@ -262,34 +262,36 @@
   }
 
   //CPF PARA APARECER NO PERFIL---------------------------------------------------
-  app.get('/publicacoes/:cpf', (req, res) => {
-    // mantém o CPF exatamente como está (com pontos e traço)
-    const cpf = req.params.cpf;
-    console.log(" Rota /publicacoes/:cpf chamada com CPF:", cpf);
+app.get('/publicacoes/:cpf', (req, res) => {
+  const cpf = req.params.cpf;
+  console.log("Rota /publicacoes/:cpf chamada com CPF:", cpf);
 
-    const query = `
-      SELECT 
-        p.conteudo,
-        DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
-        u.nome,
-        u.nomeUsuario,
-        u.fotoDePerfil
-      FROM publicacao p
-      JOIN usuario u ON p.autor_CPF = u.CPF
-      WHERE p.autor_CPF = ?
-      ORDER BY p.data_publicacao DESC
-    `;
+  const query = `
+    SELECT 
+      p.conteudo,
+      DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
+      u.nome,
+      u.nomeUsuario,
+      u.fotoDePerfil
+    FROM publicacao p
+    JOIN usuario u ON p.autor_CPF = u.CPF
+    WHERE p.autor_CPF = ?
+    ORDER BY p.data_publicacao DESC
+  `;
 
-    connection.query(query, [cpf], (erro, resultados) => {
-      if (erro) {
-        console.error('Erro ao buscar publicações do usuário:', erro);
-        return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
-      }
+  connection.query(query, [cpf], (erro, resultados) => {
+    if (erro) {
+      console.error('Erro ao buscar publicações do usuário:', erro);
+      return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
+    }
 
-      console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
-      res.json(resultados);
+    console.log(`${resultados.length} publicações encontradas para CPF ${cpf}`);
+    res.json({
+      success: true,
+      posts: resultados
     });
   });
+});
 
   // PUBLICACOES -------------------------------------------------------------
   app.post('/publicacoes', (req, res) => {
