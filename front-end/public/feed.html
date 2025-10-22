@@ -94,17 +94,30 @@
             <div class="perfil-usuario">
                 <img id="fotoUsuarioPost" src="imagens/profile.picture.jpg" alt="Foto do usuário">
                 <div id="nome_usuario">Usuário sem nome</div>
-                <div id="esportes">Esportes</div>
+                <div class="esporte-select">
+                    <label for="esportes">🏅</label>
+                    <select id="esportes">
+                        <option value="">Selecionar esporte</option><!--AQUI O USUARIO VAI ESCOLHER O ESPORTE -->
+                    </select>
+                </div>
             </div>
 
             <div class="post-input-container">
-                <textarea id="post-text" rows="3" placeholder="O que deseja compartilhar?"></textarea>
-                <div class="add-post-links">
-                    <a href="#"><i class="fa-solid fa-images" style="color: #0d7000;"></i>Imagem</a>
-                   
-                    <button type="button" class="post-btn" onClick="criarPost()">Postar</button>
-                </div>
-            </div>
+  <textarea id="post-text" rows="3" placeholder="O que deseja compartilhar?"></textarea>
+
+  <div class="add-post-links">
+    <!-- Botão para abrir o seletor de arquivos -->
+    <a href="#" id="btn-imagem" class="add-img">
+      <i class="fa-solid fa-images" style="color: #0d7000;"></i> Imagem
+    </a>
+
+    <!-- Input file escondido -->
+    <input type="file" id="input-imagem" accept="image/*" style="display: none;">
+
+    <button type="button" class="post-btn" onClick="criarPost()">Postar</button>
+  </div>
+</div>
+
         </div>
 
         <!-- FEED DINÂMICO -->

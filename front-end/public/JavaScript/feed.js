@@ -1,82 +1,3 @@
-// ================== CRIAR POST ==================
-async function criarPost() {
-  console.log("Função criarPost chamada");
-
-  const texto = document.getElementById("post-text").value.trim();
-  if (!texto) return; // não posta vazio
-
-  const cpf = localStorage.getItem("cpf");
-  if (!cpf) {
-    alert("Erro: CPF não encontrado. Faça login novamente.");
-    return;
-  }
-
-  const novoPost = {
-    autor_CPF: cpf,
-    conteudo: texto
-  };
-
-  try {
-    const resposta = await fetch("http://localhost:3000/publicacoes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(novoPost)
-    });
-
-    const dados = await resposta.json();
-    console.log("Resposta do POST:", dados);
-
-    if (dados.success) {
-      document.getElementById("post-text").value = "";
-      await carregarFeed(); // recarrega o feed para mostrar o novo post
-    } else {
-      alert(dados.message || "Erro ao publicar.");
-    }
-  } catch (erro) {
-    console.error("Erro ao criar post:", erro);
-    alert("Erro no servidor. Tente novamente.");
-  }
-}
-
-// ================== CARREGAR FEED ==================
-async function carregarFeed() {
-  console.log("Função carregarFeed chamada");
-
-  try {
-    const resposta = await fetch("http://localhost:3000/publicacoes");
-    const posts = await resposta.json();
-
-    const feed = document.getElementById("feed");
-    feed.innerHTML = "";
-
-    posts.forEach(post => {
-      const div = document.createElement("div");
-      div.classList.add("post");
-
-      const caminhoFoto = post.fotoDePerfil
-        ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
-        : "imagens/profile.picture.jpg";
-
-      div.innerHTML = `
-        <div class="post-header">
-          <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
-          <div class="post-info">
-            <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
-            <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
-          </div>
-        </div>
-        <div class="conteudo">${post.conteudo}</div>
-        <div class="data">${post.data_publicacao || ""}</div>
-      `;
-
-      feed.appendChild(div);
-    });
-
-  } catch (erro) {
-    console.error("Erro ao carregar o feed:", erro);
-  }
-}
-
 // ================== PREENCHER PERFIL ==================
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");
@@ -120,15 +41,75 @@ async function preencherPerfil() {
   }
 }
 
-// BARRA DE PESQUISA (MARIA)
+// ================== CARREGAR FEED ==================
+async function carregarFeed() {
+  try {
+    const resposta = await fetch("http://localhost:3000/publicacoes");
+    if (!resposta.ok) throw new Error('Erro ao buscar publicações');
+    const posts = await resposta.json();
+
+    const feed = document.getElementById("feed");
+    feed.innerHTML = "";
+
+    posts.forEach(post => {
+      const div = document.createElement("div");
+      div.classList.add("post");
+
+      const caminhoFoto = post.fotoDePerfil
+        ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
+        : "imagens/profile.picture.jpg";
+
+      // Cabeçalho do post
+      div.innerHTML = `
+        <div class="post-header">
+          <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
+          <div class="post-info">
+            <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
+            <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
+          </div>
+        </div>
+      `;
+
+      // Conteúdo de texto (se existir)
+      const conteudoDiv = document.createElement("div");
+      conteudoDiv.classList.add("conteudo");
+      conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
+      div.appendChild(conteudoDiv);
+
+      // Imagem (se existir)
+      if (post.imagem) {
+        const imagemPath = post.imagem.startsWith("/")
+          ? `http://localhost:3000${post.imagem}`
+          : `http://localhost:3000/uploads/${post.imagem}`;
+
+        const img = document.createElement("img");
+        img.src = imagemPath;
+        img.alt = "Imagem do post";
+        img.classList.add("post-imagem");
+        div.appendChild(img);
+      }
+
+      // Data
+      const dataDiv = document.createElement("div");
+      dataDiv.classList.add("data");
+      dataDiv.textContent = post.data_publicacao || "";
+      div.appendChild(dataDiv);
+
+      feed.appendChild(div);
+    });
+  } catch (erro) {
+    console.error("Erro ao carregar o feed:", erro);
+  }
+}
+
+// ================== BARRA DE PESQUISA ==================
 const searchInput = document.getElementById("searchInput");
 const resultsDiv = document.getElementById("resultsDiv");
 
 if (searchInput && resultsDiv) {
-  // função principal de busca
   async function fazerBusca() {
     const termo = searchInput.value.trim();
-    if (!termo) return; // não faz nada se estiver vazio
+    if (!termo) return;
 
     try {
       const resposta = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(termo)}`);
@@ -176,13 +157,77 @@ if (searchInput && resultsDiv) {
     }
   }
 
-  // Ativar busca ao apertar Enter
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       fazerBusca();
     }
   });
+}
+
+// ================== UPLOAD DE IMAGEM + CRIAR POST ==================
+let imagemSelecionada = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnImagem = document.getElementById("btn-imagem");
+  const inputImagem = document.getElementById("input-imagem");
+
+  if (btnImagem && inputImagem) {
+    btnImagem.addEventListener("click", (e) => {
+      e.preventDefault();
+      inputImagem.click();
+    });
+
+    inputImagem.addEventListener("change", (e) => {
+      const arquivo = e.target.files[0];
+      if (arquivo) {
+        imagemSelecionada = arquivo;
+        console.log("Imagem selecionada:", arquivo.name);
+      }
+    });
+  }
+});
+
+async function criarPost() {
+  const texto = document.getElementById("post-text").value.trim();
+  const cpf = localStorage.getItem("cpf");
+
+  if (!cpf) {
+    alert("Erro: CPF não encontrado. Faça login novamente.");
+    return;
+  }
+
+  if (!texto && !imagemSelecionada) {
+    alert("Escreva algo ou selecione uma imagem para postar.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("autor_CPF", cpf);
+  formData.append("conteudo", texto || "");
+  if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
+
+  try {
+    const resposta = await fetch("http://localhost:3000/publicacoes/imagem", {
+      method: "POST",
+      body: formData,
+    });
+
+    const dados = await resposta.json();
+    console.log("Resposta do servidor:", dados);
+
+    if (dados.success) {
+      document.getElementById("post-text").value = "";
+      document.getElementById("input-imagem").value = "";
+      imagemSelecionada = null;
+      await carregarFeed();
+    } else {
+      alert(dados.message || "Erro ao publicar.");
+    }
+  } catch (erro) {
+    console.error("Erro ao criar post:", erro);
+    alert("Erro no servidor. Tente novamente.");
+  }
 }
 
 // ================== MOSTRAR ESPORTES ==================
@@ -227,13 +272,12 @@ async function carregarEsportes() {
     console.error("Erro ao carregar esportes:", erro);
   }
 }
-// isso aq é pra abrir o painel de config (maria)
+
+// ================== MENU DE CONFIGURAÇÃO ==================
 var configmenu = document.querySelector(".config-menu");
 function configuracoesMenuAlter(){
-    // toggle = alternar - comando de alternar entre 2 estados (maria)
-    configmenu.classList.toggle("config-menu-height");
+  configmenu.classList.toggle("config-menu-height");
 }
-
 
 // ================== INICIALIZAÇÃO ==================
 document.addEventListener("DOMContentLoaded", () => {
