@@ -120,6 +120,71 @@ async function preencherPerfil() {
   }
 }
 
+// BARRA DE PESQUISA (MARIA)
+const searchInput = document.getElementById("searchInput");
+const resultsDiv = document.getElementById("resultsDiv");
+
+if (searchInput && resultsDiv) {
+  // função principal de busca
+  async function fazerBusca() {
+    const termo = searchInput.value.trim();
+    if (!termo) return; // não faz nada se estiver vazio
+
+    try {
+      const resposta = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(termo)}`);
+      if (!resposta.ok) throw new Error("Erro ao buscar dados");
+
+      const resultados = await resposta.json();
+      resultsDiv.innerHTML = "";
+
+      if (resultados.posts.length === 0 && resultados.usuarios.length === 0) {
+        resultsDiv.textContent = "Nenhum resultado encontrado.";
+        return;
+      }
+
+      // Mostrar usuários
+      if (resultados.usuarios.length > 0) {
+        const tituloUsuarios = document.createElement("h3");
+        tituloUsuarios.textContent = "Usuários";
+        resultsDiv.appendChild(tituloUsuarios);
+
+        resultados.usuarios.forEach(usuario => {
+          const div = document.createElement("div");
+          div.classList.add("resultado-usuario");
+          div.textContent = `${usuario.nome} (@${usuario.nomeUsuario})`;
+          resultsDiv.appendChild(div);
+        });
+      }
+
+      // Mostrar posts
+      if (resultados.posts.length > 0) {
+        const tituloPosts = document.createElement("h3");
+        tituloPosts.textContent = "Postagens";
+        resultsDiv.appendChild(tituloPosts);
+
+        resultados.posts.forEach(post => {
+          const div = document.createElement("div");
+          div.classList.add("resultado-post");
+          div.innerHTML = `<strong>${post.nome || "Usuário sem nome"}</strong>: ${post.conteudo}`;
+          resultsDiv.appendChild(div);
+        });
+      }
+
+    } catch (erro) {
+      console.error("Erro ao fazer busca:", erro);
+      resultsDiv.textContent = "Erro ao buscar. Tente novamente.";
+    }
+  }
+
+  // Ativar busca ao apertar Enter
+  searchInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      fazerBusca();
+    }
+  });
+}
+
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
@@ -162,11 +227,14 @@ async function carregarEsportes() {
     console.error("Erro ao carregar esportes:", erro);
   }
 }
+// isso aq é pra abrir o painel de config (maria)
 var configmenu = document.querySelector(".config-menu");
 function configuracoesMenuAlter(){
     // toggle = alternar - comando de alternar entre 2 estados (maria)
     configmenu.classList.toggle("config-menu-height");
 }
+
+
 // ================== INICIALIZAÇÃO ==================
 document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();
