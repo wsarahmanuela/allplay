@@ -179,6 +179,12 @@ async function carregarFeed() {
             <div class="nome">${escapeHtml(nome)}</div>
             <div class="username">@${escapeHtml(username)}</div>
           </div>
+          <div class="post-menu">
+            <button class="menu-btn">⋮</button>
+            <div class="menu-opcoes">
+              <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
+            </div>
+          </div>
         </div>
         <div class="publicacao-conteudo">${escapeHtml(conteudo)}</div>
       `;
@@ -195,11 +201,54 @@ async function carregarFeed() {
         card.appendChild(img);
       }
 
+      // ===== MENU =====
+      const menuBtn = card.querySelector(".menu-btn");
+      const menuOpcoes = card.querySelector(".menu-opcoes");
+
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menuOpcoes.classList.toggle("ativo");
+      });
+
+      document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
+
+      // ===== EXCLUIR POST =====
+      const btnExcluir = card.querySelector(".excluir-btn");
+      btnExcluir.addEventListener("click", async () => {
+        if (confirm("Deseja realmente excluir esta publicação?")) {
+          const id = btnExcluir.dataset.id;
+          try {
+            const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, {
+              method: "DELETE",
+            });
+            const resultado = await resp.json();
+            if (resultado.success) {
+              carregarFeed();
+            } else {
+              alert("Erro ao excluir publicação.");
+            }
+          } catch (erro) {
+            console.error("Erro ao excluir:", erro);
+          }
+        }
+      });
+
+      // ===== DATA E HORA =====
       const footer = document.createElement("div");
       footer.className = "publicacao-footer";
-      footer.innerHTML = `<div class="publicacao-data">${escapeHtml(data)}</div>`;
-      card.appendChild(footer);
 
+      if (data) {
+        const dataObj = new Date(data);
+        footer.innerHTML = `<div class="publicacao-data">${dataObj.toLocaleString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}</div>`;
+      }
+
+      card.appendChild(footer);
       postsContainer.appendChild(card);
     });
   } catch (erro) {

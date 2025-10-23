@@ -468,10 +468,11 @@ nav {
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #333;
+  color: #000000;
 }
 
 .menu-opcoes {
+  
   display: none;
   position: absolute;
   right: 0;
@@ -479,7 +480,7 @@ nav {
   background: white;
   border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(255, 3, 3, 0.1);
   z-index: 10;
 }
 
@@ -488,6 +489,7 @@ nav {
 }
 
 .menu-opcoes button {
+  color: red;
   display: block;
   width: 100%;
   padding: 8px 15px;

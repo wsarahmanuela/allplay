@@ -63,7 +63,7 @@ async function carregarFeed() {
         ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
         : "imagens/profile.picture.jpg";
 
-      // Cabeçalho do post + botão de menu
+      // Cabeçalho do post
       div.innerHTML = `
         <div class="post-header">
           <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
@@ -80,7 +80,7 @@ async function carregarFeed() {
         </div>
       `;
 
-      // Mostra/oculta menu ao clicar nos três pontinhos
+      // Mostra/oculta o menu ao clicar nos três pontinhos
       const menuBtn = div.querySelector(".menu-btn");
       const menuOpcoes = div.querySelector(".menu-opcoes");
       menuBtn.addEventListener("click", (e) => {
@@ -108,23 +108,55 @@ async function carregarFeed() {
         }
       });
 
-      // Conteudo do post
+      // Conteúdo de texto
       const conteudoDiv = document.createElement("div");
       conteudoDiv.classList.add("conteudo");
       conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
       div.appendChild(conteudoDiv);
 
-      // Imagem do post
+      // Imagem (se existir)
       if (post.imagem) {
         const imagemPath = post.imagem.startsWith("/")
           ? `http://localhost:3000${post.imagem}`
           : `http://localhost:3000/uploads/${post.imagem}`;
         const img = document.createElement("img");
         img.src = imagemPath;
+        img.alt = "Imagem do post";
         img.classList.add("post-imagem");
         div.appendChild(img);
       }
 
+     // Data
+const dataDiv = document.createElement("div");
+dataDiv.classList.add("data");
+
+// Se vier no formato ISO do MySQL, formata para dd/mm/aaaa hh:mm
+if (post.data_publicacao) {
+  // Garante que sempre tenha hora
+  const dataValida = post.data_publicacao.includes("T")
+    ? post.data_publicacao
+    : `${post.data_publicacao}T00:00:00`;
+
+  const data = new Date(dataValida);
+
+  if (!isNaN(data)) {
+    dataDiv.textContent = data.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+  } else {
+    dataDiv.textContent = post.data_publicacao; // fallback se der erro
+  }
+} else {
+  dataDiv.textContent = "";
+}
+
+
+      div.appendChild(dataDiv);
       feed.appendChild(div);
     });
   } catch (erro) {

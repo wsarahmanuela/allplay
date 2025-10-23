@@ -225,22 +225,25 @@ nav {
 
 /* ======================= ÁREA DE PUBLICAÇÕES ======================= */
 #container-baixo {
-  background-color: #ffffff3c; /* branco sólido */
+  background-color: #ffffff3c;
   border-radius: 20px;
   padding: 30px;
-  margin-top: 50px; /* distância da foto */
-  min-height: 500px; /* altura mínima */
-  width: 100%; /* ocupa o mesmo espaço da faixa verde */
-  max-width: 1000px; /* mesmo limite da faixa verde */
+  margin-top: 50px;
+  width: 100%;
+  max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+
+  /* REMOVIDO o min-height fixo */
+  height: auto; /* altura automática conforme o conteúdo */
+  justify-content: flex-start; /* garante que o conteúdo comece do topo */
 }
+
     
 #container-baixo h2 {
   color: #555;
@@ -543,3 +546,48 @@ nav {
   margin-top: 8px;
   text-align: right;
 }
+.post-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #000000;
+}
+
+.menu-opcoes {
+  
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 25px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(255, 3, 3, 0.1);
+  z-index: 10;
+}
+
+.menu-opcoes.ativo {
+  display: block;
+}
+
+.menu-opcoes button {
+  color: red;
+  display: block;
+  width: 100%;
+  padding: 8px 15px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.menu-opcoes button:hover {
+  background: #f5f5f5;
+}
+
