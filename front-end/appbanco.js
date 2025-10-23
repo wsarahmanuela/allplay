@@ -284,7 +284,9 @@ app.get('/publicacoes/:cpf', (req, res) => {
 
   const query = `
     SELECT 
+      p.IDpublicacao,
       p.conteudo,
+      p.imagem, 
       DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
       u.nome,
       u.nomeUsuario,
@@ -308,6 +310,7 @@ app.get('/publicacoes/:cpf', (req, res) => {
     });
   });
 });
+
 
   // PUBLICACOES -------------------------------------------------------------
   app.post('/publicacoes', (req, res) => {
@@ -343,6 +346,7 @@ app.get('/publicacoes/:cpf', (req, res) => {
 
     const query = `
   SELECT 
+    p.IDpublicacao,
     p.conteudo,
     p.imagem,
     DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
@@ -388,6 +392,37 @@ app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
     res.json({ success: true, message: "Publicação criada com sucesso!" });
   });
 });
+
+// ==================== EXCLUIR PUBLICAÇÃO ====================
+app.delete("/publicacoes/:id", (req, res) => {
+  const id = req.params.id;
+
+  const sql = "DELETE FROM publicacao WHERE IDpublicacao = ?";
+  connection.query(sql, [id], (erro, resultado) => {
+    if (erro) {
+      console.error("Erro ao excluir publicação:", erro);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor ao excluir a publicação.",
+        erro
+      });
+    }
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Publicação não encontrada.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Publicação excluída com sucesso!",
+    });
+  });
+});
+
+
 
 
   //================ MAP ================

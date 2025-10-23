@@ -36,6 +36,10 @@ async function preencherPerfil() {
     const nomeTela = document.getElementById("nome_usuario");
     if (nomeTela) nomeTela.textContent = nome;
 
+    const fotoNavbar = document.querySelector(".nav-user-icon img");
+    if (fotoNavbar) fotoNavbar.src = foto;
+
+
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
   }
@@ -59,7 +63,7 @@ async function carregarFeed() {
         ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
         : "imagens/profile.picture.jpg";
 
-      // Cabeçalho do post
+      // Cabeçalho do post + botão de menu
       div.innerHTML = `
         <div class="post-header">
           <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
@@ -67,33 +71,59 @@ async function carregarFeed() {
             <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
             <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
           </div>
+          <div class="post-menu">
+            <button class="menu-btn">⋮</button>
+            <div class="menu-opcoes">
+              <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
+            </div>
+          </div>
         </div>
       `;
 
-      // Conteúdo de texto (se existir)
+      // Mostra/oculta menu ao clicar nos três pontinhos
+      const menuBtn = div.querySelector(".menu-btn");
+      const menuOpcoes = div.querySelector(".menu-opcoes");
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menuOpcoes.classList.toggle("ativo");
+      });
+      document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
+
+      // Botão de excluir
+      const btnExcluir = div.querySelector(".excluir-btn");
+      btnExcluir.addEventListener("click", async () => {
+        if (confirm("Deseja realmente excluir esta publicação?")) {
+          const id = btnExcluir.dataset.id;
+          try {
+            const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
+            const resultado = await resp.json();
+            if (resultado.success) {
+              carregarFeed(); // atualiza o feed
+            } else {
+              alert("Erro ao excluir publicação.");
+            }
+          } catch (erro) {
+            console.error("Erro ao excluir:", erro);
+          }
+        }
+      });
+
+      // Conteudo do post
       const conteudoDiv = document.createElement("div");
       conteudoDiv.classList.add("conteudo");
       conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
       div.appendChild(conteudoDiv);
 
-      // Imagem (se existir)
+      // Imagem do post
       if (post.imagem) {
         const imagemPath = post.imagem.startsWith("/")
           ? `http://localhost:3000${post.imagem}`
           : `http://localhost:3000/uploads/${post.imagem}`;
-
         const img = document.createElement("img");
         img.src = imagemPath;
-        img.alt = "Imagem do post";
         img.classList.add("post-imagem");
         div.appendChild(img);
       }
-
-      // Data
-      const dataDiv = document.createElement("div");
-      dataDiv.classList.add("data");
-      dataDiv.textContent = post.data_publicacao || "";
-      div.appendChild(dataDiv);
 
       feed.appendChild(div);
     });
@@ -101,6 +131,7 @@ async function carregarFeed() {
     console.error("Erro ao carregar o feed:", erro);
   }
 }
+
 
 // ================== BARRA DE PESQUISA ==================
 const searchInput = document.getElementById("searchInput");
@@ -171,6 +202,7 @@ let imagemSelecionada = null;
 document.addEventListener("DOMContentLoaded", () => {
   const btnImagem = document.getElementById("btn-imagem");
   const inputImagem = document.getElementById("input-imagem");
+  const preview = document.getElementById("preview-imagem");
 
   if (btnImagem && inputImagem) {
     btnImagem.addEventListener("click", (e) => {
@@ -178,11 +210,26 @@ document.addEventListener("DOMContentLoaded", () => {
       inputImagem.click();
     });
 
+    // Mostrar pré-visualização da imagem
     inputImagem.addEventListener("change", (e) => {
       const arquivo = e.target.files[0];
       if (arquivo) {
         imagemSelecionada = arquivo;
         console.log("Imagem selecionada:", arquivo.name);
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          if (preview) {
+            preview.src = ev.target.result;
+            preview.style.display = "block";
+          }
+        };
+        reader.readAsDataURL(arquivo);
+      } else {
+        if (preview) {
+          preview.src = "";
+          preview.style.display = "none";
+        }
       }
     });
   }
@@ -191,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function criarPost() {
   const texto = document.getElementById("post-text").value.trim();
   const cpf = localStorage.getItem("cpf");
+  const preview = document.getElementById("preview-imagem"); 
 
   if (!cpf) {
     alert("Erro: CPF não encontrado. Faça login novamente.");
@@ -219,6 +267,10 @@ async function criarPost() {
     if (dados.success) {
       document.getElementById("post-text").value = "";
       document.getElementById("input-imagem").value = "";
+      if (preview) {
+        preview.src = "";
+        preview.style.display = "none";
+      }
       imagemSelecionada = null;
       await carregarFeed();
     } else {
@@ -229,6 +281,7 @@ async function criarPost() {
     alert("Erro no servidor. Tente novamente.");
   }
 }
+
 
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {

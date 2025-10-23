@@ -1,20 +1,112 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHAT ALLPLAY</title>
-    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <title>All Play - Chat</title>
+    <link rel="stylesheet" href="chat.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/93596a3fd2.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- NAVBAR -->
     <nav>
-        <!-- Coluna a esquerda da tela, com a logo e icone de notificações (Natan)-->
-        <div class="logo"> 
+        <div class="nav-left">
             <h1>ALL PLAY</h1>
+            <ul>
+                <li><img src="imagens/Notificacao.png.png" alt="Notificação"></li>
+            </ul>
         </div>
-        <ul>
-            <li><img src="imagens/Notificacao.png.png" alt="Notificação"></li>
-        </ul>
+
+        <div class="nav-right">
+            <div class="search-box">
+                <img src="imagens/search.image.png">
+                <input type="text" placeholder="Pesquisar">
+            </div>
+            <div class="nav-user-icon online">
+                <img src="imagens/profile.picture.jpg">
+            </div>
+        </div>
     </nav>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <!-- LADO ESQUERDO -->
+        <div class="left-sidebar">
+            <div class="imp-links">
+                <a href="#"><img src="imagens/friends.png">Amigos</a>
+                <a href="#"><img src="imagens/club.png">Notificação</a>
+                <a href="map.html"><img src="imagens/Design_sem_nome__3_-removebg-preview.png">Localização</a>
+            </div>
+            <div class="shortcut-links">
+                <p>Seus esportes</p>
+                <a href="#"><img src="imagens/jiu.png">Jiu-Jitsu</a>
+                <a href="#"><img src="imagens/natacao.png">Natação</a>
+                <a href="#"><img src="imagens/padel.png">Padel</a>
+                <a href="#"><img src="imagens/volei.png">Vôlei</a>
+            </div>
+        </div>
+
+        <!-- CHAT PRINCIPAL -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <img src="imagens/profile.picture.jpg" alt="">
+                <div>
+                    <h4>Sarah Manuela</h4>
+                    <p>Online agora</p>
+                </div>
+            </div>
+
+            <div class="chat-messages">
+                <div class="msg received">
+                    <p>Oi Sarah! Tudo bem?</p>
+                    <span>10:23</span>
+                </div>
+                <div class="msg sent">
+                    <p>Oi! Tudo ótimo 😄 e você?</p>
+                    <span>10:24</span>
+                </div>
+                <div class="msg received">
+                    <p>Animada pro treino de hoje?</p>
+                    <span>10:25</span>
+                </div>
+                <div class="msg sent">
+                    <p>Demais! 🏋️‍♀️ Mal posso esperar!</p>
+                    <span>10:26</span>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" placeholder="Digite uma mensagem...">
+                <button><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- LISTA DE CONVERSAS -->
+        <div class="right-sidebar chat-list">
+            <h4>Conversas</h4>
+            <div class="chat-user">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <h5>Lucas Pereira</h5>
+                    <p>“Vamos marcar o jogo de sábado?”</p>
+                </div>
+            </div>
+            <div class="chat-user">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <h5>Maria Costa</h5>
+                    <p>“Amei o treino de hoje 😍”</p>
+                </div>
+            </div>
+            <div class="chat-user">
+                <img src="imagens/profile.picture.jpg">
+                <div>
+                    <h5>João Oliveira</h5>
+                    <p>“Traz a bola nova amanhã!”</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
