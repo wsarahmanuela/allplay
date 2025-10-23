@@ -74,16 +74,20 @@
         <!-- Esportes favoritos -->
         <section class="esportes">
             <h3>Esportes Favoritos</h3>
+
             <div class="tags">
-                <span class="tag">Futebol</span>
-                <span class="tag">Vôlei</span>
-                <span class="tag">Basquete</span>
-                <span class="tag">Tênis de mesa</span>
+                
             </div>
+
             <div class="add-esporte">
-                <input type="text" placeholder="Adicionar outro esporte...">
-                <button>Adicionar</button>
+                <input type="text" id="input-novo-esporte" placeholder="Adicionar outro esporte..."
+                    list="lista-esportes">
+                <button id="btn-adicionar-esporte">Adicionar</button>
             </div>
+
+            <datalist id="lista-esportes">
+            </datalist>
+
         </section>
 
         <!-- Clubes que frequento -->

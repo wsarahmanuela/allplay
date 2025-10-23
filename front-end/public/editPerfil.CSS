@@ -213,9 +213,7 @@ body {
 
 
 /* ======== INPUTS ======== */
-.input-grupo input,
-.add-esporte input,
-textarea {
+.input-grupo input, .add-esporte input, textarea {
     border: 2px solid #ccc;
     border-radius: 8px;
     padding: 12px;
@@ -232,6 +230,17 @@ textarea::placeholder {
     color: #999;
     font-style: italic;
     opacity: 0.8;
+}
+
+.add-esporte input {
+    flex-grow: 1; 
+    width: auto; 
+    
+    /* ********** CHAVE PARA CORRIGIR A APARÊNCIA DA LISTA ********** */
+    /* Remove a seta que está sendo desenhada pelo navegador/CSS */
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    appearance: none; 
 }
 
 /* ======== EFEITO DE FOCO ======== */
@@ -298,6 +307,35 @@ select:focus {
     padding: 6px 12px;
     border-radius: 25px;
     font-size: 14px;
+    
+    /* ********** CHAVE 1: Usa Flexbox para alinhar texto e botão ********** */
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espaço entre o texto e o 'x' */
+}
+
+.remover-tag {
+    background: rgba(255, 255, 255, 0.3); /* Um fundo branco transparente */
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1; /* Garante que o 'x' fique centralizado */
+    padding: 2px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    
+    /* Ajusta a aparência para ser um círculo pequeno */
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.remover-tag:hover {
+    background: rgba(255, 255, 255, 0.5); /* Fica mais claro ao passar o mouse */
 }
 
 .add-esporte {
