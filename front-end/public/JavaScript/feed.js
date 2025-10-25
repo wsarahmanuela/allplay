@@ -39,22 +39,44 @@ async function preencherPerfil() {
     const fotoNavbar = document.querySelector(".nav-user-icon img");
     if (fotoNavbar) fotoNavbar.src = foto;
 
-
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
   }
 }
 
 // ================== CARREGAR FEED ==================
-async function carregarFeed() {
+async function carregarFeed(filtroEsporte = "") {
+  const cpf = localStorage.getItem("cpf");
+  const feed = document.getElementById("feed");
+  if (!feed) return;
+
   try {
-    const resposta = await fetch("http://localhost:3000/publicacoes");
-    if (!resposta.ok) throw new Error('Erro ao buscar publicações');
-    const posts = await resposta.json();
+    const url = filtroEsporte
+      ? `http://localhost:3000/publicacoes/${cpf}?esporte=${encodeURIComponent(filtroEsporte)}`
+      : "http://localhost:3000/publicacoes";
 
-    const feed = document.getElementById("feed");
-    feed.innerHTML = "";
+    const resposta = await fetch(url);
+    if (!resposta.ok) throw new Error("Erro ao buscar publicações");
 
+    const dados = await resposta.json();
+    console.log("🔍 Retorno do servidor:", dados);
+
+    // 🔧 garante que seja sempre um array
+    let posts = [];
+    if (Array.isArray(dados)) {
+      posts = dados;
+    } else if (Array.isArray(dados.posts)) {
+      posts = dados.posts;
+    }
+
+    feed.innerHTML = ""; // limpa feed antes de exibir novos posts
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      feed.innerHTML = "<p>Nenhuma publicação encontrada.</p>";
+      return;
+    }
+
+    // percorre e mostra cada publicação
     posts.forEach(post => {
       const div = document.createElement("div");
       div.classList.add("post");
@@ -63,7 +85,6 @@ async function carregarFeed() {
         ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
         : "imagens/profile.picture.jpg";
 
-      // Cabeçalho do post
       div.innerHTML = `
         <div class="post-header">
           <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
@@ -80,7 +101,7 @@ async function carregarFeed() {
         </div>
       `;
 
-      // Mostra/oculta o menu ao clicar nos três pontinhos
+      // Mostra/oculta menu
       const menuBtn = div.querySelector(".menu-btn");
       const menuOpcoes = div.querySelector(".menu-opcoes");
       menuBtn.addEventListener("click", (e) => {
@@ -98,7 +119,7 @@ async function carregarFeed() {
             const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
             const resultado = await resp.json();
             if (resultado.success) {
-              carregarFeed(); // atualiza o feed
+              carregarFeed(filtroEsporte); // recarrega mantendo o filtro atual
             } else {
               alert("Erro ao excluir publicação.");
             }
@@ -108,13 +129,13 @@ async function carregarFeed() {
         }
       });
 
-      // Conteúdo de texto
+      // Conteúdo
       const conteudoDiv = document.createElement("div");
       conteudoDiv.classList.add("conteudo");
       conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
       div.appendChild(conteudoDiv);
 
-      // Imagem (se existir)
+      // Imagem (se houver)
       if (post.imagem) {
         const imagemPath = post.imagem.startsWith("/")
           ? `http://localhost:3000${post.imagem}`
@@ -126,44 +147,44 @@ async function carregarFeed() {
         div.appendChild(img);
       }
 
-     // Data
-const dataDiv = document.createElement("div");
-dataDiv.classList.add("data");
-
-// Se vier no formato ISO do MySQL, formata para dd/mm/aaaa hh:mm
-if (post.data_publicacao) {
-  // Garante que sempre tenha hora
-  const dataValida = post.data_publicacao.includes("T")
-    ? post.data_publicacao
-    : `${post.data_publicacao}T00:00:00`;
-
-  const data = new Date(dataValida);
-
-  if (!isNaN(data)) {
-    dataDiv.textContent = data.toLocaleString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    });
-  } else {
-    dataDiv.textContent = post.data_publicacao; // fallback se der erro
-  }
-} else {
-  dataDiv.textContent = "";
-}
-
-
+      // Data formatada
+      const dataDiv = document.createElement("div");
+      dataDiv.classList.add("data");
+      if (post.data_publicacao) {
+        const dataValida = post.data_publicacao.includes("T")
+          ? post.data_publicacao
+          : `${post.data_publicacao}T00:00:00`;
+        const data = new Date(dataValida);
+        if (!isNaN(data)) {
+          dataDiv.textContent = data.toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+        } else {
+          dataDiv.textContent = post.data_publicacao;
+        }
+      }
       div.appendChild(dataDiv);
+
+      // Tag do esporte (se existir)
+      if (post.esporte) {
+        const tag = document.createElement("span");
+        tag.classList.add("tag-esporte");
+        tag.textContent = post.esporte;
+        div.appendChild(tag);
+      }
+
       feed.appendChild(div);
     });
+
   } catch (erro) {
     console.error("Erro ao carregar o feed:", erro);
   }
 }
-
 
 // ================== BARRA DE PESQUISA ==================
 const searchInput = document.getElementById("searchInput");
@@ -186,7 +207,6 @@ if (searchInput && resultsDiv) {
         return;
       }
 
-      // Mostrar usuários
       if (resultados.usuarios.length > 0) {
         const tituloUsuarios = document.createElement("h3");
         tituloUsuarios.textContent = "Usuários";
@@ -200,7 +220,6 @@ if (searchInput && resultsDiv) {
         });
       }
 
-      // Mostrar posts
       if (resultados.posts.length > 0) {
         const tituloPosts = document.createElement("h3");
         tituloPosts.textContent = "Postagens";
@@ -242,13 +261,10 @@ document.addEventListener("DOMContentLoaded", () => {
       inputImagem.click();
     });
 
-    // Mostrar pré-visualização da imagem
     inputImagem.addEventListener("change", (e) => {
       const arquivo = e.target.files[0];
       if (arquivo) {
         imagemSelecionada = arquivo;
-        console.log("Imagem selecionada:", arquivo.name);
-
         const reader = new FileReader();
         reader.onload = (ev) => {
           if (preview) {
@@ -270,7 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
 async function criarPost() {
   const texto = document.getElementById("post-text").value.trim();
   const cpf = localStorage.getItem("cpf");
-  const preview = document.getElementById("preview-imagem"); 
+  const preview = document.getElementById("preview-imagem");
+  const selectEsporte = document.getElementById("esportes");
+  const esporte = selectEsporte ? selectEsporte.value : "";
 
   if (!cpf) {
     alert("Erro: CPF não encontrado. Faça login novamente.");
@@ -282,9 +300,15 @@ async function criarPost() {
     return;
   }
 
+  if (!esporte) {
+    alert("Selecione um esporte antes de postar.");
+    return;
+  }
+
   const formData = new FormData();
   formData.append("autor_CPF", cpf);
   formData.append("conteudo", texto || "");
+  formData.append("esporte", esporte);
   if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
 
   try {
@@ -304,6 +328,7 @@ async function criarPost() {
         preview.style.display = "none";
       }
       imagemSelecionada = null;
+      selectEsporte.value = "";
       await carregarFeed();
     } else {
       alert(dados.message || "Erro ao publicar.");
@@ -313,7 +338,6 @@ async function criarPost() {
     alert("Erro no servidor. Tente novamente.");
   }
 }
-
 
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {
@@ -336,8 +360,9 @@ async function carregarEsportes() {
     }
 
     esportes.forEach(nome => {
-      const a = document.createElement("a");
-      a.href = "#";
+      const div = document.createElement("div");
+      div.classList.add("esporte-item");
+      div.dataset.esporte = nome;
 
       const nomeArquivo = nome
         .normalize("NFD")
@@ -345,22 +370,57 @@ async function carregarEsportes() {
         .replace(/\s+/g, "")
         .toLowerCase();
 
-      const img = document.createElement("img");
-      img.src = `${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png`;
-      img.alt = nome;
+      div.innerHTML = `
+        <a href="#">
+          <img src="${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png" 
+               onerror="this.src='imagens/default.png'" 
+               alt="${nome}">
+          ${nome}
+        </a>
+      `;
 
-      a.appendChild(img);
-      a.appendChild(document.createTextNode(nome));
-      container.appendChild(a);
+      // Clique em cada esporte → carrega apenas posts desse esporte
+      div.addEventListener("click", () => {
+        carregarFeed(nome);
+      });
+
+      container.appendChild(div);
     });
+
   } catch (erro) {
     console.error("Erro ao carregar esportes:", erro);
   }
 }
 
+// ================== PREENCHER SELECT DE ESPORTES ==================
+async function preencherSelectEsportes() {
+  const select = document.getElementById("esportes");
+  if (!select) return;
+
+  const cpf = localStorage.getItem("cpf");
+  if (!cpf) return;
+
+  try {
+    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
+    const esportes = await resposta.json();
+
+    select.innerHTML = '<option value="">Selecionar esporte</option>';
+
+    esportes.forEach(nome => {
+      const option = document.createElement("option");
+      option.value = nome;
+      option.textContent = nome;
+      select.appendChild(option);
+    });
+
+  } catch (erro) {
+    console.error("Erro ao preencher o select de esportes:", erro);
+  }
+}
+
 // ================== MENU DE CONFIGURAÇÃO ==================
 var configmenu = document.querySelector(".config-menu");
-function configuracoesMenuAlter(){
+function configuracoesMenuAlter() {
   configmenu.classList.toggle("config-menu-height");
 }
 
@@ -369,4 +429,5 @@ document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();
   carregarFeed();
   carregarEsportes();
+  preencherSelectEsportes();
 });

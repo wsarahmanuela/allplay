@@ -241,17 +241,6 @@ const upload = multer({ storage });
     );
   });//aqui mai mostrar no feed 
 
-  app.get("/esportes/:cpf", (req, res) => {
-    const cpf = req.params.cpf;
-    const sql = "SELECT esporte FROM esportes WHERE cpf = ?";
-    db.query(sql, [cpf], (erro, resultado) => {
-      if (erro) return res.status(500).json({ erro });
-      const esportes = resultado.map(r => r.esporte);
-      res.json(esportes);
-    });
-  });
-
-
   // CARREGAR FEED  
   // essa func é importante p carregar as proximas postagens
   async function carregarFeed() {
@@ -277,12 +266,16 @@ const upload = multer({ storage });
       }
   }
 
-  //CPF PARA APARECER NO PERFIL---------------------------------------------------
+// ===================== PUBLICAÇÕES DO USUÁRIO =====================
 app.get('/publicacoes/:cpf', (req, res) => {
   const cpf = req.params.cpf;
-  console.log("Rota /publicacoes/:cpf chamada com CPF:", cpf);
+  const { esporte } = req.query; // opcional: ?esporte=Vôlei
 
-  const query = `
+  console.log(`\n Rota /publicacoes/:cpf chamada com:`);
+  console.log(`   CPF: ${cpf}`);
+  console.log(`   Esporte: ${esporte || 'todos'}`);
+
+  let query = `
     SELECT 
       p.IDpublicacao,
       p.conteudo,
@@ -290,23 +283,35 @@ app.get('/publicacoes/:cpf', (req, res) => {
       DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
       u.nome,
       u.nomeUsuario,
-      u.fotoDePerfil
+      u.fotoDePerfil,
+      p.esporte
     FROM publicacao p
     JOIN usuario u ON p.autor_CPF = u.CPF
     WHERE p.autor_CPF = ?
-    ORDER BY p.data_publicacao DESC
   `;
 
-  connection.query(query, [cpf], (erro, resultados) => {
+  const params = [cpf];
+
+  if (esporte) {
+    query += ' AND p.esporte = ?';
+    params.push(esporte);
+  }
+
+  query += ' ORDER BY p.data_publicacao DESC';
+
+  connection.query(query, params, (erro, resultados) => {
     if (erro) {
-      console.error('Erro ao buscar publicações do usuário:', erro);
-      return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
+      console.error('Erro ao buscar publicações:', erro);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao carregar publicações do usuário.',
+      });
     }
 
-    console.log(`${resultados.length} publicações encontradas para CPF ${cpf}`);
+    console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
     res.json({
       success: true,
-      posts: resultados
+      posts: resultados,
     });
   });
 });
@@ -314,31 +319,31 @@ app.get('/publicacoes/:cpf', (req, res) => {
 
   // PUBLICACOES -------------------------------------------------------------
   app.post('/publicacoes', (req, res) => {
-    console.log("POST PUBLICACOES");
+  console.log("POST PUBLICACOES");
 
-    const { autor_CPF, conteudo } = req.body;
+  const { autor_CPF, conteudo, esporte } = req.body;
 
-    if (!autor_CPF || !conteudo) {
-      return res.status(400).json({
-        success: false,
-        message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!'
-      });
+  if (!autor_CPF || !conteudo) {
+    return res.status(400).json({
+      success: false,
+      message: 'O CPF do autor e o conteúdo da publicação são obrigatórios!'
+    });
+  }
+
+  const query = `
+    INSERT INTO publicacao (autor_CPF, conteudo, imagem, esporte, data_publicacao)
+    VALUES (?, ?, ?, ?, NOW())
+  `;
+
+  connection.query(query, [autor_CPF, conteudo, null, esporte], (erro, resultado) => {
+    if (erro) {
+      console.error('Erro ao inserir publicação:', erro);
+      return res.status(500).json({ success: false, message: 'Erro no servidor.' });
     }
 
-    const query = `
-      INSERT INTO publicacao (autor_CPF, conteudo, imagem, data_publicacao)
-      VALUES (?, ?, ?, NOW())
-    `;
-
-    connection.query(query, [conteudo, autor_CPF], (erro, resultado) => {
-      if (erro) {
-        console.error('Erro ao inserir publicação:', erro);
-        return res.status(500).json({ success: false, message: 'Erro no servidor.' });
-      }
-
-      res.json({ success: true, id: resultado.insertId });
-    });
+    res.json({ success: true, id: resultado.insertId });
   });
+});
 
 
   app.get('/publicacoes', (req, res) => {
@@ -371,25 +376,39 @@ app.get('/publicacoes/:cpf', (req, res) => {
   });
 // =================== PUBLICAR POSTAGEM (com imagem ou texto) ===================
 app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
-  const { autor_CPF, conteudo } = req.body;
+  const { autor_CPF, conteudo, esporte } = req.body;
   const imagem = req.file ? req.file.filename : null;
 
+  console.log("   Nova publicação recebida:");
+  console.log("   CPF:", autor_CPF);
+  console.log("   Esporte:", esporte || "nenhum");
+  console.log("   Conteúdo:", conteudo?.substring(0, 40) || "(vazio)");
+
   if (!autor_CPF) {
-    return res.status(400).json({ success: false, message: "CPF do autor não informado." });
+    return res.status(400).json({
+      success: false,
+      message: "CPF do autor não informado."
+    });
   }
 
   const sql = `
-    INSERT INTO publicacao (autor_CPF, conteudo, imagem, data_publicacao)
-    VALUES (?, ?, ?, NOW())
+    INSERT INTO publicacao (autor_CPF, conteudo, imagem, esporte, data_publicacao)
+    VALUES (?, ?, ?, ?, NOW())
   `;
 
-  connection.query(sql, [autor_CPF, conteudo, imagem], (erro) => {
+  connection.query(sql, [autor_CPF, conteudo, imagem, esporte], (erro) => {
     if (erro) {
       console.error("Erro ao salvar publicação:", erro);
-      return res.status(500).json({ success: false, message: "Erro ao salvar publicação." });
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao salvar publicação no banco."
+      });
     }
 
-    res.json({ success: true, message: "Publicação criada com sucesso!" });
+    res.json({
+      success: true,
+      message: "Publicação criada com sucesso!"
+    });
   });
 });
 
@@ -530,14 +549,14 @@ app.get("/search", (req, res) => {
 
   const termoLike = `%${termo}%`;
 
-  // 🔹 Buscar usuários
+  // Buscar usuários
   const queryUsuarios = `
     SELECT nome, nomeUsuario, fotoDePerfil
     FROM usuario
     WHERE nome LIKE ? OR nomeUsuario LIKE ?
   `;
 
-  // 🔹 Buscar posts
+  // Buscar posts
   const queryPosts = `
     SELECT p.conteudo, u.nome, u.nomeUsuario, u.fotoDePerfil
     FROM publicacao p
