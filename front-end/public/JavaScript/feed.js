@@ -59,7 +59,7 @@ async function carregarFeed(filtroEsporte = "") {
     if (!resposta.ok) throw new Error("Erro ao buscar publicações");
 
     const dados = await resposta.json();
-    console.log("🔍 Retorno do servidor:", dados);
+    console.log(" Retorno do servidor:", dados);
 
     // 🔧 garante que seja sempre um array
     let posts = [];
@@ -101,7 +101,7 @@ async function carregarFeed(filtroEsporte = "") {
         </div>
       `;
 
-      // Mostra/oculta menu
+      // Mostra ou oculta menu
       const menuBtn = div.querySelector(".menu-btn");
       const menuOpcoes = div.querySelector(".menu-opcoes");
       menuBtn.addEventListener("click", (e) => {
@@ -110,7 +110,7 @@ async function carregarFeed(filtroEsporte = "") {
       });
       document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
 
-      // Botão de excluir
+      // Botao de excluir
       const btnExcluir = div.querySelector(".excluir-btn");
       btnExcluir.addEventListener("click", async () => {
         if (confirm("Deseja realmente excluir esta publicação?")) {
@@ -129,13 +129,13 @@ async function carregarFeed(filtroEsporte = "") {
         }
       });
 
-      // Conteúdo
+      // Conteudo
       const conteudoDiv = document.createElement("div");
       conteudoDiv.classList.add("conteudo");
       conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
       div.appendChild(conteudoDiv);
 
-      // Imagem (se houver)
+      // Imagem se tiver ne
       if (post.imagem) {
         const imagemPath = post.imagem.startsWith("/")
           ? `http://localhost:3000${post.imagem}`
@@ -300,15 +300,14 @@ async function criarPost() {
     return;
   }
 
-  if (!esporte) {
-    alert("Selecione um esporte antes de postar.");
-    return;
-  }
-
+  // aqui ta fazendo que nao é obrigrtorio selecionar um esporte 
   const formData = new FormData();
   formData.append("autor_CPF", cpf);
   formData.append("conteudo", texto || "");
-  formData.append("esporte", esporte);
+
+  // Envia o esporte apenas se o usuário escolheu
+  if (esporte) formData.append("esporte", esporte);
+
   if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
 
   try {
@@ -328,8 +327,8 @@ async function criarPost() {
         preview.style.display = "none";
       }
       imagemSelecionada = null;
-      selectEsporte.value = "";
-      await carregarFeed();
+      if (selectEsporte) selectEsporte.value = "";
+      await carregarFeed(); // recarrega o feed geral
     } else {
       alert(dados.message || "Erro ao publicar.");
     }
@@ -338,6 +337,7 @@ async function criarPost() {
     alert("Erro no servidor. Tente novamente.");
   }
 }
+
 
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {
@@ -379,7 +379,7 @@ async function carregarEsportes() {
         </a>
       `;
 
-      // Clique em cada esporte → carrega apenas posts desse esporte
+      // Clique em cada esporte e carrega apenas posts desse esporte
       div.addEventListener("click", () => {
         carregarFeed(nome);
       });
