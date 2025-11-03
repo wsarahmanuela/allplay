@@ -64,7 +64,7 @@
         <!-- Biografia -->
         <section class="biografia">
             <h3>Biografia</h3>
-            <textarea id="bio-textarea" placeholder="Escreva sobre você!" maxlength="300"></textarea>
+            <textarea id="bio-textarea" placeholder="Escreva sobre você!" maxlength="200"></textarea>
 
             <span class="contador-bio">
                 <span id="bio-restante">300</span> caracteres restantes
@@ -76,12 +76,17 @@
             <h3>Esportes Favoritos</h3>
 
             <div class="tags">
-                
+
             </div>
 
             <div class="add-esporte">
-                <input type="text" id="input-novo-esporte" placeholder="Adicionar outro esporte..."
-                    list="lista-esportes">
+                    <div class="input-com-dropdown">
+                        <input type="text" id="input-novo-esporte" placeholder="Adicionar outro esporte...">
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+
+                        <ul id="lista-sugestoes-custom" class="lista-sugestoes">
+                        </ul>
+                    </div>
                 <button id="btn-adicionar-esporte">Adicionar</button>
             </div>
 

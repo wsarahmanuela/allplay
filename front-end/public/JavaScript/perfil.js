@@ -12,7 +12,19 @@ function escapeHtml(text) {
 function caminhoFoto(fotoDePerfil) {
   if (!fotoDePerfil) return "imagens/profile.picture.jpg";
   if (fotoDePerfil.startsWith("http") || fotoDePerfil.startsWith("/")) return fotoDePerfil;
-  return `/uploads/${fotoDePerfil}`;
+  return `http://localhost:3000/uploads/${fotoDePerfil}`;
+}
+
+// =================================================================
+// FUNÇÃO PARA TRATAR O CAMINHO DO BANNER
+// NOTE: Deixamos esta função APENAS uma vez, no topo, para evitar conflitos.
+// =================================================================
+function caminhoBanner(banner) {
+  // Se não houver banner, retorna string vazia. O CSS deve aplicar o fundo padrão.
+  if (!banner) return ""; 
+  // Usa o endereço completo para garantir o carregamento
+  if (banner.startsWith("http") || banner.startsWith("/")) return banner;
+  return `http://localhost:3000/uploads/${banner}`;
 }
 
 // ===== ESCOLHA DE ESPORTES =====
@@ -32,7 +44,7 @@ async function carregarEsportes() {
 
     const dados = await resposta.json();
     const esportes = Array.isArray(dados) ? dados : (dados.esportes || []);
-    const caminhoImagens = "ImagensEscolhaEsportes/";
+    const caminhoImagens = "ImagensEscolhaEsportes/"; // Note: Assumindo que este é o caminho local correto
 
     container.innerHTML = "<p>Seus esportes</p>";
 
@@ -74,7 +86,7 @@ async function carregarEsportes() {
   }
 }
 
-// ===== FOTO DE PERFIL, NOME E BIO =====
+// ===== FOTO DE PERFIL, NOME, BIO E BANNER =====
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");
   if (!cpf) {
@@ -90,6 +102,8 @@ async function preencherPerfil() {
 
     if (!resposta.ok || !dados.success) {
       console.error("Erro ao buscar perfil:", dados);
+      // Aqui, limpamos a tela para indicar que algo falhou
+      document.querySelector("#container-meio").innerHTML = "<h1>Erro ao carregar perfil.</h1>";
       return;
     }
 
@@ -98,16 +112,30 @@ async function preencherPerfil() {
     const arroba = usuario.nomeUsuario ? `@${usuario.nomeUsuario}` : "@usuario";
     const foto = caminhoFoto(usuario.fotoDePerfil);
     const bio = usuario.bio?.trim() || "Nenhuma biografia adicionada ainda.";
+    const bannerPath = caminhoBanner(usuario.bannerURL); // <--- Lendo o campo bannerUrl
 
+    // 1. Elementos do Perfil
     const fotoPerfil = document.querySelector("#container-meio .usuario-foto img");
     const nomePerfil = document.querySelector("#container-segue .nome h3");
     const arrobaPerfil = document.querySelector("#container-segue .nome h5");
     const bioPerfil = document.getElementById("bio");
+    const bannerElement = document.getElementById("banner-perfil"); // <--- Elemento do Banner
 
+    // 2. Aplica dados de Texto/Foto
     if (fotoPerfil) fotoPerfil.src = foto;
     if (nomePerfil) nomePerfil.textContent = nome;
     if (arrobaPerfil) arrobaPerfil.textContent = arroba;
     if (bioPerfil) bioPerfil.textContent = bio;
+
+    // 3. Aplica o Banner
+    if (bannerElement) {
+        if (bannerPath) {
+            bannerElement.style.backgroundImage = `url(${bannerPath})`;
+            bannerElement.style.backgroundColor = 'transparent'; // Opcional: Remove cor de fundo
+        } else {
+            bannerElement.style.backgroundImage = 'none'; 
+        }
+    }
 
     const fotoNavbar = document.querySelector(".nav-user-icon img");
     if (fotoNavbar) fotoNavbar.src = foto;
@@ -256,7 +284,7 @@ async function carregarFeed() {
   }
 }
 
-// ================== UPLOAD DE IMAGEM + CRIAR POST ==================
+// ================== UPLOAD DE IMAGEM + CRIAR POST (NÃO ALTERADO) ==================
 let imagemSelecionada = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -321,9 +349,30 @@ async function criarPost() {
   }
 }
 
-// ===== inicialização =====
+// =================================================================
+// FUNÇÃO DE NAVEGAÇÃO PARA EDIÇÃO DE PERFIL
+// =================================================================
+function configurarBotaoEditar() {
+    const btnEditar = document.getElementById('btn-editar-perfil');
+    
+    if (btnEditar) {
+        btnEditar.addEventListener('click', () => {
+            console.log('Botão Editar Perfil clicado. Redirecionando...');
+            window.location.href = 'editPerfil.html'; 
+        });
+    } else {
+        console.warn("Elemento com ID 'btn-editar-perfil' não encontrado. O botão de edição pode estar ausente.");
+    }
+}
+
+
+// ===== inicialização (Tudo que deve rodar ao carregar a página) =====
 document.addEventListener("DOMContentLoaded", () => {
-  preencherPerfil();
-  carregarFeed();
-  carregarEsportes();
+    // Chamadas principais
+    preencherPerfil();
+    carregarFeed();
+    carregarEsportes();
+    
+    // Chamada do botão de edição
+    configurarBotaoEditar(); 
 });

@@ -1,3 +1,4 @@
+/* ======================= CONFIGURAÇÃO GERAL ======================= */
 * {
     margin: 0;
     padding: 0;
@@ -75,7 +76,7 @@ nav {
 }
 
 .search-box img {
-    width: 18px; 
+    width: 18px;
 }
 
 .search-box input {
@@ -86,7 +87,7 @@ nav {
     border: 0;
 }
 
-/* ======================= CONTAINER ======================= */
+/* ======================= CONTAINER GERAL DA PÁGINA ======================= */
 .container {
     display: flex;
     flex-wrap: nowrap;
@@ -97,7 +98,7 @@ nav {
     margin-top: 90px;
 }
 
-/* ======================= LATERAL ESQUERDA (AJUSTADA) ======================= */
+/* ======================= LATERAL ESQUERDA ======================= */
 
 .left-sidebar {
     flex: none;
@@ -108,7 +109,7 @@ nav {
 }
 
 /* Links principais */
-.imp-links a, 
+.imp-links a,
 .shortcut-links a {
     text-decoration: none;
     display: flex;
@@ -122,7 +123,7 @@ nav {
 }
 
 /* Ícones */
-.imp-links a img, 
+.imp-links a img,
 .shortcut-links a img {
     width: 25px;
     margin-right: 15px;
@@ -159,7 +160,7 @@ nav {
     margin-right: 15px;
 }
 
-/* ======================= PERFIL ======================= */
+/* ======================= PERFIL (ÁREA CENTRAL) ======================= */
 #perfil-wrapper {
     display: flex;
     flex-direction: column;
@@ -167,6 +168,7 @@ nav {
     width: 100%;
 }
 
+/* CONTÊINER PRINCIPAL (BANNER/GRADIENTE) */
 #container-meio {
     background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
     border-radius: 10px;
@@ -179,6 +181,28 @@ nav {
     position: relative;
 }
 
+/* BANNER (PARA RECEBER IMAGEM VIA JS) */
+#banner-perfil {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 10px;
+}
+
+/* CONTÊINER DA FOTO DE PERFIL */
+.usuario-foto {
+    position: absolute;
+    bottom: -65px;
+    left: 40px;
+    z-index: 2;
+}
+
+/* IMAGEM DA FOTO DE PERFIL */
 .usuario-foto img {
     width: 150px;
     height: 150px;
@@ -187,28 +211,20 @@ nav {
     margin-top: 250px;
 }
 
-/* Nome e botão seguir */
+/* NOME E BOTÃO EDITAR */
 #container-segue {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: 13rem;
     position: relative;
-    margin-left: 180px;
+    margin-left: 200px;
+    margin-top: 15px;
 }
 
-.nome h3 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
+.nome {
     display: flex;
-}
-
-.nome h5 {
-    margin: 0;
-    color: #333;
-    font-weight: 500;
-    font-size: 1rem;
-    display: flex;
+    flex-direction: column;
 }
 
 .seguir h3 {
@@ -219,74 +235,62 @@ nav {
     cursor: pointer;
     font-size: 1rem;
 }
+.nome h5 {
+    margin: 0;
+    color: #333;
+    font-weight: 500;
+    font-size: 1rem;
+    display: flex;
+}
+
+.nome h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    display: flex;
+}
+
+
 
 /* ======================= ÁREA DE PUBLICAÇÕES ======================= */
 #container-baixo {
-  background-color: #ffffff3c;
-  border-radius: 20px;
-  padding: 30px;
-  margin-top: 50px;
-  width: 100%;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-
-  /* REMOVIDO o min-height fixo */
-  height: auto; /* altura automática conforme o conteúdo */
-  justify-content: flex-start; /* garante que o conteúdo comece do topo */
-}
-
-    
-#container-baixo h2 {
-  color: #555;
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-}
-
-#container-baixo .foto img {
-  width: 80px;
-  opacity: 0.7;
-}
-
-/* garante que o gradiente e a área branca fiquem alinhados */
-#container-meio {
-  background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
-  border-radius: 10px;
-  width: 100%;
-  max-width: 1000px; /* mesmo tamanho do container abaixo */
-  height: 25vh;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 1rem;
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
+    background-color: #ffffff3c;
+    border-radius: 20px;
+    padding: 30px;
+    /* Reduz a margem para evitar grande espaçamento entre o banner e este container */
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    height: auto;
+    justify-content: flex-start;
 }
 
 #container-baixo h2 {
-  color: #555;
-  font-size: 1.2rem;
-  margin-bottom: 15px;
+    color: #555;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
 }
 
 #container-baixo .foto img {
-  width: 70px;
-  opacity: 0.7;
+    width: 70px;
+    opacity: 0.7;
 }
+
 
 /* ======================= CONTAINER CENTRAL PERFIL ======================= */
 .perfil-container {
     display: flex;
-    justify-content: center; /* deixa os blocos mais centrados */
+    justify-content: center;
     align-items: flex-start;
-    background: transparent; /* remove fundo branco que estava juntando */
-    gap: 40px; /* aumenta a separação entre centro e direita */
+    background: transparent;
+    gap: 40px;
     width: 100%;
     max-width: 1300px;
     margin: 0 auto;
@@ -307,20 +311,17 @@ nav {
     border-radius: 10px;
     box-shadow: 2px 8px rgba(0, 0, 0, 0.08);
     height: fit-content;
-    margin-top: 40px; /* afasta da faixa verde */
+    margin-top: 40px;
 }
-
-
-
 
 /* Publicação */
 .publicacao-card {
     background: #fff;
     width: 100%;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding:  20px;
-    text-align: left; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: left;
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
@@ -388,7 +389,8 @@ nav {
     justify-content: space-between;
 }
 
-.seguindo, .seguidores {
+.seguindo,
+.seguidores {
     flex: 0 0 48%;
     height: 40px;
     display: flex;
@@ -400,7 +402,8 @@ nav {
     font-weight: bold;
 }
 
-.seguindo h4, .seguidores h4 {
+.seguindo h4,
+.seguidores h4 {
     margin: 0;
     font-size: 14px;
 }
@@ -476,7 +479,7 @@ nav {
     padding: 15px 10px;
     border-radius: 12px;
     background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
     box-sizing: border-box;
 }
@@ -490,101 +493,102 @@ nav {
 .clube-card p strong {
     color: #000;
 }
+
 .post {
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  padding: 15px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 15px;
 }
 
 .post-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .foto-perfil {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  object-fit: cover;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .post-info .nome {
-  font-weight: 600;
-  color: #111;
+    font-weight: 600;
+    color: #111;
 }
 
 .post-info .usuario {
-  display: block;
-  color: #777;
-  font-size: 0.9rem;
+    display: block;
+    color: #777;
+    font-size: 0.9rem;
 }
 
 .conteudo {
-  margin: 10px 0;
-  color: #222;
-  font-size: 0.95rem;
-  white-space: pre-wrap;
+    margin: 10px 0;
+    color: #222;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
 }
 
 .post-imagem {
-  width: 100%;
-  border-radius: 12px;
-  margin-top: 10px;
-  object-fit: cover;
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 10px;
+    object-fit: cover;
 }
 
 .data {
-  color: #666;
-  font-size: 0.85rem;
-  margin-top: 8px;
-  text-align: right;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    text-align: right;
 }
+
 .post-menu {
-  position: relative;
-  margin-left: auto;
+    position: relative;
+    margin-left: auto;
 }
 
 .menu-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #000000;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #000000;
 }
 
 .menu-opcoes {
-  
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 25px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(255, 3, 3, 0.1);
-  z-index: 10;
+
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 25px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(255, 3, 3, 0.1);
+    z-index: 10;
 }
 
 .menu-opcoes.ativo {
-  display: block;
+    display: block;
 }
 
 .menu-opcoes button {
-  color: red;
-  display: block;
-  width: 100%;
-  padding: 8px 15px;
-  border: none;
-  background: white;
-  cursor: pointer;
-  text-align: left;
+    color: red;
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    text-align: left;
 }
 
 .menu-opcoes button:hover {
-  background: #f5f5f5;
+    background: #f5f5f5;
 }
-
