@@ -115,4 +115,17 @@ body {
     height: 50px;
 
   }
-  
+
+
+  #seguirP{
+    width: 150px;
+    height: 30px;
+    background-color: #1aa54a;
+    border-radius: 10px;
+    color:white;
+    display: flex;
+    align-items: center;   
+    justify-content: center; 
+    text-align: center;   
+
+  }

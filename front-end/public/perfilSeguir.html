@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERFIL</title>
+    <link rel="stylesheet" href="perfilSeguir.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <h2 class="logo">
+                <a href="feed.html" style="text-decoration: none; color: inherit;">ALL PLAY</a>
+            </h2>
+            <ul>
+                <li>
+                    <img src="imagens/Notificacao.png.png" alt="Notificação">
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-right">
+            <div class="search-box">
+                <img src="imagens/search.image.png" alt="Search">
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="nav-user-icon online" onclick="configuracoesMenuAlter()">
+                <img src="imagens/profile.picture.jpg" alt="Usuário">
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="left-sidebar">
+            <div class="imp-links">
+                <a href="#"><img src="imagens/friends.png" alt="">Amigos</a>
+                <a href="#"><img src="imagens/club.png" alt="">Notificação</a>
+                <a href="map.html"><img src="imagens/Design_sem_nome__3_-removebg-preview.png">Localização</a>
+            </div>
+            <div class="shortcut-links" id="atalhos-esportes">
+                <p>Seus esportes</p>
+                <!--AQUI VAI FICAR OS ESPORTES -->
+            </div>
+        </div>
+
+        <!-- CONTAINER CENTRAL ADICIONADO -->
+        <div class="perfil-container">
+            <div class="main-content">
+                <div id="perfil-wrapper">
+                    <div id="container-meio"> 
+                        <div class="usuario-foto">
+                            <img src="imagens/profile.picture.jpg" alt="usuario">
+                        </div>
+                    </div>
+
+                    <div id="container-segue">
+                        <div class="nome">
+                            <h3>Nome Completo</h3>
+                            <h5>@nome_usuário</h5>
+                        </div>
+                        <div class="seguir">
+                            <h3>seguir</h3>
+                        </div>   
+                    </div>
+                </div>
+
+                <div id="container-baixo">
+                    <!-- publicações -->
+                </div>
+            </div>
+
+            <div id="container-direita"> 
+                <div class="seguindo-seguidores">
+                    <div class="seguindo"><h4>0 seguindo</h4></div>
+                    <div class="seguidores"><h4>0 seguidores</h4></div>
+                </div>
+
+                <div class="esportes">
+                    <div class="esporte">Basquete</div>
+                    <div class="esporte">Vôlei</div>
+                    <div class="esporte">Futebol</div>
+                    <div class="esporte">Tênis de mesa</div>
+                </div>
+
+                <div class="infos-geral">
+                    <div class="biografia">
+                        <h2>Biografia</h2>
+                        <p id="bio">Carregando biografia...</p>
+                    </div>
+                </div>
+
+                <div class="clubes">
+                    <h2>Clubes que frequento</h2>
+                    <div class="clube-card">
+                        <p><strong>Tupi Gaspar</strong></p>
+                        <p>Futebol</p>
+                    </div>
+                    <div class="clube-card">
+                        <p><strong>AEEG</strong></p>
+                        <p>Vôlei</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- FIM DO CONTAINER CENTRAL -->
+    </div>
+
+    <script src="JavaScript/perfil.js"></script>
+</body>
+</html>
