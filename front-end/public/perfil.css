@@ -493,6 +493,17 @@ nav {
 .clube-card p strong {
     color: #000;
 }
+<<<<<<< HEAD
+/*------ Post (Estilo da Primeira Imagem/Feed) ------ */
+.post {
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  font-family: "Poppins", sans-serif;
+=======
 
 .post {
     background: #fff;
@@ -500,9 +511,30 @@ nav {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     padding: 15px;
+>>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
+}
+.post-imagem {
+  width: 100%;
+  max-height: 400px;
+  border-radius: 10px;
+  margin-top: 10px;
+  object-fit: cover;
 }
 
+
 .post-header {
+<<<<<<< HEAD
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.foto-perfil {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+=======
     display: flex;
     align-items: center;
     gap: 10px;
@@ -514,9 +546,39 @@ nav {
     height: 45px;
     border-radius: 50%;
     object-fit: cover;
+>>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
+}
+
+.post-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 }
 
 .post-info .nome {
+<<<<<<< HEAD
+  font-weight: 600;
+  font-size: 15px;
+  color: #000;
+}
+
+.post-info .usuario {
+  font-size: 14px;
+  color: #555;
+}
+
+.conteudo {
+  margin-top: 10px;
+  font-size: 15px;
+  color: #111;
+  white-space: pre-wrap;
+}
+
+.data {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #777;
+=======
     font-weight: 600;
     color: #111;
 }
@@ -546,6 +608,7 @@ nav {
     font-size: 0.85rem;
     margin-top: 8px;
     text-align: right;
+>>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
 }
 
 .post-menu {
@@ -590,5 +653,10 @@ nav {
 }
 
 .menu-opcoes button:hover {
+<<<<<<< HEAD
+  background: #f5f5f5;
+}
+=======
     background: #f5f5f5;
 }
+>>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c

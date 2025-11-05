@@ -31,14 +31,13 @@ async function carregarEsportes() {
   if (!container) return;
 
   const cpf = localStorage.getItem("cpf");
-  if (!cpf) {
-    container.innerHTML = "<p>CPF não encontrado. Faça login novamente.</p>";
-    return;
-  }
+  if (!cpf) return;
 
   try {
-    const resposta = await fetch(`http://localhost:3000/esportes/${encodeURIComponent(cpf)}`);
-    if (!resposta.ok) throw new Error("Erro ao buscar esportes.");
+    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
+    const esportes = await resposta.json();
+
+    const caminhoImagens = "ImagensEscolhaEsportes/";
 
     const dados = await resposta.json();
     const esportes = Array.isArray(dados) ? dados : (dados.esportes || []);
@@ -47,17 +46,14 @@ async function carregarEsportes() {
     container.innerHTML = "<p>Seus esportes</p>";
 
     if (esportes.length === 0) {
-      container.insertAdjacentHTML("beforeend", "<p>Você ainda não escolheu esportes.</p>");
+      container.innerHTML += "<p>Você ainda não escolheu esportes.</p>";
       return;
     }
 
     esportes.forEach(nome => {
-      const a = document.createElement("a");
-      a.href = "#";
-      a.style.display = "flex";
-      a.style.alignItems = "center";
-      a.style.gap = "8px";
-      a.style.marginBottom = "12px";
+      const div = document.createElement("div");
+      div.classList.add("esporte-item");
+      div.dataset.esporte = nome;
 
       const nomeArquivo = nome
         .normalize("NFD")
@@ -65,25 +61,40 @@ async function carregarEsportes() {
         .replace(/\s+/g, "")
         .toLowerCase();
 
-      const img = document.createElement("img");
-      img.src = `${caminhoImagens}${nomeArquivo}.png`;
-      img.alt = nome;
-      img.style.width = "30px";
-      img.onerror = () => (img.style.display = "none");
+      div.innerHTML = `
+        <a href="#">
+          <img src="${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png" 
+               onerror="this.src='imagens/default.png'" 
+               alt="${nome}">
+          ${nome}
+        </a>
+      `;
 
-      const texto = document.createElement("span");
-      texto.textContent = nome;
+      //  Quando clica, o nome fica verde e o feed é filtrado
+      div.addEventListener("click", () => {
+        // remove ativo dos outros
+        document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
+          link.classList.remove("ativo");
+        });
 
-      a.appendChild(img);
-      a.appendChild(texto);
-      container.appendChild(a);
+        // adiciona ativo ao clicado
+        const link = div.querySelector("a");
+        link.classList.add("ativo");
+
+        // filtra feed
+        carregarFeed(nome);
+      });
+
+      container.appendChild(div);
     });
+
   } catch (erro) {
     console.error("Erro ao carregar esportes:", erro);
-    container.innerHTML = `<p>Erro ao carregar seus esportes: ${escapeHtml(erro.message || String(erro))}</p>`;
   }
 }
 
+
+// ===== FOTO DE PERFIL, NOME E BIO =====
 // ===== FOTO DE PERFIL, NOME, BIO E BANNER =====
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");

@@ -61,7 +61,7 @@ async function carregarFeed(filtroEsporte = "") {
     const dados = await resposta.json();
     console.log(" Retorno do servidor:", dados);
 
-    // 🔧 garante que seja sempre um array
+    //  garante que seja sempre um array
     let posts = [];
     if (Array.isArray(dados)) {
       posts = dados;
@@ -193,7 +193,10 @@ const resultsDiv = document.getElementById("resultsDiv");
 if (searchInput && resultsDiv) {
   async function fazerBusca() {
     const termo = searchInput.value.trim();
-    if (!termo) return;
+    if (!termo) {
+      resultsDiv.style.display = "none";
+      return;
+    }
 
     try {
       const resposta = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(termo)}`);
@@ -202,50 +205,55 @@ if (searchInput && resultsDiv) {
       const resultados = await resposta.json();
       resultsDiv.innerHTML = "";
 
-      if (resultados.posts.length === 0 && resultados.usuarios.length === 0) {
+      if (resultados.usuarios.length === 0 && resultados.posts.length === 0) {
         resultsDiv.textContent = "Nenhum resultado encontrado.";
-        return;
-      }
-
-      if (resultados.usuarios.length > 0) {
-        const tituloUsuarios = document.createElement("h3");
-        tituloUsuarios.textContent = "Usuários";
-        resultsDiv.appendChild(tituloUsuarios);
-
+      } else {
+        // Usuários
         resultados.usuarios.forEach(usuario => {
           const div = document.createElement("div");
-          div.classList.add("resultado-usuario");
-          div.textContent = `${usuario.nome} (@${usuario.nomeUsuario})`;
+          div.classList.add("result-item");
+          div.innerHTML = `
+            <img src="${usuario.fotoDePerfil ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}` : 'imagens/profile.picture.jpg'}" alt="${usuario.nome}">
+            <span>${usuario.nome} (@${usuario.nomeUsuario})</span>
+          `;
+          div.addEventListener("click", () => {
+            // exemplo: ir pro perfil do usuário
+            window.location.href = `/perfil.html?cpf=${usuario.CPF}`;
+          });
           resultsDiv.appendChild(div);
         });
-      }
 
-      if (resultados.posts.length > 0) {
-        const tituloPosts = document.createElement("h3");
-        tituloPosts.textContent = "Postagens";
-        resultsDiv.appendChild(tituloPosts);
-
+        // Posts
         resultados.posts.forEach(post => {
           const div = document.createElement("div");
-          div.classList.add("resultado-post");
-          div.innerHTML = `<strong>${post.nome || "Usuário sem nome"}</strong>: ${post.conteudo}`;
+          div.classList.add("result-item");
+          div.innerHTML = `
+            <strong>${post.nome}</strong>: ${post.conteudo}
+          `;
           resultsDiv.appendChild(div);
         });
       }
+
+      resultsDiv.style.display = "block";
 
     } catch (erro) {
       console.error("Erro ao fazer busca:", erro);
       resultsDiv.textContent = "Erro ao buscar. Tente novamente.";
+      resultsDiv.style.display = "block";
     }
   }
 
-  searchInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      fazerBusca();
+  searchInput.addEventListener("input", fazerBusca);
+
+  document.addEventListener("click", (e) => {
+    if (!resultsDiv.contains(e.target) && e.target !== searchInput) {
+      resultsDiv.style.display = "none";
     }
   });
 }
+
+
+
 
 // ================== UPLOAD DE IMAGEM + CRIAR POST ==================
 let imagemSelecionada = null;
@@ -379,8 +387,18 @@ async function carregarEsportes() {
         </a>
       `;
 
-      // Clique em cada esporte e carrega apenas posts desse esporte
+      //  Quando clica, o nome fica verde e o feed é filtrado
       div.addEventListener("click", () => {
+        // remove ativo dos outros
+        document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
+          link.classList.remove("ativo");
+        });
+
+        // adiciona ativo ao clicado
+        const link = div.querySelector("a");
+        link.classList.add("ativo");
+
+        // filtra feed
         carregarFeed(nome);
       });
 
