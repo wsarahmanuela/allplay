@@ -15,10 +15,8 @@ function caminhoFoto(fotoDePerfil) {
   return `http://localhost:3000/uploads/${fotoDePerfil}`;
 }
 
-// =================================================================
+
 // FUNÇÃO PARA TRATAR O CAMINHO DO BANNER
-// NOTE: Deixamos esta função APENAS uma vez, no topo, para evitar conflitos.
-// =================================================================
 function caminhoBanner(banner) {
   // Se não houver banner, retorna string vazia. O CSS deve aplicar o fundo padrão.
   if (!banner) return ""; 
