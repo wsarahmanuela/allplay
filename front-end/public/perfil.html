@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PERFIL</title>
     <link rel="stylesheet" href="perfil.css">
 </head>
+
 <body>
     <nav>
         <div class="nav-left">
@@ -48,7 +50,10 @@
         <div class="perfil-container">
             <div class="main-content">
                 <div id="perfil-wrapper">
-                    <div id="container-meio"> 
+                    
+                    <div id="container-meio">
+                        <div id="banner-perfil"></div>
+
                         <div class="usuario-foto">
                             <img src="imagens/profile.picture.jpg" alt="usuario">
                         </div>
@@ -59,9 +64,9 @@
                             <h3>Nome Completo</h3>
                             <h5>@nome_usuário</h5>
                         </div>
-                        <div class="seguir">
+                        <div class="seguir" id="btn-editar-perfil">
                             <h3>editar</h3>
-                        </div>   
+                        </div>
                     </div>
                 </div>
 
@@ -70,10 +75,14 @@
                 </div>
             </div>
 
-            <div id="container-direita"> 
+            <div id="container-direita">
                 <div class="seguindo-seguidores">
-                    <div class="seguindo"><h4>0 seguindo</h4></div>
-                    <div class="seguidores"><h4>0 seguidores</h4></div>
+                    <div class="seguindo">
+                        <h4>0 seguindo</h4>
+                    </div>
+                    <div class="seguidores">
+                        <h4>0 seguidores</h4>
+                    </div>
                 </div>
 
                 <div class="esportes">
@@ -108,4 +117,5 @@
 
     <script src="JavaScript/perfil.js"></script>
 </body>
+
 </html>

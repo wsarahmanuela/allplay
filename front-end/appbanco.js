@@ -1,16 +1,16 @@
-  const express = require("express");
-  const app = express();
-  const path = require("path");
-  const multer = require("multer");
-  const mysql2 = require("mysql2");
+const express = require("express");
+const app = express();
+const path = require("path");
+const multer = require("multer");
+const mysql2 = require("mysql2");
 
-  app.use(express.static(path.join(__dirname, "public")));
-  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  const uploadDir = path.join(__dirname, "uploads");
-  // =================== CONFIGURAÇÃO DO MULTER ===================
+const uploadDir = path.join(__dirname, "uploads");
+// =================== CONFIGURAÇÃO DO MULTER ===================
 const fs = require("fs");
 
 const storage = multer.diskStorage({
@@ -28,243 +28,225 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-  const connection = mysql2.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Glsarah25!',
-    database: 'pi_bbd'
-  });
+const connection = mysql2.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'Glsarah25!',
+  database: 'pi_bbd'
+});
 
-  connection.connect((err) => {
+connection.connect((err) => {
+  if (err) {
+    console.error('Erro ao conectar no banco de dados:');
+    console.error('Código:', err.code);
+    console.error('Mensagem:', err.message);
+    console.error('SQL State:', err.sqlState);
+    return;
+  }
+  console.log('Conectado ao banco de dados MySQL!');
+
+  connection.query('SHOW TABLES LIKE "usuario"', (err, results) => {
     if (err) {
-      console.error('Erro ao conectar no banco de dados:');
-      console.error('Código:', err.code);
-      console.error('Mensagem:', err.message);
-      console.error('SQL State:', err.sqlState);
+      console.error('Erro ao verificar tabela:', err);
       return;
     }
-    console.log('Conectado ao banco de dados MySQL!');
-    
-    connection.query('SHOW TABLES LIKE "usuario"', (err, results) => {
-      if (err) {
-        console.error('Erro ao verificar tabela:', err);
-        return;
-      }
-      if (results.length > 0) {
-        console.log('Tabela usuarios encontrada!');
-      } else {
-        console.log('Tabela usuarios NAO encontrada!');
-      }
-    });
-  });
-
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
-
-
-  app.post('/cadastro', (req, res) => {
-    const { nome, telefone, cpf, cidade, email, senha } = req.body;
-
-    if (!nome || !telefone || !cpf || !cidade || !email || !senha) {
-      return res.status(400).json({
-        success: false,
-        message: 'Todos os campos são obrigatórios!'
-      });
+    if (results.length > 0) {
+      console.log('Tabela usuarios encontrada!');
+    } else {
+      console.log('Tabela usuarios NAO encontrada!');
     }
+  });
+});
 
-    const query = `
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+
+app.post('/cadastro', (req, res) => {
+  const { nome, telefone, cpf, cidade, email, senha } = req.body;
+
+  if (!nome || !telefone || !cpf || !cidade || !email || !senha) {
+    return res.status(400).json({
+      success: false,
+      message: 'Todos os campos são obrigatórios!'
+    });
+  }
+
+  const query = `
       INSERT INTO usuario 
       (nome, telefone, cpf, cidade, email, senha) 
       VALUES (?, ?, ?, ?, ?, ?)`;
 
-    connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
-      if (error) {
-        console.error('Erro ao inserir no banco:', error);
-        if (error.code === 'ER_DUP_ENTRY') {
-          return res.status(400).json({
-            success: false,
-            message: 'Email ou CPF já cadastrado!'
-          });
-        }
-        return res.status(500).json({
+  connection.query(query, [nome, telefone, cpf, cidade, email, senha], (error, results) => {
+    if (error) {
+      console.error('Erro ao inserir no banco:', error);
+      if (error.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({
           success: false,
-          message: 'Erro ao cadastrar usuario'
+          message: 'Email ou CPF já cadastrado!'
         });
       }
-      console.log('Usuário cadastrado com sucesso!');
-      res.json({
-        success: true,
-        message: 'Usuário cadastrado com sucesso!'
-      });
-    });
-  });
-
-  // LOGIN ------------------------------------------------
-  app.post('/login', (req, res) => {
-    const { email, senha } = req.body;
-
-    console.log('Tentativa de login para:', email);
-
-    if (!email || !senha) {
-      return res.status(400).json({ message: "Email e senha são obrigatórios." });
-    }
-
-    const sql = "SELECT * FROM usuario WHERE email = ? AND senha = ?";
-    connection.query(sql, [email, senha], (erro, resultados) => {
-      if (erro) {
-        console.error('Erro ao buscar usuário:', erro);
-        return res.status(500).json({ message: "Erro no servidor." });
-      }
-
-      console.log('Resultados encontrados:', resultados.length);
-
-      if (resultados.length > 0) {
-        console.log('Login bem-sucedido para:', email);
-
-        const usuario = resultados[0];
-
-        return res.status(200).json({cpf: usuario.CPF,
-          message: "Login bem-sucedido!"})
-      } else {
-        console.log('Usuario nao encontrado ou senha incorreta para:', email);
-        return res.status(401).json({ message: "Email ou senha incorretos." });
-      }
-    });
-  });
-
-  app.get('/usuario', (req, res) => {
-    connection.query('SELECT id, nome, email FROM usuario', (erro, resultados) => {
-      if (erro) {
-        console.error('Erro ao buscar usuários:', erro);
-        return res.status(500).json({ message: 'Erro no servidor' });
-      }
-      res.json(resultados);
-    });
-  });
-
-  app.get('/teste', (req, res) => {
-    res.json({ 
-      message: 'Servidor funcionando!',
-      timestamp: new Date().toISOString(),
-      database: connection.state
-    });
-  });
-
-  app.get('/teste-banco', (req, res) => {
-    connection.query('SELECT 1 as test', (erro, resultados) => {
-      if (erro) {
-        return res.status(500).json({
-          success: false,
-          message: 'Erro na conexão com o banco',
-          error: erro.message
-        });
-      }
-      res.json({
-        success: true,
-        message: 'Conexão com banco funcionando!',
-        result: resultados
-      });
-    });
-  });
-
-
-
-  //CADASTRO02 -----------------------------------------------------------------
-  app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
-    const { cpf, bio, nomeUsuario } = req.body;
-    const foto = req.file ? req.file.filename : null;
-
-    if (!cpf || !bio || !nomeUsuario || !foto) {
-      // Incluído nomeUsuario na validação, para ter certeza que é enviado
-      return res.status(400).json({
+      return res.status(500).json({
         success: false,
-        message: "Dados incompletos (CPF, Bio, Nome de Usuário ou Foto de Perfil faltando)."
+        message: 'Erro ao cadastrar usuario'
       });
     }
-
-    const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ?, nomeUsuario = ? WHERE cpf = ?";
-    connection.query(sql, [bio, foto, nomeUsuario, cpf], (erro) => {
-      if (erro) {
-        console.error("Erro ao salvar perfil no banco:", erro);
-        return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
-      }
-      res.json({ success: true, message: "Perfil atualizado com sucesso." });
+    console.log('Usuário cadastrado com sucesso!');
+    res.json({
+      success: true,
+      message: 'Usuário cadastrado com sucesso!'
     });
   });
+});
 
-  // ESCOLHA DE ESPORTE --------------------------------------------------------
-  app.post('/esportes', (req, res) => {
-    const { cpf, esportes } = req.body;
+// LOGIN ------------------------------------------------
+app.post('/login', (req, res) => {
+  const { email, senha } = req.body;
 
-    if (!cpf || !esportes || esportes.length === 0) {
-      return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
+  console.log('Tentativa de login para:', email);
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: "Email e senha são obrigatórios." });
+  }
+
+  const sql = "SELECT * FROM usuario WHERE email = ? AND senha = ?";
+  connection.query(sql, [email, senha], (erro, resultados) => {
+    if (erro) {
+      console.error('Erro ao buscar usuário:', erro);
+      return res.status(500).json({ message: "Erro no servidor." });
     }
 
-    connection.query("DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?", [cpf], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ mensagem: "Erro ao deletar esportes antigos" });
-      }
+    console.log('Resultados encontrados:', resultados.length);
 
-      const valores = esportes.map(e => [cpf, e]); 
-      connection.query(
-        "INSERT INTO usuario_esportesdeinteresse (CPF_usuario, nome_esporte) VALUES ?",
-        [valores],
-        (err2) => {
-          if (err2) {
-            console.error(err2);
-            return res.status(500).json({ mensagem: "Erro ao salvar no banco" });
-          }
+    if (resultados.length > 0) {
+      console.log('Login bem-sucedido para:', email);
 
-          res.json({ mensagem: "Esportes salvos com sucesso" });
-        }
-      );
+      const usuario = resultados[0];
+
+      return res.status(200).json({
+        cpf: usuario.CPF,
+        message: "Login bem-sucedido!"
+      })
+    } else {
+      console.log('Usuario nao encontrado ou senha incorreta para:', email);
+      return res.status(401).json({ message: "Email ou senha incorretos." });
+    }
+  });
+});
+
+app.get('/usuario', (req, res) => {
+  connection.query('SELECT id, nome, email FROM usuario', (erro, resultados) => {
+    if (erro) {
+      console.error('Erro ao buscar usuários:', erro);
+      return res.status(500).json({ message: 'Erro no servidor' });
+    }
+    res.json(resultados);
+  });
+});
+
+app.get('/teste', (req, res) => {
+  res.json({
+    message: 'Servidor funcionando!',
+    timestamp: new Date().toISOString(),
+    database: connection.state
+  });
+});
+
+app.get('/teste-banco', (req, res) => {
+  connection.query('SELECT 1 as test', (erro, resultados) => {
+    if (erro) {
+      return res.status(500).json({
+        success: false,
+        message: 'Erro na conexão com o banco',
+        error: erro.message
+      });
+    }
+    res.json({
+      success: true,
+      message: 'Conexão com banco funcionando!',
+      result: resultados
     });
   });
+});
 
-  app.get("/esportes/:cpf", (req, res) => {// Buscar esportes do ususrio pelo CPF
-    const cpf = req.params.cpf;
 
+
+//CADASTRO02 -----------------------------------------------------------------
+
+
+// ESCOLHA DE ESPORTE --------------------------------------------------------
+app.post('/esportes', (req, res) => {
+  const { cpf, esportes } = req.body;
+
+  if (!cpf || !esportes || esportes.length === 0) {
+    return res.status(400).json({ mensagem: "CPF e esportes são obrigatórios" });
+  }
+
+  connection.query("DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?", [cpf], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ mensagem: "Erro ao deletar esportes antigos" });
+    }
+
+    const valores = esportes.map(e => [cpf, e]);
     connection.query(
-      "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
-      [cpf],
-      (err, rows) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
+      "INSERT INTO usuario_esportesdeinteresse (CPF_usuario, nome_esporte) VALUES ?",
+      [valores],
+      (err2) => {
+        if (err2) {
+          console.error(err2);
+          return res.status(500).json({ mensagem: "Erro ao salvar no banco" });
         }
 
-        const esportes = rows.map(r => r.nome_esporte);
-        res.json(esportes);
+        res.json({ mensagem: "Esportes salvos com sucesso" });
       }
     );
-  });//aqui mai mostrar no feed 
+  });
+});
 
-  // CARREGAR FEED  
-  // essa func é importante p carregar as proximas postagens
-  async function carregarFeed() {
-      console.log("Tentando carregar o feed...");
-      
-      try {
-          const response = await fetch('/publicacoes', {
-            method: "GET"
-          });
+app.get("/esportes/:cpf", (req, res) => {// Buscar esportes do ususrio pelo CPF
+  const cpf = req.params.cpf;
 
-          if (!response.ok) {
-              throw new Error(`Erro HTTP ao buscar posts! Status: ${response.status}`);
-          }
-
-          const posts = await response.json(); 
-          
-          console.log(" Posts recebidos com sucesso. Total:", posts.length);
-          
-          // exibirPostsNoHTML(posts); 
-
-      } catch (erro) {
-          console.error("Erro fatal ao carregar o feed:", erro);
+  connection.query(
+    "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
+    [cpf],
+    (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
       }
+
+      const esportes = rows.map(r => r.nome_esporte);
+      res.json(esportes);
+    }
+  );
+});//aqui mai mostrar no feed 
+
+// CARREGAR FEED  
+// essa func é importante p carregar as proximas postagens
+async function carregarFeed() {
+  console.log("Tentando carregar o feed...");
+
+  try {
+    const response = await fetch('/publicacoes', {
+      method: "GET"
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP ao buscar posts! Status: ${response.status}`);
+    }
+
+    const posts = await response.json();
+
+    console.log(" Posts recebidos com sucesso. Total:", posts.length);
+
+    // exibirPostsNoHTML(posts); 
+
+  } catch (erro) {
+    console.error("Erro fatal ao carregar o feed:", erro);
   }
+}
 
 // ===================== PUBLICAÇÕES DO USUÁRIO =====================
 app.get('/publicacoes/:cpf', (req, res) => {
@@ -317,8 +299,8 @@ app.get('/publicacoes/:cpf', (req, res) => {
 });
 
 
-  // PUBLICACOES -------------------------------------------------------------
-  app.post('/publicacoes', (req, res) => {
+// PUBLICACOES -------------------------------------------------------------
+app.post('/publicacoes', (req, res) => {
   console.log("POST PUBLICACOES");
 
   const { autor_CPF, conteudo, esporte } = req.body;
@@ -346,10 +328,10 @@ app.get('/publicacoes/:cpf', (req, res) => {
 });
 
 
-  app.get('/publicacoes', (req, res) => {
-    console.log("GET PUBLICACOES");
+app.get('/publicacoes', (req, res) => {
+  console.log("GET PUBLICACOES");
 
-    const query = `
+  const query = `
   SELECT 
     p.IDpublicacao,
     p.conteudo,
@@ -364,16 +346,16 @@ app.get('/publicacoes/:cpf', (req, res) => {
 `;
 
 
-    connection.query(query, (erro, resultados) => {
-      if (erro) {
-        console.error('Erro ao buscar publicações:', erro);
-        return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
-      }
+  connection.query(query, (erro, resultados) => {
+    if (erro) {
+      console.error('Erro ao buscar publicações:', erro);
+      return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
+    }
 
 
-      res.json(resultados);
-    });
+    res.json(resultados);
   });
+});
 // =================== PUBLICAR POSTAGEM (com imagem ou texto) ===================
 app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
   const { autor_CPF, conteudo, esporte } = req.body;
@@ -444,24 +426,24 @@ app.delete("/publicacoes/:id", (req, res) => {
 
 
 
-  //================ MAP ================
-  // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
-  app.post('/api/usuarios-proximos', (req, res) => {
-      const { latitude, longitude, cpf } = req.body;
-      const raio_metros = 20000; // Raio de busca
+//================ MAP ================
+// ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
+app.post('/api/usuarios-proximos', (req, res) => {
+  const { latitude, longitude, cpf } = req.body;
+  const raio_metros = 20000; // Raio de busca
 
-      if (!cpf || !latitude || !longitude) {
-          return res.status(400).json({ success: false, message: 'Dados incompletos.' });
-      }
+  if (!cpf || !latitude || !longitude) {
+    return res.status(400).json({ success: false, message: 'Dados incompletos.' });
+  }
 
-      // 1. ATUALIZA a localização do usuário logado
-      const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
-      connection.query(updateSql, [latitude, longitude, cpf], (err) => {
-          // Se houver erro, apenas logamos, mas continuamos a busca
-          if (err) console.error('Erro ao atualizar localização:', err); 
+  // 1. ATUALIZA a localização do usuário logado
+  const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
+  connection.query(updateSql, [latitude, longitude, cpf], (err) => {
+    // Se houver erro, apenas logamos, mas continuamos a busca
+    if (err) console.error('Erro ao atualizar localização:', err);
 
-          // 2. BUSCA com a Fórmula de Haversine
-          const haversineQuery = `
+    // 2. BUSCA com a Fórmula de Haversine
+    const haversineQuery = `
               SELECT
                   u.nome,
                   u.fotoDePerfil,
@@ -480,60 +462,60 @@ app.delete("/publicacoes/:id", (req, res) => {
                   distancia_m
               LIMIT 10
           `;
-          
-          const params = [latitude, longitude, latitude, cpf, raio_metros];
 
-          connection.query(haversineQuery, params, (erroBusca, resultados) => {
-              if (erroBusca) {
-                  console.error('Erro na busca Haversine:', erroBusca);
-                  return res.status(500).json({ success: false, message: 'Erro ao buscar usuários próximos.' });
-              }
+    const params = [latitude, longitude, latitude, cpf, raio_metros];
 
-              const usuariosProximos = resultados.map(usuario => ({
-                  nome: usuario.nome,
-                  distancia: Math.round(usuario.distancia_m)
-              }));
-              
-              res.json({ success: true, usuarios: usuariosProximos });
-          });
-      });
+    connection.query(haversineQuery, params, (erroBusca, resultados) => {
+      if (erroBusca) {
+        console.error('Erro na busca Haversine:', erroBusca);
+        return res.status(500).json({ success: false, message: 'Erro ao buscar usuários próximos.' });
+      }
+
+      const usuariosProximos = resultados.map(usuario => ({
+        nome: usuario.nome,
+        distancia: Math.round(usuario.distancia_m)
+      }));
+
+      res.json({ success: true, usuarios: usuariosProximos });
+    });
   });
+});
 
-  // ROTA 2: BUSCA TODOS OS USUÁRIOS PARA O MAPA (Rota GET que estava dando 404)
-  app.get('/api/todos-usuarios-mapa', (req, res) => {
-      
-      // SQL: Seleciona nome, latitude e longitude da tabela 'usuario'.
-      const sql = `
+// ROTA 2: BUSCA TODOS OS USUÁRIOS PARA O MAPA (Rota GET que estava dando 404)
+app.get('/api/todos-usuarios-mapa', (req, res) => {
+
+  // SQL: Seleciona nome, latitude e longitude da tabela 'usuario'.
+  const sql = `
           SELECT CPF, nome, latitude, longitude
           FROM usuario
           WHERE latitude IS NOT NULL AND longitude IS NOT NULL
       `;
 
-      connection.query(sql, (erro, resultados) => {
-          if (erro) {
-              console.error('Erro ao buscar todos os usuários do MySQL:', erro);
-              return res.status(500).json({ 
-                  success: false, 
-                  message: "Erro interno do servidor ao consultar o banco de dados." 
-              });
-          }
-
-          const usuariosParaMapa = resultados.map(u => ({
-              cpf: u.CPF,
-              nome: u.nome, 
-              latitude: parseFloat(u.latitude), 
-              longitude: parseFloat(u.longitude)
-          }));
-          
-          console.log(`[API] Retornando ${usuariosParaMapa.length} usuários para o mapa.`);
-
-          res.json({
-              success: true,
-              message: "Lista de todos os usuários para o mapa obtida com sucesso.",
-              usuarios: usuariosParaMapa
-          });
+  connection.query(sql, (erro, resultados) => {
+    if (erro) {
+      console.error('Erro ao buscar todos os usuários do MySQL:', erro);
+      return res.status(500).json({
+        success: false,
+        message: "Erro interno do servidor ao consultar o banco de dados."
       });
+    }
+
+    const usuariosParaMapa = resultados.map(u => ({
+      cpf: u.CPF,
+      nome: u.nome,
+      latitude: parseFloat(u.latitude),
+      longitude: parseFloat(u.longitude)
+    }));
+
+    console.log(`[API] Retornando ${usuariosParaMapa.length} usuários para o mapa.`);
+
+    res.json({
+      success: true,
+      message: "Lista de todos os usuários para o mapa obtida com sucesso.",
+      usuarios: usuariosParaMapa
+    });
   });
+});
 
 
 
@@ -582,12 +564,13 @@ app.get("/search", (req, res) => {
   });
 });
 
-  //NOME DE USUARIO ---------------------------------------------------
-  app.get("/usuario/:cpf", (req, res) => {
+//NOME DE USUARIO ---------------------------------------------------
+app.get("/usuario/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
-  const sql = "SELECT nome, nomeUsuario, fotoDePerfil, bio FROM usuario WHERE cpf = ?";
-  connection.query(sql, [cpf], (erro, resultados) => {
+const sql = "SELECT nome, nomeUsuario, fotoDePerfil, bio, banner AS bannerURL, cidade FROM usuario WHERE cpf = ?"
+
+connection.query(sql, [cpf], (erro, resultados) => {
     if (erro) {
       console.error("Erro ao buscar dados do usuário:", erro);
       return res.status(500).json({ success: false, message: "Erro no servidor." });
@@ -604,9 +587,99 @@ app.get("/search", (req, res) => {
   });
 });
 
+//==============EDITAR PERFIL==============
 
-  // A LINHA app.listen DEVE SER A ÚLTIMA!
-  const PORT = 3000;
-  app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+// LISTA MESTRA DE ESPORTES (NOVA ROTA)
+app.get("/esportes/mestra", (req, res) => {
+  // Na vida real, você buscaria isso de uma tabela 'esportes' no seu banco.
+  // Aqui, usamos uma lista fixa para o exemplo.
+  const todosEsportes = [
+    "Basquete", "Futebol", "Vôlei", "Natação", "Corrida",
+    "Ciclismo", "Tênis de mesa", "E-Sports", "Atletismo", "Handebol"
+  ];
+  res.json(todosEsportes);
+});
+
+// ==================== ROTA CORRETA DE UPLOAD DE FOTOS/BANNER ====================
+app.post("/usuario/upload-perfil/:cpf", upload.fields([
+  { name: 'fotoDePerfil', maxCount: 1 }, // Nome do campo deve ser 'fotoDePerfil'
+  { name: 'banner', maxCount: 1 }      // Nome do campo deve ser 'banner'
+]), (req, res) => {
+  const cpf = req.params.cpf;
+  const fotoDePerfilFile = req.files?.fotoDePerfil?.[0];
+  const bannerFile = req.files?.banner?.[0]; // Agora é o campo 'banner'
+
+  if (!cpf) {
+    return res.status(400).json({ success: false, message: "CPF é obrigatório." });
+  }
+
+  const updates = [];
+  const params = [];
+
+  // 1. Verifica e adiciona o banner
+  if (bannerFile) {
+    updates.push("banner = ?"); // <<<<<<<<<< CORRIGIDO PARA 'banner'
+    params.push(bannerFile.filename);
+  }
+
+  // 2. Verifica e adiciona a foto de perfil
+  if (fotoDePerfilFile) {
+    updates.push("fotoDePerfil = ?");
+    params.push(fotoDePerfilFile.filename);
+  }
+
+  if (updates.length === 0) {
+    return res.status(200).json({ success: true, message: "Nenhuma imagem para atualizar." });
+  }
+
+  // Constrói a query de UPDATE
+  const sql = `UPDATE usuario SET ${updates.join(', ')} WHERE cpf = ?`;
+  params.push(cpf);
+
+  connection.query(sql, params, (erro) => {
+    if (erro) {
+      console.error("Erro ao salvar imagens no banco:", erro);
+      // IMPORTANTE: Se o erro persistir, o problema será nesta query.
+      return res.status(500).json({ success: false, message: "Erro ao atualizar imagens no servidor (Erro de Banco de Dados)." });
+    }
+    res.json({ success: true, message: "Imagens do perfil atualizadas com sucesso." });
   });
+});
+
+
+// ATUALIZAR DADOS DO PERFIL (NOVA ROTA)
+app.put("/usuario/atualizar", (req, res) => {
+  const { cpf, nomeCompleto, nomeUsuario, bio, localizacao } = req.body;
+
+  if (!cpf) {
+    return res.status(400).json({ success: false, message: "CPF é obrigatório para atualização." });
+  }
+
+  // Nota: O campo 'cidade' no seu cadastro inicial provavelmente é a 'localizacao'
+  const sql = `
+        UPDATE usuario 
+        SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
+        WHERE cpf = ?
+    `;
+
+  // A foto e o banner são atualizados na rota '/cadastro/foto' (requer FormData)
+
+  connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao atualizar perfil:", erro);
+      return res.status(500).json({ success: false, message: "Erro ao atualizar dados no servidor." });
+    }
+
+    if (resultados.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: "Usuário não encontrado." });
+    }
+
+    res.json({ success: true, message: "Dados do perfil atualizados com sucesso." });
+  });
+});
+
+// A LINHA app.listen DEVE SER A ÚLTIMA!
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
