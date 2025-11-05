@@ -61,7 +61,7 @@ async function carregarFeed(filtroEsporte = "") {
     const dados = await resposta.json();
     console.log(" Retorno do servidor:", dados);
 
-    // 🔧 garante que seja sempre um array
+    //  garante que seja sempre um array
     let posts = [];
     if (Array.isArray(dados)) {
       posts = dados;
@@ -379,8 +379,18 @@ async function carregarEsportes() {
         </a>
       `;
 
-      // Clique em cada esporte e carrega apenas posts desse esporte
+      //  Quando clica, o nome fica verde e o feed é filtrado
       div.addEventListener("click", () => {
+        // remove ativo dos outros
+        document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
+          link.classList.remove("ativo");
+        });
+
+        // adiciona ativo ao clicado
+        const link = div.querySelector("a");
+        link.classList.add("ativo");
+
+        // filtra feed
         carregarFeed(nome);
       });
 
