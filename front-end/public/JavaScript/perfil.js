@@ -39,14 +39,12 @@ async function carregarEsportes() {
     const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
     const esportes = await resposta.json();
 
-<<<<<<< HEAD
     const caminhoImagens = "ImagensEscolhaEsportes/";
-=======
+
     const dados = await resposta.json();
     const esportes = Array.isArray(dados) ? dados : (dados.esportes || []);
     const caminhoImagens = "ImagensEscolhaEsportes/"; // Note: Assumindo que este é o caminho local correto
 
->>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
     container.innerHTML = "<p>Seus esportes</p>";
 
     if (esportes.length === 0) {
@@ -97,12 +95,9 @@ async function carregarEsportes() {
   }
 }
 
-<<<<<<< HEAD
 
 // ===== FOTO DE PERFIL, NOME E BIO =====
-=======
 // ===== FOTO DE PERFIL, NOME, BIO E BANNER =====
->>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");
   if (!cpf) {
