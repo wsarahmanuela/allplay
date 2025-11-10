@@ -15,10 +15,8 @@ function caminhoFoto(fotoDePerfil) {
   return `http://localhost:3000/uploads/${fotoDePerfil}`;
 }
 
-// =================================================================
+
 // FUNÇÃO PARA TRATAR O CAMINHO DO BANNER
-// NOTE: Deixamos esta função APENAS uma vez, no topo, para evitar conflitos.
-// =================================================================
 function caminhoBanner(banner) {
   // Se não houver banner, retorna string vazia. O CSS deve aplicar o fundo padrão.
   if (!banner) return ""; 
@@ -33,31 +31,33 @@ async function carregarEsportes() {
   if (!container) return;
 
   const cpf = localStorage.getItem("cpf");
-  if (!cpf) return;
+  if (!cpf) {
+    container.innerHTML = "<p>CPF não encontrado. Faça login novamente.</p>";
+    return;
+  }
 
   try {
-    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
-    const esportes = await resposta.json();
+    const resposta = await fetch(`http://localhost:3000/esportes/${encodeURIComponent(cpf)}`);
+    if (!resposta.ok) throw new Error("Erro ao buscar esportes.");
 
-<<<<<<< HEAD
-    const caminhoImagens = "ImagensEscolhaEsportes/";
-=======
     const dados = await resposta.json();
     const esportes = Array.isArray(dados) ? dados : (dados.esportes || []);
     const caminhoImagens = "ImagensEscolhaEsportes/"; // Note: Assumindo que este é o caminho local correto
 
->>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
     container.innerHTML = "<p>Seus esportes</p>";
 
     if (esportes.length === 0) {
-      container.innerHTML += "<p>Você ainda não escolheu esportes.</p>";
+      container.insertAdjacentHTML("beforeend", "<p>Você ainda não escolheu esportes.</p>");
       return;
     }
 
     esportes.forEach(nome => {
-      const div = document.createElement("div");
-      div.classList.add("esporte-item");
-      div.dataset.esporte = nome;
+      const a = document.createElement("a");
+      a.href = "#";
+      a.style.display = "flex";
+      a.style.alignItems = "center";
+      a.style.gap = "8px";
+      a.style.marginBottom = "12px";
 
       const nomeArquivo = nome
         .normalize("NFD")
@@ -65,44 +65,26 @@ async function carregarEsportes() {
         .replace(/\s+/g, "")
         .toLowerCase();
 
-      div.innerHTML = `
-        <a href="#">
-          <img src="${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png" 
-               onerror="this.src='imagens/default.png'" 
-               alt="${nome}">
-          ${nome}
-        </a>
-      `;
+      const img = document.createElement("img");
+      img.src = `${caminhoImagens}${nomeArquivo}.png`;
+      img.alt = nome;
+      img.style.width = "30px";
+      img.onerror = () => (img.style.display = "none");
 
-      //  Quando clica, o nome fica verde e o feed é filtrado
-      div.addEventListener("click", () => {
-        // remove ativo dos outros
-        document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
-          link.classList.remove("ativo");
-        });
+      const texto = document.createElement("span");
+      texto.textContent = nome;
 
-        // adiciona ativo ao clicado
-        const link = div.querySelector("a");
-        link.classList.add("ativo");
-
-        // filtra feed
-        carregarFeed(nome);
-      });
-
-      container.appendChild(div);
+      a.appendChild(img);
+      a.appendChild(texto);
+      container.appendChild(a);
     });
-
   } catch (erro) {
     console.error("Erro ao carregar esportes:", erro);
+    container.innerHTML = `<p>Erro ao carregar seus esportes: ${escapeHtml(erro.message || String(erro))}</p>`;
   }
 }
 
-<<<<<<< HEAD
-
-// ===== FOTO DE PERFIL, NOME E BIO =====
-=======
 // ===== FOTO DE PERFIL, NOME, BIO E BANNER =====
->>>>>>> 45da7b71959508690f249c62964beb1cc2cf408c
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");
   if (!cpf) {

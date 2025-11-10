@@ -61,6 +61,15 @@ async function carregarFeed(filtroEsporte = "") {
     const dados = await resposta.json();
     console.log(" Retorno do servidor:", dados);
 
+    console.log("CPF logado:", localStorage.getItem("cpf"));
+
+if (Array.isArray(dados)) {
+  dados.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
+} else if (Array.isArray(dados.posts)) {
+  dados.posts.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
+}
+
+
     //  garante que seja sempre um array
     let posts = [];
     if (Array.isArray(dados)) {
@@ -76,110 +85,176 @@ async function carregarFeed(filtroEsporte = "") {
       return;
     }
 
-    // percorre e mostra cada publicação
     posts.forEach(post => {
-      const div = document.createElement("div");
-      div.classList.add("post");
+  const div = document.createElement("div");
+  div.classList.add("post");
 
-      const caminhoFoto = post.fotoDePerfil
-        ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
-        : "imagens/profile.picture.jpg";
+  const caminhoFoto = post.fotoDePerfil
+    ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
+    : "imagens/profile.picture.jpg";
 
-      div.innerHTML = `
-        <div class="post-header">
-          <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
-          <div class="post-info">
-            <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
-            <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
-          </div>
-          <div class="post-menu">
-            <button class="menu-btn">⋮</button>
-            <div class="menu-opcoes">
-              <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
-            </div>
-          </div>
+  // CPF do usuário logado
+  const cpfLogado = localStorage.getItem("cpf");
+
+  // Verifica se o post pertence ao usuário logado
+  const podeExcluir = post.cpf === cpfLogado;
+
+  // Monta o menu (aparece só pro dono do post)
+  let menuHtml = "";
+  if (podeExcluir) {
+    menuHtml = `
+      <div class="post-menu">
+        <button class="menu-btn">⋮</button>
+        <div class="menu-opcoes">
+          <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
         </div>
-      `;
+      </div>
+    `;
+  }
 
-      // Mostra ou oculta menu
-      const menuBtn = div.querySelector(".menu-btn");
-      const menuOpcoes = div.querySelector(".menu-opcoes");
-      menuBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        menuOpcoes.classList.toggle("ativo");
-      });
-      document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
+  // Estrutura principal do post
+  div.innerHTML = `
+    <div class="post-header">
+      <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
+      <div class="post-info">
+        <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
+        <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
+      </div>
+      ${menuHtml}
+    </div>
+  `;
 
-      // Botao de excluir
-      const btnExcluir = div.querySelector(".excluir-btn");
-      btnExcluir.addEventListener("click", async () => {
-        if (confirm("Deseja realmente excluir esta publicação?")) {
-          const id = btnExcluir.dataset.id;
-          try {
-            const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
-            const resultado = await resp.json();
-            if (resultado.success) {
-              carregarFeed(filtroEsporte); // recarrega mantendo o filtro atual
-            } else {
-              alert("Erro ao excluir publicação.");
-            }
-          } catch (erro) {
-            console.error("Erro ao excluir:", erro);
-          }
-        }
-      });
+  // Se houver botão de menu, adiciona o evento
+  if (podeExcluir) {
+    const menuBtn = div.querySelector(".menu-btn");
+    const menuOpcoes = div.querySelector(".menu-opcoes");
 
-      // Conteudo
-      const conteudoDiv = document.createElement("div");
-      conteudoDiv.classList.add("conteudo");
-      conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
-      div.appendChild(conteudoDiv);
-
-      // Imagem se tiver ne
-      if (post.imagem) {
-        const imagemPath = post.imagem.startsWith("/")
-          ? `http://localhost:3000${post.imagem}`
-          : `http://localhost:3000/uploads/${post.imagem}`;
-        const img = document.createElement("img");
-        img.src = imagemPath;
-        img.alt = "Imagem do post";
-        img.classList.add("post-imagem");
-        div.appendChild(img);
-      }
-
-      // Data formatada
-      const dataDiv = document.createElement("div");
-      dataDiv.classList.add("data");
-      if (post.data_publicacao) {
-        const dataValida = post.data_publicacao.includes("T")
-          ? post.data_publicacao
-          : `${post.data_publicacao}T00:00:00`;
-        const data = new Date(dataValida);
-        if (!isNaN(data)) {
-          dataDiv.textContent = data.toLocaleString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-        } else {
-          dataDiv.textContent = post.data_publicacao;
-        }
-      }
-      div.appendChild(dataDiv);
-
-      // Tag do esporte (se existir)
-      if (post.esporte) {
-        const tag = document.createElement("span");
-        tag.classList.add("tag-esporte");
-        tag.textContent = post.esporte;
-        div.appendChild(tag);
-      }
-
-      feed.appendChild(div);
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menuOpcoes.classList.toggle("ativo");
     });
+
+    document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
+
+    // Função de exclusão
+    const btnExcluir = div.querySelector(".excluir-btn");
+    btnExcluir.addEventListener("click", async () => {
+      if (confirm("Deseja realmente excluir esta publicação?")) {
+        const id = btnExcluir.dataset.id;
+        try {
+          const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
+          const resultado = await resp.json();
+          if (resultado.success) {
+            carregarFeed(filtroEsporte);
+          } else {
+            alert("Erro ao excluir publicação.");
+          }
+        } catch (erro) {
+          console.error("Erro ao excluir:", erro);
+        }
+      }
+    });
+  }
+
+  // Conteúdo do post
+  const conteudoDiv = document.createElement("div");
+  conteudoDiv.classList.add("conteudo");
+  conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
+  div.appendChild(conteudoDiv);
+
+  // Imagem do post
+  if (post.imagem) {
+    const imagemPath = post.imagem.startsWith("/")
+      ? `http://localhost:3000${post.imagem}`
+      : `http://localhost:3000/uploads/${post.imagem}`;
+    const img = document.createElement("img");
+    img.src = imagemPath;
+    img.alt = "Imagem do post";
+    img.classList.add("post-imagem");
+    div.appendChild(img);
+  }
+
+  // Data formatada
+  const dataDiv = document.createElement("div");
+  dataDiv.classList.add("data");
+  if (post.data_publicacao) {
+    let dataString = post.data_publicacao;
+    let dataValida;
+
+    if (dataString.includes('/')) {
+      const [dataParte, tempoParte = '00:00:00'] = dataString.split(' ');
+      const [dia, mes, ano] = dataParte.split('/');
+      dataValida = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')} ${tempoParte}`;
+    } else if (dataString.includes('T')) {
+      dataValida = dataString.replace('Z', '').replace('T', ' ');
+    } else {
+      dataValida = dataString;
+    }
+
+    const data = new Date(dataValida);
+    if (!isNaN(data) && dataValida) {
+      dataDiv.textContent = data.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+    } else {
+      dataDiv.textContent = "Data Inválida";
+    }
+  }
+  div.appendChild(dataDiv);
+
+  // Esporte (tag)
+  if (post.esporte) {
+    const tag = document.createElement("span");
+    tag.classList.add("tag-esporte");
+    tag.textContent = post.esporte;
+    div.appendChild(tag);
+  }
+  // === CURTIDAS ===
+  const curtidaDiv = document.createElement("div");
+  curtidaDiv.classList.add("curtidas");
+
+  const btnCurtir = document.createElement("button");
+  btnCurtir.classList.add("btn-curtir");
+  btnCurtir.innerHTML = "❤️ Curtir";//COLOCAR ICONE AQUI NATAN DE CORAÇÃO TA BOM NAO ESQUECE 
+
+  const contador = document.createElement("span");
+  contador.classList.add("contador-curtidas");
+  contador.textContent = "0 curtidas";
+
+  async function atualizarCurtidas() {
+    const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
+    const dados = await resp.json();
+    contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
+  }
+
+  btnCurtir.addEventListener("click", async () => {
+    const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idPublicacao: post.IDpublicacao, cpf: cpfLogado }),
+    });
+    const resultado = await resp.json();
+    if (resultado.liked) {
+      btnCurtir.classList.add("curtido");
+    } else {
+      btnCurtir.classList.remove("curtido");
+    }
+    atualizarCurtidas();
+  });
+
+  curtidaDiv.appendChild(btnCurtir);
+  curtidaDiv.appendChild(contador);
+  div.appendChild(curtidaDiv);
+  atualizarCurtidas();
+
+  feed.appendChild(div);
+});
 
   } catch (erro) {
     console.error("Erro ao carregar o feed:", erro);
@@ -337,7 +412,6 @@ async function criarPost() {
     alert("Erro no servidor. Tente novamente.");
   }
 }
-
 
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {
