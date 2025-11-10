@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-  // ================== PREENCHER PERFIL ==================
-  async function preencherPerfil() {
-    const cpf = localStorage.getItem("cpf");
-    if (!cpf) return;
-=======
 // ================== PREENCHER PERFIL ==================
 async function preencherPerfil() {
   const cpf = localStorage.getItem("cpf");
@@ -67,15 +61,6 @@ async function carregarFeed(filtroEsporte = "") {
     const dados = await resposta.json();
     console.log(" Retorno do servidor:", dados);
 
-    console.log("CPF logado:", localStorage.getItem("cpf"));
-
-if (Array.isArray(dados)) {
-  dados.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
-} else if (Array.isArray(dados.posts)) {
-  dados.posts.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
-}
-
-
     //  garante que seja sempre um array
     let posts = [];
     if (Array.isArray(dados)) {
@@ -91,176 +76,110 @@ if (Array.isArray(dados)) {
       return;
     }
 
+    // percorre e mostra cada publicação
     posts.forEach(post => {
-  const div = document.createElement("div");
-  div.classList.add("post");
+      const div = document.createElement("div");
+      div.classList.add("post");
 
-  const caminhoFoto = post.fotoDePerfil
-    ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
-    : "imagens/profile.picture.jpg";
+      const caminhoFoto = post.fotoDePerfil
+        ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
+        : "imagens/profile.picture.jpg";
 
-  // CPF do usuário logado
-  const cpfLogado = localStorage.getItem("cpf");
-
-  // Verifica se o post pertence ao usuário logado
-  const podeExcluir = post.cpf === cpfLogado;
-
-  // Monta o menu (aparece só pro dono do post)
-  let menuHtml = "";
-  if (podeExcluir) {
-    menuHtml = `
-      <div class="post-menu">
-        <button class="menu-btn">⋮</button>
-        <div class="menu-opcoes">
-          <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
+      div.innerHTML = `
+        <div class="post-header">
+          <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
+          <div class="post-info">
+            <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
+            <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
+          </div>
+          <div class="post-menu">
+            <button class="menu-btn">⋮</button>
+            <div class="menu-opcoes">
+              <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
+            </div>
+          </div>
         </div>
-      </div>
-    `;
-  }
+      `;
 
-  // Estrutura principal do post
-  div.innerHTML = `
-    <div class="post-header">
-      <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
-      <div class="post-info">
-        <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
-        <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
-      </div>
-      ${menuHtml}
-    </div>
-  `;
+      // Mostra ou oculta menu
+      const menuBtn = div.querySelector(".menu-btn");
+      const menuOpcoes = div.querySelector(".menu-opcoes");
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menuOpcoes.classList.toggle("ativo");
+      });
+      document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
 
-  // Se houver botão de menu, adiciona o evento
-  if (podeExcluir) {
-    const menuBtn = div.querySelector(".menu-btn");
-    const menuOpcoes = div.querySelector(".menu-opcoes");
-
-    menuBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      menuOpcoes.classList.toggle("ativo");
-    });
-
-    document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
-
-    // Função de exclusão
-    const btnExcluir = div.querySelector(".excluir-btn");
-    btnExcluir.addEventListener("click", async () => {
-      if (confirm("Deseja realmente excluir esta publicação?")) {
-        const id = btnExcluir.dataset.id;
-        try {
-          const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
-          const resultado = await resp.json();
-          if (resultado.success) {
-            carregarFeed(filtroEsporte);
-          } else {
-            alert("Erro ao excluir publicação.");
+      // Botao de excluir
+      const btnExcluir = div.querySelector(".excluir-btn");
+      btnExcluir.addEventListener("click", async () => {
+        if (confirm("Deseja realmente excluir esta publicação?")) {
+          const id = btnExcluir.dataset.id;
+          try {
+            const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
+            const resultado = await resp.json();
+            if (resultado.success) {
+              carregarFeed(filtroEsporte); // recarrega mantendo o filtro atual
+            } else {
+              alert("Erro ao excluir publicação.");
+            }
+          } catch (erro) {
+            console.error("Erro ao excluir:", erro);
           }
-        } catch (erro) {
-          console.error("Erro ao excluir:", erro);
+        }
+      });
+
+      // Conteudo
+      const conteudoDiv = document.createElement("div");
+      conteudoDiv.classList.add("conteudo");
+      conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
+      div.appendChild(conteudoDiv);
+
+      // Imagem se tiver ne
+      if (post.imagem) {
+        const imagemPath = post.imagem.startsWith("/")
+          ? `http://localhost:3000${post.imagem}`
+          : `http://localhost:3000/uploads/${post.imagem}`;
+        const img = document.createElement("img");
+        img.src = imagemPath;
+        img.alt = "Imagem do post";
+        img.classList.add("post-imagem");
+        div.appendChild(img);
+      }
+
+      // Data formatada
+      const dataDiv = document.createElement("div");
+      dataDiv.classList.add("data");
+      if (post.data_publicacao) {
+        const dataValida = post.data_publicacao.includes("T")
+          ? post.data_publicacao
+          : `${post.data_publicacao}T00:00:00`;
+        const data = new Date(dataValida);
+        if (!isNaN(data)) {
+          dataDiv.textContent = data.toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+        } else {
+          dataDiv.textContent = post.data_publicacao;
         }
       }
+      div.appendChild(dataDiv);
+
+      // Tag do esporte (se existir)
+      if (post.esporte) {
+        const tag = document.createElement("span");
+        tag.classList.add("tag-esporte");
+        tag.textContent = post.esporte;
+        div.appendChild(tag);
+      }
+
+      feed.appendChild(div);
     });
-  }
-
-  // Conteúdo do post
-  const conteudoDiv = document.createElement("div");
-  conteudoDiv.classList.add("conteudo");
-  conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
-  div.appendChild(conteudoDiv);
-
-  // Imagem do post
-  if (post.imagem) {
-    const imagemPath = post.imagem.startsWith("/")
-      ? `http://localhost:3000${post.imagem}`
-      : `http://localhost:3000/uploads/${post.imagem}`;
-    const img = document.createElement("img");
-    img.src = imagemPath;
-    img.alt = "Imagem do post";
-    img.classList.add("post-imagem");
-    div.appendChild(img);
-  }
-
-  // Data formatada
-  const dataDiv = document.createElement("div");
-  dataDiv.classList.add("data");
-  if (post.data_publicacao) {
-    let dataString = post.data_publicacao;
-    let dataValida;
-
-    if (dataString.includes('/')) {
-      const [dataParte, tempoParte = '00:00:00'] = dataString.split(' ');
-      const [dia, mes, ano] = dataParte.split('/');
-      dataValida = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')} ${tempoParte}`;
-    } else if (dataString.includes('T')) {
-      dataValida = dataString.replace('Z', '').replace('T', ' ');
-    } else {
-      dataValida = dataString;
-    }
-
-    const data = new Date(dataValida);
-    if (!isNaN(data) && dataValida) {
-      dataDiv.textContent = data.toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      });
-    } else {
-      dataDiv.textContent = "Data Inválida";
-    }
-  }
-  div.appendChild(dataDiv);
-
-  // Esporte (tag)
-  if (post.esporte) {
-    const tag = document.createElement("span");
-    tag.classList.add("tag-esporte");
-    tag.textContent = post.esporte;
-    div.appendChild(tag);
-  }
-  // === CURTIDAS ===
-  const curtidaDiv = document.createElement("div");
-  curtidaDiv.classList.add("curtidas");
-
-  const btnCurtir = document.createElement("button");
-  btnCurtir.classList.add("btn-curtir");
-  btnCurtir.innerHTML = "❤️ Curtir";//COLOCAR ICONE AQUI NATAN DE CORAÇÃO TA BOM NAO ESQUECE 
-
-  const contador = document.createElement("span");
-  contador.classList.add("contador-curtidas");
-  contador.textContent = "0 curtidas";
-
-  async function atualizarCurtidas() {
-    const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
-    const dados = await resp.json();
-    contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
-  }
-
-  btnCurtir.addEventListener("click", async () => {
-    const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idPublicacao: post.IDpublicacao, cpf: cpfLogado }),
-    });
-    const resultado = await resp.json();
-    if (resultado.liked) {
-      btnCurtir.classList.add("curtido");
-    } else {
-      btnCurtir.classList.remove("curtido");
-    }
-    atualizarCurtidas();
-  });
-
-  curtidaDiv.appendChild(btnCurtir);
-  curtidaDiv.appendChild(contador);
-  div.appendChild(curtidaDiv);
-  atualizarCurtidas();
-
-  feed.appendChild(div);
-});
 
   } catch (erro) {
     console.error("Erro ao carregar o feed:", erro);
@@ -278,458 +197,255 @@ if (searchInput && resultsDiv) {
       resultsDiv.style.display = "none";
       return;
     }
->>>>>>> a0b0a61039019d16dc027bcee352d5867f998abe
 
     try {
-      const resposta = await fetch(`http://localhost:3000/usuario/${cpf}`);
-      const dados = await resposta.json();
+      const resposta = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(termo)}`);
+      if (!resposta.ok) throw new Error("Erro ao buscar dados");
 
-      if (!dados.success) {
-        console.error("Erro:", dados.message);
-        return;
+      const resultados = await resposta.json();
+      resultsDiv.innerHTML = "";
+
+      if (resultados.usuarios.length === 0 && resultados.posts.length === 0) {
+        resultsDiv.textContent = "Nenhum resultado encontrado.";
+      } else {
+        // Usuários
+        resultados.usuarios.forEach(usuario => {
+          const div = document.createElement("div");
+          div.classList.add("result-item");
+          div.innerHTML = `
+            <img src="${usuario.fotoDePerfil ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}` : 'imagens/profile.picture.jpg'}" alt="${usuario.nome}">
+            <span>${usuario.nome} (@${usuario.nomeUsuario})</span>
+          `;
+          div.addEventListener("click", () => {
+            // exemplo: ir pro perfil do usuário
+            window.location.href = `/perfil.html?cpf=${usuario.CPF}`;
+          });
+          resultsDiv.appendChild(div);
+        });
+
+        // Posts
+        resultados.posts.forEach(post => {
+          const div = document.createElement("div");
+          div.classList.add("result-item");
+          div.innerHTML = `
+            <strong>${post.nome}</strong>: ${post.conteudo}
+          `;
+          resultsDiv.appendChild(div);
+        });
       }
 
-      const usuario = dados.usuario;
-      const nome = usuario.nome || "Usuário sem nome";
-      const arroba = usuario.nomeUsuario ? `@${usuario.nomeUsuario}` : "@usuario";
-      const foto = usuario.fotoDePerfil
-        ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}`
-        : "imagens/profile.picture.jpg";
-
-      const nomeTopo = document.getElementById("nomeUsuarioFeed");
-      const arrobaTopo = document.getElementById("arrobaFeed");
-      const fotoTopo = document.getElementById("fotoPerfilFeed");
-
-      if (nomeTopo) nomeTopo.textContent = nome;
-      if (arrobaTopo) arrobaTopo.textContent = arroba;
-      if (fotoTopo) fotoTopo.src = foto;
-
-      const nomePostar = document.getElementById("nomeUsuarioPost");
-      const fotoPostar = document.getElementById("fotoUsuarioPost");
-
-      if (nomePostar) nomePostar.textContent = nome;
-      if (fotoPostar) fotoPostar.src = foto;
-
-      const nomeTela = document.getElementById("nome_usuario");
-      if (nomeTela) nomeTela.textContent = nome;
-
-      const fotoNavbar = document.querySelector(".nav-user-icon img");
-      if (fotoNavbar) fotoNavbar.src = foto;
+      resultsDiv.style.display = "block";
 
     } catch (erro) {
-      console.error("Erro ao carregar perfil:", erro);
+      console.error("Erro ao fazer busca:", erro);
+      resultsDiv.textContent = "Erro ao buscar. Tente novamente.";
+      resultsDiv.style.display = "block";
     }
   }
 
-  // ================== CARREGAR FEED ==================
-  async function carregarFeed(filtroEsporte = "") {
-    const cpf = localStorage.getItem("cpf");
-    const feed = document.getElementById("feed");
-    if (!feed) return;
+  searchInput.addEventListener("input", fazerBusca);
 
-    try {
-      const url = filtroEsporte
-        ? `http://localhost:3000/publicacoes/${cpf}?esporte=${encodeURIComponent(filtroEsporte)}`
-        : "http://localhost:3000/publicacoes";
-
-      const resposta = await fetch(url);
-      if (!resposta.ok) throw new Error("Erro ao buscar publicações");
-
-      const dados = await resposta.json();
-      console.log(" Retorno do servidor:", dados);
-
-      //  garante que seja sempre um array
-      let posts = [];
-      if (Array.isArray(dados)) {
-        posts = dados;
-      } else if (Array.isArray(dados.posts)) {
-        posts = dados.posts;
-      }
-
-      feed.innerHTML = ""; // limpa feed antes de exibir novos posts
-
-      if (!Array.isArray(posts) || posts.length === 0) {
-        feed.innerHTML = "<p>Nenhuma publicação encontrada.</p>";
-        return;
-      }
-
-      // percorre e mostra cada publicação
-      posts.forEach(post => {
-        const div = document.createElement("div");
-        div.classList.add("post");
-
-        const caminhoFoto = post.fotoDePerfil
-          ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
-          : "imagens/profile.picture.jpg";
-
-        div.innerHTML = `
-          <div class="post-header">
-            <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
-            <div class="post-info">
-              <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
-              <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
-            </div>
-            <div class="post-menu">
-              <button class="menu-btn">⋮</button>
-              <div class="menu-opcoes">
-                <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
-              </div>
-            </div>
-          </div>
-        `;
-
-        // Mostra ou oculta menu
-        const menuBtn = div.querySelector(".menu-btn");
-        const menuOpcoes = div.querySelector(".menu-opcoes");
-        menuBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          menuOpcoes.classList.toggle("ativo");
-        });
-        document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
-
-        // Botao de excluir
-        const btnExcluir = div.querySelector(".excluir-btn");
-        btnExcluir.addEventListener("click", async () => {
-          if (confirm("Deseja realmente excluir esta publicação?")) {
-            const id = btnExcluir.dataset.id;
-            try {
-              const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
-              const resultado = await resp.json();
-              if (resultado.success) {
-                carregarFeed(filtroEsporte); // recarrega mantendo o filtro atual
-              } else {
-                alert("Erro ao excluir publicação.");
-              }
-            } catch (erro) {
-              console.error("Erro ao excluir:", erro);
-            }
-          }
-        });
-
-        // Conteudo
-        const conteudoDiv = document.createElement("div");
-        conteudoDiv.classList.add("conteudo");
-        conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
-        div.appendChild(conteudoDiv);
-
-        // Imagem se tiver ne
-        if (post.imagem) {
-          const imagemPath = post.imagem.startsWith("/")
-            ? `http://localhost:3000${post.imagem}`
-            : `http://localhost:3000/uploads/${post.imagem}`;
-          const img = document.createElement("img");
-          img.src = imagemPath;
-          img.alt = "Imagem do post";
-          img.classList.add("post-imagem");
-          div.appendChild(img);
-        }
-
-        // Data formatada
-        const dataDiv = document.createElement("div");
-        dataDiv.classList.add("data");
-        if (post.data_publicacao) {
-          const dataValida = post.data_publicacao.includes("T")
-            ? post.data_publicacao
-            : `${post.data_publicacao}T00:00:00`;
-          const data = new Date(dataValida);
-          if (!isNaN(data)) {
-            dataDiv.textContent = data.toLocaleString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            });
-          } else {
-            dataDiv.textContent = post.data_publicacao;
-          }
-        }
-        div.appendChild(dataDiv);
-
-        // Tag do esporte (se existir)
-        if (post.esporte) {
-          const tag = document.createElement("span");
-          tag.classList.add("tag-esporte");
-          tag.textContent = post.esporte;
-          div.appendChild(tag);
-        }
-
-        feed.appendChild(div);
-      });
-
-    } catch (erro) {
-      console.error("Erro ao carregar o feed:", erro);
+  document.addEventListener("click", (e) => {
+    if (!resultsDiv.contains(e.target) && e.target !== searchInput) {
+      resultsDiv.style.display = "none";
     }
-  }
-
-  // ================== BARRA DE PESQUISA ==================
-  const searchInput = document.getElementById("searchInput");
-  const resultsDiv = document.getElementById("resultsDiv");
-
-  if (searchInput && resultsDiv) {
-    async function fazerBusca() {
-      const termo = searchInput.value.trim();
-      if (!termo) {
-        resultsDiv.style.display = "none";
-        return;
-      }
-
-      try {
-        const resposta = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(termo)}`);
-        if (!resposta.ok) throw new Error("Erro ao buscar dados");
-
-        const resultados = await resposta.json();
-        resultsDiv.innerHTML = "";
-
-        if (resultados.usuarios.length === 0 && resultados.posts.length === 0) {
-          resultsDiv.textContent = "Nenhum resultado encontrado.";
-        } else {
-          // Usuários
-          resultados.usuarios.forEach(usuario => {
-            const div = document.createElement("div");
-            div.classList.add("result-item");
-            div.innerHTML = `
-              <img src="${usuario.fotoDePerfil ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}` : 'imagens/profile.picture.jpg'}" alt="${usuario.nome}">
-              <span>${usuario.nome} (@${usuario.nomeUsuario})</span>
-            `;
-            div.addEventListener("click", () => {
-    localStorage.setItem("perfilVisualizado", usuario.id);
-    window.location.href = "perfilSeguir.html";
   });
-            resultsDiv.appendChild(div);
-          });
+}
 
-          // Posts
-          resultados.posts.forEach(post => {
-            const div = document.createElement("div");
-            div.classList.add("result-item");
-            div.innerHTML = `
-              <strong>${post.nome}</strong>: ${post.conteudo}
-            `;
-            resultsDiv.appendChild(div);
-          });
-        }
 
-        resultsDiv.style.display = "block";
 
-      } catch (erro) {
-        console.error("Erro ao fazer busca:", erro);
-        resultsDiv.textContent = "Erro ao buscar. Tente novamente.";
-        resultsDiv.style.display = "block";
-      }
-    }
 
-    searchInput.addEventListener("input", fazerBusca);
+// ================== UPLOAD DE IMAGEM + CRIAR POST ==================
+let imagemSelecionada = null;
 
-    document.addEventListener("click", (e) => {
-      if (!resultsDiv.contains(e.target) && e.target !== searchInput) {
-        resultsDiv.style.display = "none";
-      }
+document.addEventListener("DOMContentLoaded", () => {
+  const btnImagem = document.getElementById("btn-imagem");
+  const inputImagem = document.getElementById("input-imagem");
+  const preview = document.getElementById("preview-imagem");
+
+  if (btnImagem && inputImagem) {
+    btnImagem.addEventListener("click", (e) => {
+      e.preventDefault();
+      inputImagem.click();
     });
-  }
 
-
-
-
-  // ================== UPLOAD DE IMAGEM + CRIAR POST ==================
-  let imagemSelecionada = null;
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const btnImagem = document.getElementById("btn-imagem");
-    const inputImagem = document.getElementById("input-imagem");
-    const preview = document.getElementById("preview-imagem");
-
-    if (btnImagem && inputImagem) {
-      btnImagem.addEventListener("click", (e) => {
-        e.preventDefault();
-        inputImagem.click();
-      });
-
-      inputImagem.addEventListener("change", (e) => {
-        const arquivo = e.target.files[0];
-        if (arquivo) {
-          imagemSelecionada = arquivo;
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            if (preview) {
-              preview.src = ev.target.result;
-              preview.style.display = "block";
-            }
-          };
-          reader.readAsDataURL(arquivo);
-        } else {
+    inputImagem.addEventListener("change", (e) => {
+      const arquivo = e.target.files[0];
+      if (arquivo) {
+        imagemSelecionada = arquivo;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
           if (preview) {
-            preview.src = "";
-            preview.style.display = "none";
+            preview.src = ev.target.result;
+            preview.style.display = "block";
           }
-        }
-      });
-    }
-  });
-
-  async function criarPost() {
-    const texto = document.getElementById("post-text").value.trim();
-    const cpf = localStorage.getItem("cpf");
-    const preview = document.getElementById("preview-imagem");
-    const selectEsporte = document.getElementById("esportes");
-    const esporte = selectEsporte ? selectEsporte.value : "";
-
-    if (!cpf) {
-      alert("Erro: CPF não encontrado. Faça login novamente.");
-      return;
-    }
-
-    if (!texto && !imagemSelecionada) {
-      alert("Escreva algo ou selecione uma imagem para postar.");
-      return;
-    }
-
-    // aqui ta fazendo que nao é obrigrtorio selecionar um esporte 
-    const formData = new FormData();
-    formData.append("autor_CPF", cpf);
-    formData.append("conteudo", texto || "");
-
-    // Envia o esporte apenas se o usuário escolheu
-    if (esporte) formData.append("esporte", esporte);
-
-    if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
-
-    try {
-      const resposta = await fetch("http://localhost:3000/publicacoes/imagem", {
-        method: "POST",
-        body: formData,
-      });
-
-      const dados = await resposta.json();
-      console.log("Resposta do servidor:", dados);
-
-      if (dados.success) {
-        document.getElementById("post-text").value = "";
-        document.getElementById("input-imagem").value = "";
+        };
+        reader.readAsDataURL(arquivo);
+      } else {
         if (preview) {
           preview.src = "";
           preview.style.display = "none";
         }
-        imagemSelecionada = null;
-        if (selectEsporte) selectEsporte.value = "";
-        await carregarFeed(); // recarrega o feed geral
-      } else {
-        alert(dados.message || "Erro ao publicar.");
       }
-    } catch (erro) {
-      console.error("Erro ao criar post:", erro);
-      alert("Erro no servidor. Tente novamente.");
-    }
+    });
+  }
+});
+
+async function criarPost() {
+  const texto = document.getElementById("post-text").value.trim();
+  const cpf = localStorage.getItem("cpf");
+  const preview = document.getElementById("preview-imagem");
+  const selectEsporte = document.getElementById("esportes");
+  const esporte = selectEsporte ? selectEsporte.value : "";
+
+  if (!cpf) {
+    alert("Erro: CPF não encontrado. Faça login novamente.");
+    return;
   }
 
+  if (!texto && !imagemSelecionada) {
+    alert("Escreva algo ou selecione uma imagem para postar.");
+    return;
+  }
 
-  // ================== MOSTRAR ESPORTES ==================
-  async function carregarEsportes() {
-    const container = document.getElementById("atalhos-esportes");
-    if (!container) return;
+  // aqui ta fazendo que nao é obrigrtorio selecionar um esporte 
+  const formData = new FormData();
+  formData.append("autor_CPF", cpf);
+  formData.append("conteudo", texto || "");
 
-    const cpf = localStorage.getItem("cpf");
-    if (!cpf) return;
+  // Envia o esporte apenas se o usuário escolheu
+  if (esporte) formData.append("esporte", esporte);
 
-    try {
-      const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
-      const esportes = await resposta.json();
+  if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
 
-      const caminhoImagens = "ImagensEscolhaEsportes/";
-      container.innerHTML = "<p>Seus esportes</p>";
+  try {
+    const resposta = await fetch("http://localhost:3000/publicacoes/imagem", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (esportes.length === 0) {
-        container.innerHTML += "<p>Você ainda não escolheu esportes.</p>";
-        return;
+    const dados = await resposta.json();
+    console.log("Resposta do servidor:", dados);
+
+    if (dados.success) {
+      document.getElementById("post-text").value = "";
+      document.getElementById("input-imagem").value = "";
+      if (preview) {
+        preview.src = "";
+        preview.style.display = "none";
       }
+      imagemSelecionada = null;
+      if (selectEsporte) selectEsporte.value = "";
+      await carregarFeed(); // recarrega o feed geral
+    } else {
+      alert(dados.message || "Erro ao publicar.");
+    }
+  } catch (erro) {
+    console.error("Erro ao criar post:", erro);
+    alert("Erro no servidor. Tente novamente.");
+  }
+}
 
-<<<<<<< HEAD
-      esportes.forEach(nome => {
-        const div = document.createElement("div");
-        div.classList.add("esporte-item");
-        div.dataset.esporte = nome;
 
-        const nomeArquivo = nome
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "")
-          .toLowerCase();
-=======
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
   if (!container) return;
->>>>>>> a0b0a61039019d16dc027bcee352d5867f998abe
 
-        div.innerHTML = `
-          <a href="#">
-            <img src="${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png" 
-                onerror="this.src='imagens/default.png'" 
-                alt="${nome}">
-            ${nome}
-          </a>
-        `;
+  const cpf = localStorage.getItem("cpf");
+  if (!cpf) return;
 
-        //  Quando clica, o nome fica verde e o feed é filtrado
-        div.addEventListener("click", () => {
-          // remove ativo dos outros
-          document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
-            link.classList.remove("ativo");
-          });
+  try {
+    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
+    const esportes = await resposta.json();
 
-          // adiciona ativo ao clicado
-          const link = div.querySelector("a");
-          link.classList.add("ativo");
+    const caminhoImagens = "ImagensEscolhaEsportes/";
+    container.innerHTML = "<p>Seus esportes</p>";
 
-          // filtra feed
-          carregarFeed(nome);
+    if (esportes.length === 0) {
+      container.innerHTML += "<p>Você ainda não escolheu esportes.</p>";
+      return;
+    }
+
+    esportes.forEach(nome => {
+      const div = document.createElement("div");
+      div.classList.add("esporte-item");
+      div.dataset.esporte = nome;
+
+      const nomeArquivo = nome
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "")
+        .toLowerCase();
+
+      div.innerHTML = `
+        <a href="#">
+          <img src="${caminhoImagens}${nomeArquivo.charAt(0).toUpperCase() + nomeArquivo.slice(1)}.png" 
+               onerror="this.src='imagens/default.png'" 
+               alt="${nome}">
+          ${nome}
+        </a>
+      `;
+
+      //  Quando clica, o nome fica verde e o feed é filtrado
+      div.addEventListener("click", () => {
+        // remove ativo dos outros
+        document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
+          link.classList.remove("ativo");
         });
 
-        container.appendChild(div);
+        // adiciona ativo ao clicado
+        const link = div.querySelector("a");
+        link.classList.add("ativo");
+
+        // filtra feed
+        carregarFeed(nome);
       });
 
-    } catch (erro) {
-      console.error("Erro ao carregar esportes:", erro);
-    }
+      container.appendChild(div);
+    });
+
+  } catch (erro) {
+    console.error("Erro ao carregar esportes:", erro);
   }
+}
 
-  // ================== PREENCHER SELECT DE ESPORTES ==================
-  async function preencherSelectEsportes() {
-    const select = document.getElementById("esportes");
-    if (!select) return;
+// ================== PREENCHER SELECT DE ESPORTES ==================
+async function preencherSelectEsportes() {
+  const select = document.getElementById("esportes");
+  if (!select) return;
 
-    const cpf = localStorage.getItem("cpf");
-    if (!cpf) return;
+  const cpf = localStorage.getItem("cpf");
+  if (!cpf) return;
 
-    try {
-      const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
-      const esportes = await resposta.json();
+  try {
+    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
+    const esportes = await resposta.json();
 
-      select.innerHTML = '<option value="">Selecionar esporte</option>';
+    select.innerHTML = '<option value="">Selecionar esporte</option>';
 
-      esportes.forEach(nome => {
-        const option = document.createElement("option");
-        option.value = nome;
-        option.textContent = nome;
-        select.appendChild(option);
-      });
+    esportes.forEach(nome => {
+      const option = document.createElement("option");
+      option.value = nome;
+      option.textContent = nome;
+      select.appendChild(option);
+    });
 
-    } catch (erro) {
-      console.error("Erro ao preencher o select de esportes:", erro);
-    }
+  } catch (erro) {
+    console.error("Erro ao preencher o select de esportes:", erro);
   }
+}
 
-  // ================== MENU DE CONFIGURAÇÃO ==================
-  var configmenu = document.querySelector(".config-menu");
-  function configuracoesMenuAlter() {
-    configmenu.classList.toggle("config-menu-height");
-  }
+// ================== MENU DE CONFIGURAÇÃO ==================
+var configmenu = document.querySelector(".config-menu");
+function configuracoesMenuAlter() {
+  configmenu.classList.toggle("config-menu-height");
+}
 
-  // ================== INICIALIZAÇÃO ==================
-  document.addEventListener("DOMContentLoaded", () => {
-    preencherPerfil();
-    carregarFeed();
-    carregarEsportes();
-    preencherSelectEsportes();
-  });
+// ================== INICIALIZAÇÃO ==================
+document.addEventListener("DOMContentLoaded", () => {
+  preencherPerfil();
+  carregarFeed();
+  carregarEsportes();
+  preencherSelectEsportes();
+});
