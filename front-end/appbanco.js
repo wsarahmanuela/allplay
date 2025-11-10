@@ -273,7 +273,6 @@ app.get('/publicacoes/:cpf', (req, res) => {
   console.log(`\n Rota /publicacoes/:cpf chamada com:`);
   console.log(`   CPF: ${cpf}`);
   console.log(`   Esporte: ${esporte || 'todos'}`);
-<<<<<<< HEAD
 let query = `
   SELECT 
     p.IDpublicacao,
@@ -289,23 +288,8 @@ let query = `
   JOIN usuario u ON p.autor_CPF = u.CPF
   WHERE p.autor_CPF = ?
 `;
-=======
 
-  let query = `
-    SELECT 
-      p.IDpublicacao,
-      p.conteudo,
-      p.imagem, 
-      DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
-      u.nome,
-      u.nomeUsuario,
-      u.fotoDePerfil,
-      p.esporte
-    FROM publicacao p
-    JOIN usuario u ON p.autor_CPF = u.CPF
-    WHERE p.autor_CPF = ?
-  `;
->>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
+
 
   const params = [cpf];
 
@@ -680,23 +664,19 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
 
 // ATUALIZAR DADOS DO PERFIL (NOVA ROTA)
 app.put("/usuario/atualizar", (req, res) => {
-  const { cpf, nomeUsuario, bio, localizacao } = req.body;
+  const { cpf, nomeCompleto, nomeUsuario, bio, localizacao } = req.body;
 
   if (!cpf) {
     return res.status(400).json({ success: false, message: "CPF é obrigatório para atualização." });
   }
 
   const sql = `
-    UPDATE usuario 
-    SET nomeUsuario = ?, bio = ?, cidade = ?
-    WHERE cpf = ?
-  `;
+        UPDATE usuario 
+        SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
+        WHERE cpf = ?
+    `;
 
-<<<<<<< HEAD
   connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
-=======
-  connection.query(sql, [nomeUsuario, bio, localizacao || null, cpf], (erro, resultados) => {
->>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
     if (erro) {
       console.error("Erro ao atualizar perfil:", erro);
       return res.status(500).json({ success: false, message: "Erro ao atualizar dados no servidor." });
