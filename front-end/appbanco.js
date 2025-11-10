@@ -522,7 +522,7 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
 
 
 // barra de pesquisa
-app.get("/search", (req, res) => {
+ app.get("/search", (req, res) => {
   const termo = req.query.query;
 
   if (!termo || termo.trim() === "") {
@@ -531,14 +531,12 @@ app.get("/search", (req, res) => {
 
   const termoLike = `%${termo}%`;
 
-  // Buscar usuários
   const queryUsuarios = `
-    SELECT nome, nomeUsuario, fotoDePerfil
+    SELECT CPF AS id, nome, nomeUsuario, fotoDePerfil
     FROM usuario
     WHERE nome LIKE ? OR nomeUsuario LIKE ?
   `;
 
-  // Buscar posts
   const queryPosts = `
     SELECT p.conteudo, u.nome, u.nomeUsuario, u.fotoDePerfil
     FROM publicacao p
@@ -546,7 +544,6 @@ app.get("/search", (req, res) => {
     WHERE p.conteudo LIKE ?
   `;
 
-  // Executar as duas buscas em paralelo
   connection.query(queryUsuarios, [termoLike, termoLike], (errUsuarios, usuarios) => {
     if (errUsuarios) {
       console.error("Erro ao buscar usuários:", errUsuarios);
@@ -563,6 +560,31 @@ app.get("/search", (req, res) => {
     });
   });
 });
+
+// 👤 Buscar perfil por ID (CPF)
+app.get("/usuario/id/:id", (req, res) => {
+  const id = req.params.id;
+
+  const query = `
+    SELECT CPF, nome, nomeUsuario, fotoDePerfil, cidade, email
+    FROM usuario
+    WHERE CPF = ?
+  `;
+
+  connection.query(query, [id], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar usuário:", erro);
+      return res.status(500).json({ success: false, message: "Erro no servidor" });
+    }
+
+    if (resultados.length === 0) {
+      return res.status(404).json({ success: false, message: "Usuário não encontrado" });
+    }
+
+    res.json({ success: true, usuario: resultados[0] });
+  });
+});
+
 
 //NOME DE USUARIO ---------------------------------------------------
 app.get("/usuario/:cpf", (req, res) => {

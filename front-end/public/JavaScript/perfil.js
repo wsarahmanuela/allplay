@@ -362,6 +362,10 @@ function configurarBotaoEditar() {
         console.warn("Elemento com ID 'btn-editar-perfil' não encontrado. O botão de edição pode estar ausente.");
     }
 }
+ var configmenu = document.querySelector(".config-menu");
+  function configuracoesMenuAlter() {
+    configmenu.classList.toggle("config-menu-height");
+  }
 
 
 // ===== inicialização (Tudo que deve rodar ao carregar a página) =====
