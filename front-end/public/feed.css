@@ -541,7 +541,7 @@ i {
   gap: 10px;
   padding: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:  0.2s;
 }
 
 .result-item:hover {
@@ -574,7 +574,6 @@ i {
   transition: transform 0.2s ease;
 }
 
-<<<<<<< HEAD
 .btn-curtir.curtido {
   color: red;
   transform: scale(1.1);
@@ -584,5 +583,4 @@ i {
   font-size: 14px;
   color: #555;
 }
-=======
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
+

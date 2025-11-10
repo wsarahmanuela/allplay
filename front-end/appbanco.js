@@ -420,38 +420,41 @@ app.delete("/publicacoes/:id", (req, res) => {
     });
   });
 });
-//=================== curtida =================
+
 // ==================== CURTIDAS ====================
 app.post("/publicacoes/curtir", (req, res) => {
   const { idPublicacao, cpf } = req.body;
-
-  if (!idPublicacao || !cpf) {
-    return res.status(400).json({ error: "ID da publicação e CPF são obrigatórios" });
-  }
+  console.log("Recebido no /curtir:", req.body);
 
   const sqlCheck = "SELECT * FROM curtida WHERE publicacao_ID = ? AND usuario_CPF = ?";
   connection.query(sqlCheck, [idPublicacao, cpf], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.error("Erro SQL ao verificar curtida:", err);
+      return res.status(500).json({ error: err.message });
+    }
 
     if (result.length > 0) {
-      // Já curtiu → remove curtida
       const sqlDelete = "DELETE FROM curtida WHERE publicacao_ID = ? AND usuario_CPF = ?";
       connection.query(sqlDelete, [idPublicacao, cpf], (err2) => {
-        if (err2) return res.status(500).json({ error: err2.message });
-        res.json({ liked: false });
+        if (err2) {
+          console.error("Erro SQL ao remover curtida:", err2);
+          return res.status(500).json({ error: err2.message });
+        }
+        return res.json({ message: "Curtida removida" });
       });
     } else {
-      // Ainda não curtiu → adiciona
       const sqlInsert = "INSERT INTO curtida (publicacao_ID, usuario_CPF) VALUES (?, ?)";
       connection.query(sqlInsert, [idPublicacao, cpf], (err3) => {
-        if (err3) return res.status(500).json({ error: err3.message });
-        res.json({ liked: true });
+        if (err3) {
+          console.error("Erro SQL ao inserir curtida:", err3);
+          return res.status(500).json({ error: err3.message });
+        }
+        return res.json({ message: "Curtida adicionada" });
       });
     }
   });
 });
-
-// Contar curtidas de cada publicação
+// Contar curtidas de cada publicação tem 
 app.get("/publicacoes/:id/curtidas", (req, res) => {
   const id = req.params.id;
   const sql = "SELECT COUNT(*) AS total FROM curtida WHERE publicacao_ID = ?";
@@ -460,12 +463,6 @@ app.get("/publicacoes/:id/curtidas", (req, res) => {
     res.json(result[0]);
   });
 });
-
-
-
-
-
-
 
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)

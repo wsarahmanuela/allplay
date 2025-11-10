@@ -493,8 +493,6 @@ nav {
 .clube-card p strong {
     color: #000;
 }
-<<<<<<< HEAD
-=======
 /*------ Post (Estilo da Primeira Imagem/Feed) ------ */
 .post {
   background-color: #fff;
@@ -505,8 +503,6 @@ nav {
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   font-family: "Poppins", sans-serif;
 }
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
-
 .post {
     background-color: #fff;
     padding: 15px;
@@ -527,8 +523,6 @@ nav {
 
 
 .post-header {
-<<<<<<< HEAD
-=======
   display: flex;
   align-items: center;
   gap: 10px;
@@ -539,7 +533,6 @@ nav {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
     display: flex;
     align-items: center;
     gap: 10px;
@@ -551,10 +544,6 @@ nav {
     height: 45px;
     border-radius: 50%;
     object-fit: cover;
-<<<<<<< HEAD
-
-=======
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
 }
 
 .post-info {
@@ -564,8 +553,6 @@ nav {
 }
 
 .post-info .nome {
-<<<<<<< HEAD
-=======
   font-weight: 600;
   font-size: 15px;
   color: #000;
@@ -587,7 +574,6 @@ nav {
   margin-top: 6px;
   font-size: 13px;
   color: #777;
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
     font-weight: 600;
     font-size: 15px;
     color: #000;
@@ -606,13 +592,10 @@ nav {
 }
 
 .data {
-<<<<<<< HEAD
-=======
     color: #666;
     font-size: 0.85rem;
     margin-top: 8px;
     text-align: right;
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
     margin-top: 6px;
     font-size: 13px;
     color: #777;
@@ -660,9 +643,5 @@ nav {
 }
 
 .menu-opcoes button:hover {
-<<<<<<< HEAD
     background: #f5f5f5;
-=======
-  background: #f5f5f5;
->>>>>>> 59a9ad6de1a793b08f8944061d7b01fa5cf639e4
 }
