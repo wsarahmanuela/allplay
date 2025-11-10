@@ -326,10 +326,6 @@ if (searchInput && resultsDiv) {
     }
   });
 }
-
-
-
-
 // ================== UPLOAD DE IMAGEM + CRIAR POST ==================
 let imagemSelecionada = null;
 
