@@ -172,8 +172,25 @@ app.get('/teste-banco', (req, res) => {
 
 
 
-//CADASTRO02 -----------------------------------------------------------------
+//CADASTRO02 -----------------------------------------------------------------f
 
+app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
+  const { cpf, bio } = req.body;
+  const foto = req.file ? req.file.filename : null;
+
+  if (!cpf || !bio || !foto) {
+    return res.status(400).json({ success: false, message: "Dados incompletos." });
+  }
+
+  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ? WHERE cpf = ?";
+  connection.query(sql, [bio, foto, cpf], (erro) => {
+    if (erro) {
+      console.error(erro);
+      return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
+    }
+    res.json({ success: true });
+  });
+});
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
 app.post('/esportes', (req, res) => {
@@ -649,22 +666,19 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
 
 // ATUALIZAR DADOS DO PERFIL (NOVA ROTA)
 app.put("/usuario/atualizar", (req, res) => {
-  const { cpf, nomeCompleto, nomeUsuario, bio, localizacao } = req.body;
+  const { cpf, nomeUsuario, bio, localizacao } = req.body;
 
   if (!cpf) {
     return res.status(400).json({ success: false, message: "CPF é obrigatório para atualização." });
   }
 
-  // Nota: O campo 'cidade' no seu cadastro inicial provavelmente é a 'localizacao'
   const sql = `
-        UPDATE usuario 
-        SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
-        WHERE cpf = ?
-    `;
+    UPDATE usuario 
+    SET nomeUsuario = ?, bio = ?, cidade = ?
+    WHERE cpf = ?
+  `;
 
-  // A foto e o banner são atualizados na rota '/cadastro/foto' (requer FormData)
-
-  connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
+  connection.query(sql, [nomeUsuario, bio, localizacao || null, cpf], (erro, resultados) => {
     if (erro) {
       console.error("Erro ao atualizar perfil:", erro);
       return res.status(500).json({ success: false, message: "Erro ao atualizar dados no servidor." });
