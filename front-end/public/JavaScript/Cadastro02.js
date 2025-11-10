@@ -41,38 +41,87 @@ document.addEventListener("DOMContentLoaded", () => {
     const foto = document.getElementById("upload-foto").files[0];
     const bio = document.getElementById("bio").value.trim();
     const nomeUsuario = document.getElementById("usuario").value.trim();
+    // Você pode precisar de outros campos, como 'cidade' ou 'localizacao'
+    // const localizacao = document.getElementById("cidade").value.trim(); 
 
     if (!foto || !bio || !nomeUsuario) {
-      alert("Preencha todos os campos!");
+      alert("Preencha todos os campos: Foto, Biografia e Nome de Usuário!");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("cpf", cpf);
-    formData.append("bio", bio);
-    formData.append("foto", foto);
-    formData.append("nomeUsuario", nomeUsuario);
-    console.log("Dados enviados:", cpf, bio, nomeUsuario, foto);
+    // =========================================================================
+    // 1. REQUISIÇÃO PARA UPLOAD DA FOTO (Rota: /usuario/upload-perfil/:cpf)
+    // Isso usa FormData e a rota correta para o Multer
+    // =========================================================================
 
+    const formData = new FormData();
+    // O nome do campo deve ser 'fotoDePerfil' para bater com o seu Node.js
+    formData.append("fotoDePerfil", foto);
+
+    // URL CORRETA: /usuario/upload-perfil/CPF
+    const uploadUrl = `http://localhost:3000/usuario/upload-perfil/${cpf}`;
+
+    console.log("Iniciando upload da foto para:", uploadUrl);
 
     try {
-      const resposta = await fetch("http://localhost:3000/cadastro/foto", {
+      // --- PASSO A: Enviar a foto ---
+      const respostaFoto = await fetch(uploadUrl, {
         method: "POST",
-        body: formData
+        body: formData // Envia o arquivo
       });
 
-      const resultado = await resposta.json();
-
-      if (resultado.success) {
-        alert("Cadastro finalizado com sucesso!");
-        window.location.href = "EscolhaEsporte.html";
-      } else {
-        alert("Erro: " + resultado.message);
+      // Garante que a resposta é JSON e não um erro HTML (que causa o SyntaxError)
+      if (!respostaFoto.ok) {
+        // Tenta ler o erro em JSON (se o servidor for bem comportado)
+        // Se falhar, lança um erro com o status HTTP
+        const erroJson = await respostaFoto.json().catch(() => ({ message: `Erro HTTP ${respostaFoto.status}` }));
+        throw new Error("Erro no servidor (Upload): " + erroJson.message);
       }
 
+      const resultadoFoto = await respostaFoto.json();
+      console.log("Upload da foto concluído:", resultadoFoto.message);
+
+      // =========================================================================
+      // 2. REQUISIÇÃO PARA ATUALIZAR DADOS DE TEXTO (Rota: /usuario/atualizar)
+      // Isso usa JSON e a rota PUT para atualizar bio e nomeUsuario
+      // =========================================================================
+
+      // --- PASSO B: Enviar dados de texto ---
+      const dadosPerfil = {
+        cpf: cpf,
+        nomeUsuario: nomeUsuario,
+        bio: bio,
+        // Se tiver campo de localizacao: localizacao: localizacao
+      };
+
+      const updateUrl = "http://localhost:3000/usuario/atualizar";
+
+      console.log("Enviando atualização de dados:", dadosPerfil)
+
+      const respostaDados = await fetch(updateUrl, {
+        method: "PUT", // Sua rota de atualização é PUT
+        headers: {
+          'Content-Type': 'application/json' // O Express espera JSON nesta rota
+        },
+        body: JSON.stringify(dadosPerfil)
+      });
+
+      // Garante que a resposta é JSON
+      if (!respostaDados.ok) {
+        const erroJson = await respostaDados.json().catch(() => ({ message: `Erro HTTP ${respostaDados.status}` }));
+        throw new Error("Erro no servidor (Dados): " + erroJson.message);
+      }
+
+      const resultadoDados = await respostaDados.json();
+      console.log("Atualização de dados concluída:", resultadoDados.message);
+
+      // --- PASSO C: Finalização ---
+      alert("Cadastro finalizado com sucesso!");
+      window.location.href = "EscolhaEsporte.html";
+
     } catch (erro) {
-      console.error("Erro ao enviar foto:", erro);
-      alert("Erro de conexão com o servidor.");
+      console.error("Erro fatal ao finalizar o cadastro:", erro);
+      alert("Erro ao finalizar o cadastro: " + erro.message);
     }
   });
 });
@@ -97,6 +146,4 @@ bio.addEventListener('input', () => {
 });
 
 // === AJUSTE AUTOMÁTICO DO NOME DE USUÁRIO (adiciona @) ===
-
-
-
+// (Código original não fornecido, mantendo o comentário)

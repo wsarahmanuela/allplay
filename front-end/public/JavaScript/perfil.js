@@ -314,3 +314,80 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarEsportes();
   console.log("perfil inicializado");
 });
+<<<<<<< HEAD
+=======
+
+async function criarPost() {
+  const texto = document.getElementById("post-text").value.trim();
+  const cpf = localStorage.getItem("cpf");
+
+  if (!cpf) {
+    alert("Erro: CPF não encontrado. Faça login novamente.");
+    return;
+  }
+
+  if (!texto && !imagemSelecionada) {
+    alert("Escreva algo ou selecione uma imagem para postar.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("autor_CPF", cpf);
+  formData.append("conteudo", texto || "");
+  if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
+
+  try {
+    const resposta = await fetch("http://localhost:3000/publicacoes/imagem", {
+      method: "POST",
+      body: formData,
+    });
+
+    const dados = await resposta.json();
+    console.log("Resposta do servidor:", dados);
+
+    if (dados.success) {
+      document.getElementById("post-text").value = "";
+      document.getElementById("input-imagem").value = "";
+      imagemSelecionada = null;
+      await carregarFeed();
+    } else {
+      alert(dados.message || "Erro ao publicar.");
+    }
+  } catch (erro) {
+    console.error("Erro ao criar post:", erro);
+    alert("Erro no servidor. Tente novamente.");
+  }
+}
+
+// =================================================================
+// FUNÇÃO DE NAVEGAÇÃO PARA EDIÇÃO DE PERFIL
+// =================================================================
+function configurarBotaoEditar() {
+    const btnEditar = document.getElementById('btn-editar-perfil');
+    
+    if (btnEditar) {
+        btnEditar.addEventListener('click', () => {
+            console.log('Botão Editar Perfil clicado. Redirecionando...');
+            window.location.href = 'editPerfil.html'; 
+        });
+    } else {
+        console.warn("Elemento com ID 'btn-editar-perfil' não encontrado. O botão de edição pode estar ausente.");
+    }
+}
+ var configmenu = document.querySelector(".config-menu");
+  function configuracoesMenuAlter() {
+    configmenu.classList.toggle("config-menu-height");
+  }
+
+
+// ===== inicialização (Tudo que deve rodar ao carregar a página) =====
+document.addEventListener("DOMContentLoaded", () => {
+    // Chamadas principais
+    preencherPerfil();
+    carregarFeed();
+    carregarEsportes();
+    
+    // Chamada do botão de edição
+    configurarBotaoEditar(); 
+});
+>>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18

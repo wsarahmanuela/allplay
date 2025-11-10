@@ -172,8 +172,25 @@ app.get('/teste-banco', (req, res) => {
 
 
 
-//CADASTRO02 -----------------------------------------------------------------
+//CADASTRO02 -----------------------------------------------------------------f
 
+app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
+  const { cpf, bio } = req.body;
+  const foto = req.file ? req.file.filename : null;
+
+  if (!cpf || !bio || !foto) {
+    return res.status(400).json({ success: false, message: "Dados incompletos." });
+  }
+
+  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ? WHERE cpf = ?";
+  connection.query(sql, [bio, foto, cpf], (erro) => {
+    if (erro) {
+      console.error(erro);
+      return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
+    }
+    res.json({ success: true });
+  });
+});
 
 // ESCOLHA DE ESPORTE --------------------------------------------------------
 app.post('/esportes', (req, res) => {
@@ -256,6 +273,7 @@ app.get('/publicacoes/:cpf', (req, res) => {
   console.log(`\n Rota /publicacoes/:cpf chamada com:`);
   console.log(`   CPF: ${cpf}`);
   console.log(`   Esporte: ${esporte || 'todos'}`);
+<<<<<<< HEAD
 let query = `
   SELECT 
     p.IDpublicacao,
@@ -271,6 +289,23 @@ let query = `
   JOIN usuario u ON p.autor_CPF = u.CPF
   WHERE p.autor_CPF = ?
 `;
+=======
+
+  let query = `
+    SELECT 
+      p.IDpublicacao,
+      p.conteudo,
+      p.imagem, 
+      DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
+      u.nome,
+      u.nomeUsuario,
+      u.fotoDePerfil,
+      p.esporte
+    FROM publicacao p
+    JOIN usuario u ON p.autor_CPF = u.CPF
+    WHERE p.autor_CPF = ?
+  `;
+>>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
 
   const params = [cpf];
 
@@ -339,18 +374,20 @@ app.get('/publicacoes', (req, res) => {
     p.data_publicacao,
     u.nome,
     u.nomeUsuario,
-    u.fotoDePerfil,
-    p.esporte,
-    p.autor_CPF AS cpf
+    u.fotoDePerfil
   FROM publicacao p
   JOIN usuario u ON p.autor_CPF = u.CPF
   ORDER BY p.data_publicacao DESC
 `;
+
+
   connection.query(query, (erro, resultados) => {
     if (erro) {
       console.error('Erro ao buscar publicações:', erro);
       return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
     }
+
+
     res.json(resultados);
   });
 });
@@ -421,48 +458,8 @@ app.delete("/publicacoes/:id", (req, res) => {
   });
 });
 
-// ==================== CURTIDAS ====================
-app.post("/publicacoes/curtir", (req, res) => {
-  const { idPublicacao, cpf } = req.body;
-  console.log("Recebido no /curtir:", req.body);
 
-  const sqlCheck = "SELECT * FROM curtida WHERE publicacao_ID = ? AND usuario_CPF = ?";
-  connection.query(sqlCheck, [idPublicacao, cpf], (err, result) => {
-    if (err) {
-      console.error("Erro SQL ao verificar curtida:", err);
-      return res.status(500).json({ error: err.message });
-    }
 
-    if (result.length > 0) {
-      const sqlDelete = "DELETE FROM curtida WHERE publicacao_ID = ? AND usuario_CPF = ?";
-      connection.query(sqlDelete, [idPublicacao, cpf], (err2) => {
-        if (err2) {
-          console.error("Erro SQL ao remover curtida:", err2);
-          return res.status(500).json({ error: err2.message });
-        }
-        return res.json({ message: "Curtida removida" });
-      });
-    } else {
-      const sqlInsert = "INSERT INTO curtida (publicacao_ID, usuario_CPF) VALUES (?, ?)";
-      connection.query(sqlInsert, [idPublicacao, cpf], (err3) => {
-        if (err3) {
-          console.error("Erro SQL ao inserir curtida:", err3);
-          return res.status(500).json({ error: err3.message });
-        }
-        return res.json({ message: "Curtida adicionada" });
-      });
-    }
-  });
-});
-// Contar curtidas de cada publicação tem 
-app.get("/publicacoes/:id/curtidas", (req, res) => {
-  const id = req.params.id;
-  const sql = "SELECT COUNT(*) AS total FROM curtida WHERE publicacao_ID = ?";
-  connection.query(sql, [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(result[0]);
-  });
-});
 
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
@@ -683,19 +680,23 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
 
 // ATUALIZAR DADOS DO PERFIL (NOVA ROTA)
 app.put("/usuario/atualizar", (req, res) => {
-  const { cpf, nomeCompleto, nomeUsuario, bio, localizacao } = req.body;
+  const { cpf, nomeUsuario, bio, localizacao } = req.body;
 
   if (!cpf) {
     return res.status(400).json({ success: false, message: "CPF é obrigatório para atualização." });
   }
 
   const sql = `
-        UPDATE usuario 
-        SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
-        WHERE cpf = ?
-    `;
+    UPDATE usuario 
+    SET nomeUsuario = ?, bio = ?, cidade = ?
+    WHERE cpf = ?
+  `;
 
+<<<<<<< HEAD
   connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
+=======
+  connection.query(sql, [nomeUsuario, bio, localizacao || null, cpf], (erro, resultados) => {
+>>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
     if (erro) {
       console.error("Erro ao atualizar perfil:", erro);
       return res.status(500).json({ success: false, message: "Erro ao atualizar dados no servidor." });

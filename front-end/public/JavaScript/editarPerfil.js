@@ -89,6 +89,11 @@ const carregarTagsIniciais = (esportes) => {
     });
 };
 
+//Botão de cancelar
+document.querySelector('.btn-cancelar').addEventListener('click', function() {
+    window.history.back();
+});
+
 
 // 3. Lógica de Upload e Preview (AGORA ARMAZENA O ARQUIVO NOVO)
 
