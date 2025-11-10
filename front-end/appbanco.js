@@ -629,8 +629,6 @@ connection.query(sql, [cpf], (erro, resultados) => {
 
 // LISTA MESTRA DE ESPORTES (NOVA ROTA)
 app.get("/esportes/mestra", (req, res) => {
-  // Na vida real, você buscaria isso de uma tabela 'esportes' no seu banco.
-  // Aqui, usamos uma lista fixa para o exemplo.
   const todosEsportes = [
     "Basquete", "Futebol", "Vôlei", "Natação", "Corrida",
     "Ciclismo", "Tênis de mesa", "E-Sports", "Atletismo", "Handebol"
@@ -640,12 +638,12 @@ app.get("/esportes/mestra", (req, res) => {
 
 // ==================== ROTA CORRETA DE UPLOAD DE FOTOS/BANNER ====================
 app.post("/usuario/upload-perfil/:cpf", upload.fields([
-  { name: 'fotoDePerfil', maxCount: 1 }, // Nome do campo deve ser 'fotoDePerfil'
-  { name: 'banner', maxCount: 1 }      // Nome do campo deve ser 'banner'
+  { name: 'fotoDePerfil', maxCount: 1 }, 
+  { name: 'banner', maxCount: 1 }     
 ]), (req, res) => {
   const cpf = req.params.cpf;
   const fotoDePerfilFile = req.files?.fotoDePerfil?.[0];
-  const bannerFile = req.files?.banner?.[0]; // Agora é o campo 'banner'
+  const bannerFile = req.files?.banner?.[0]; 
 
   if (!cpf) {
     return res.status(400).json({ success: false, message: "CPF é obrigatório." });
@@ -656,7 +654,7 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
 
   // 1. Verifica e adiciona o banner
   if (bannerFile) {
-    updates.push("banner = ?"); // <<<<<<<<<< CORRIGIDO PARA 'banner'
+    updates.push("banner = ?"); 
     params.push(bannerFile.filename);
   }
 
@@ -670,14 +668,12 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
     return res.status(200).json({ success: true, message: "Nenhuma imagem para atualizar." });
   }
 
-  // Constrói a query de UPDATE
   const sql = `UPDATE usuario SET ${updates.join(', ')} WHERE cpf = ?`;
   params.push(cpf);
 
   connection.query(sql, params, (erro) => {
     if (erro) {
       console.error("Erro ao salvar imagens no banco:", erro);
-      // IMPORTANTE: Se o erro persistir, o problema será nesta query.
       return res.status(500).json({ success: false, message: "Erro ao atualizar imagens no servidor (Erro de Banco de Dados)." });
     }
     res.json({ success: true, message: "Imagens do perfil atualizadas com sucesso." });
@@ -693,14 +689,11 @@ app.put("/usuario/atualizar", (req, res) => {
     return res.status(400).json({ success: false, message: "CPF é obrigatório para atualização." });
   }
 
-  // Nota: O campo 'cidade' no seu cadastro inicial provavelmente é a 'localizacao'
   const sql = `
         UPDATE usuario 
         SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
         WHERE cpf = ?
     `;
-
-  // A foto e o banner são atualizados na rota '/cadastro/foto' (requer FormData)
 
   connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
     if (erro) {

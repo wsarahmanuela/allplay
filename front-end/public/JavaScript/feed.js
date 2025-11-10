@@ -174,26 +174,36 @@ if (Array.isArray(dados)) {
     div.appendChild(img);
   }
 
-  // Data formatada
-  const dataDiv = document.createElement("div");
-  dataDiv.classList.add("data");
-  if (post.data_publicacao) {
-    let dataString = post.data_publicacao;
-    let dataValida;
+ // ================== DATA FORMATADA CORRIGIDA ==================
+const dataDiv = document.createElement("div");
+dataDiv.classList.add("data");
 
+if (post.data_publicacao) {
+  try {
+    let dataString = post.data_publicacao.trim();
+
+    // ✅ Garante formato ISO válido (ex: 2025-11-10T14:23:00)
     if (dataString.includes('/')) {
-      const [dataParte, tempoParte = '00:00:00'] = dataString.split(' ');
+      // formato dd/mm/yyyy hh:mm:ss
+      const [dataParte, tempoParte = "00:00:00"] = dataString.split(' ');
       const [dia, mes, ano] = dataParte.split('/');
-      dataValida = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')} ${tempoParte}`;
-    } else if (dataString.includes('T')) {
-      dataValida = dataString.replace('Z', '').replace('T', ' ');
-    } else {
-      dataValida = dataString;
+      dataString = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${tempoParte}`;
+    } else if (dataString.includes(' ')) {
+      // formato "2025-11-10 14:00:00"
+      dataString = dataString.replace(' ', 'T');
     }
 
-    const data = new Date(dataValida);
-    if (!isNaN(data) && dataValida) {
-      dataDiv.textContent = data.toLocaleString("pt-BR", {
+    // ✅ Cria o objeto Date
+    const data = new Date(dataString);
+
+    if (isNaN(data)) {
+      dataDiv.textContent = "Data inválida";
+    } else {
+      // ✅ Ajusta automaticamente para o fuso horário do Brasil
+      const dataLocal = new Date(data.getTime() - data.getTimezoneOffset() * 60000);
+
+      // ✅ Formata no padrão pt-BR com fuso correto
+      dataDiv.textContent = new Intl.DateTimeFormat("pt-BR", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -201,12 +211,26 @@ if (Array.isArray(dados)) {
         minute: "2-digit",
         second: "2-digit",
         hour12: false,
-      });
-    } else {
-      dataDiv.textContent = "Data Inválida";
+        timeZone: "America/Sao_Paulo"
+      }).format(dataLocal);
     }
+  } catch (erro) {
+    console.error("Erro ao formatar data:", erro);
+    dataDiv.textContent = "Data inválida";
   }
-  div.appendChild(dataDiv);
+} else {
+  // Caso a API ainda não tenha enviado data (por segurança)
+  const agora = new Date();
+  dataDiv.textContent = new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "medium",
+    timeZone: "America/Sao_Paulo"
+  }).format(agora);
+}
+
+div.appendChild(dataDiv);
+
+
 
   // Esporte (tag)
   if (post.esporte) {
