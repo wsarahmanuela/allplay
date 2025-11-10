@@ -256,21 +256,21 @@ app.get('/publicacoes/:cpf', (req, res) => {
   console.log(`\n Rota /publicacoes/:cpf chamada com:`);
   console.log(`   CPF: ${cpf}`);
   console.log(`   Esporte: ${esporte || 'todos'}`);
-
-  let query = `
-    SELECT 
-      p.IDpublicacao,
-      p.conteudo,
-      p.imagem, 
-      DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
-      u.nome,
-      u.nomeUsuario,
-      u.fotoDePerfil,
-      p.esporte
-    FROM publicacao p
-    JOIN usuario u ON p.autor_CPF = u.CPF
-    WHERE p.autor_CPF = ?
-  `;
+let query = `
+  SELECT 
+    p.IDpublicacao,
+    p.conteudo,
+    p.imagem, 
+    DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
+    u.nome,
+    u.nomeUsuario,
+    u.fotoDePerfil,
+    p.esporte,
+    p.autor_CPF AS cpf
+  FROM publicacao p
+  JOIN usuario u ON p.autor_CPF = u.CPF
+  WHERE p.autor_CPF = ?
+`;
 
   const params = [cpf];
 
@@ -339,20 +339,18 @@ app.get('/publicacoes', (req, res) => {
     DATE_FORMAT(CONVERT_TZ(p.data_publicacao, '+00:00', '-03:00'), '%d/%m/%Y %H:%i:%s') AS data_publicacao,
     u.nome,
     u.nomeUsuario,
-    u.fotoDePerfil
+    u.fotoDePerfil,
+    p.esporte,
+    p.autor_CPF AS cpf
   FROM publicacao p
   JOIN usuario u ON p.autor_CPF = u.CPF
   ORDER BY p.data_publicacao DESC
 `;
-
-
   connection.query(query, (erro, resultados) => {
     if (erro) {
       console.error('Erro ao buscar publicações:', erro);
       return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
     }
-
-
     res.json(resultados);
   });
 });
@@ -423,8 +421,48 @@ app.delete("/publicacoes/:id", (req, res) => {
   });
 });
 
+// ==================== CURTIDAS ====================
+app.post("/publicacoes/curtir", (req, res) => {
+  const { idPublicacao, cpf } = req.body;
+  console.log("Recebido no /curtir:", req.body);
 
+  const sqlCheck = "SELECT * FROM curtida WHERE publicacao_ID = ? AND usuario_CPF = ?";
+  connection.query(sqlCheck, [idPublicacao, cpf], (err, result) => {
+    if (err) {
+      console.error("Erro SQL ao verificar curtida:", err);
+      return res.status(500).json({ error: err.message });
+    }
 
+    if (result.length > 0) {
+      const sqlDelete = "DELETE FROM curtida WHERE publicacao_ID = ? AND usuario_CPF = ?";
+      connection.query(sqlDelete, [idPublicacao, cpf], (err2) => {
+        if (err2) {
+          console.error("Erro SQL ao remover curtida:", err2);
+          return res.status(500).json({ error: err2.message });
+        }
+        return res.json({ message: "Curtida removida" });
+      });
+    } else {
+      const sqlInsert = "INSERT INTO curtida (publicacao_ID, usuario_CPF) VALUES (?, ?)";
+      connection.query(sqlInsert, [idPublicacao, cpf], (err3) => {
+        if (err3) {
+          console.error("Erro SQL ao inserir curtida:", err3);
+          return res.status(500).json({ error: err3.message });
+        }
+        return res.json({ message: "Curtida adicionada" });
+      });
+    }
+  });
+});
+// Contar curtidas de cada publicação tem 
+app.get("/publicacoes/:id/curtidas", (req, res) => {
+  const id = req.params.id;
+  const sql = "SELECT COUNT(*) AS total FROM curtida WHERE publicacao_ID = ?";
+  connection.query(sql, [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result[0]);
+  });
+});
 
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)

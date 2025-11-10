@@ -541,7 +541,7 @@ i {
   gap: 10px;
   padding: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:  0.2s;
 }
 
 .result-item:hover {
@@ -559,9 +559,34 @@ i {
   font-size: 14px;
   color: #333;
 }
+<<<<<<< HEAD
 .search-container {
     position: relative;
     display: inline-block;
+=======
+.curtidas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+>>>>>>> a0b0a61039019d16dc027bcee352d5867f998abe
 }
 
+.btn-curtir {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.btn-curtir.curtido {
+  color: red;
+  transform: scale(1.1);
+}
+
+.contador-curtidas {
+  font-size: 14px;
+  color: #555;
+}
 

@@ -230,7 +230,6 @@ nav {
 #container-segue {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     gap: 13rem;
     position: relative;
     margin-left: 200px;
@@ -273,7 +272,6 @@ nav {
     background-color: #ffffff3c;
     border-radius: 20px;
     padding: 30px;
-    /* Reduz a margem para evitar grande espaçamento entre o banner e este container */
     margin-top: 20px;
     width: 100%;
     max-width: 1000px;
@@ -383,6 +381,7 @@ nav {
     font-size: 13px;
     color: #777;
     margin-left: 55px;
+    margin-top: 5px;
 }
 
 /* ======================= LATERAL DIREITA ======================= */
@@ -519,7 +518,6 @@ nav {
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   font-family: "Poppins", sans-serif;
 }
-
 .post {
     background-color: #fff;
     padding: 15px;
@@ -660,5 +658,5 @@ nav {
 }
 
 .menu-opcoes button:hover {
-  background: #f5f5f5;
+    background: #f5f5f5;
 }
