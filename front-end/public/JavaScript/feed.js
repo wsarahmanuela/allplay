@@ -210,8 +210,7 @@ if (post.data_publicacao) {
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+    minute: "2-digit", 
     hour12: false,
     timeZone: "America/Sao_Paulo"
   }).format(agora);

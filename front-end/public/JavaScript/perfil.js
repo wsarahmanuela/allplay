@@ -198,51 +198,56 @@ async function carregarPostsDoUsuario(filtroEsporte = "") {
       }
       card.appendChild(dataDiv);
 
-      // curtidas (abaixo da data)
-      const curtidaDiv = document.createElement("div");
-      curtidaDiv.className = "curtidas";
+        // === CURTIDAS ===
+  const curtidaDiv = document.createElement("div");
+  curtidaDiv.classList.add("curtidas");
 
-      const btnCurtir = document.createElement("button");
-      btnCurtir.className = "btn-curtir";
-      btnCurtir.innerHTML = "❤️ Curtir";
+  const btnCurtir = document.createElement("button");
+  btnCurtir.classList.add("btn-curtir");
+  btnCurtir.innerHTML = `
+   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+    stroke-linejoin="round" class="icone-coracao">
+    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+  </svg>
+`; 
 
-      const contador = document.createElement("span");
-      contador.className = "contador-curtidas";
-      contador.textContent = "0 curtidas";
+  const contador = document.createElement("span");
+  contador.classList.add("contador-curtidas");
+  contador.textContent = "0 ";
 
-      async function atualizarCurtidas() {
-        try {
-          const r = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
-          const j = await r.json();
-          contador.textContent = `${j.total} curtida${j.total !== 1 ? "s" : ""}`;
-        } catch (err) {
-          console.error("erro curtidas:", err);
-        }
-      }
+  async function atualizarCurtidas() {
+    const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
+    const dados = await resp.json();
+    contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
+  }
 
-      btnCurtir.addEventListener("click", async () => {
-        try {
-          const r = await fetch("http://localhost:3000/publicacoes/curtir", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idPublicacao: post.IDpublicacao, cpf: cpfLogado })
-          });
-          const jr = await r.json();
-          if (jr.liked) btnCurtir.classList.add("curtido");
-          else btnCurtir.classList.remove("curtido");
-          atualizarCurtidas();
-        } catch (err) {
-          console.error("erro ao curtir:", err);
-        }
-      });
+  btnCurtir.addEventListener("click", async () => {
+    const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+      publicacao_ID: post.IDpublicacao,
+      usuario_cpf: cpfLogado,
+    }),
 
-      curtidaDiv.appendChild(btnCurtir);
-      curtidaDiv.appendChild(contador);
-      card.appendChild(curtidaDiv);
-
-      container.appendChild(card);
-      atualizarCurtidas();
     });
+    const resultado = await resp.json();
+    if (resultado.liked) {
+      btnCurtir.classList.add("curtido");
+    } else {
+      btnCurtir.classList.remove("curtido");
+    }
+    atualizarCurtidas();
+  });
+
+  curtidaDiv.appendChild(btnCurtir);
+  curtidaDiv.appendChild(contador);
+  card.appendChild(curtidaDiv); 
+  atualizarCurtidas();
+
+  container.appendChild(card);
+});
 
   } catch (err) {
     console.error("Erro ao carregar posts do usuário:", err);

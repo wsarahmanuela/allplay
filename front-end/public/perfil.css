@@ -679,3 +679,43 @@ nav {
   font-size: 14px;
   color: #555;
 }
+.curtidas {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* espaço entre coração e número */
+  margin-top: 6px;
+}
+
+.btn-curtir {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  outline: none;
+}
+
+.btn-curtir svg {
+  width: 24px;
+  height: 24px;
+  stroke: #444;
+  fill: none;
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+.btn-curtir:hover svg {
+  transform: scale(1.1);
+}
+
+.btn-curtir.curtido svg {
+  fill: red;
+  stroke: red;
+}
+
+.contador-curtidas {
+  font-size: 14px;
+  color: #555;
+}
