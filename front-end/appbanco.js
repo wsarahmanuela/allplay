@@ -589,7 +589,7 @@ app.get("/usuario/:cpf", (req, res) => {
 
 const sql = "SELECT nome, nomeUsuario, fotoDePerfil, bio, banner AS bannerURL, cidade FROM usuario WHERE cpf = ?"
 
-connection.query(sql, [cpf], (erro, resultados) => {
+  connection.query(sql, [cpf], (erro, resultados) => {
     if (erro) {
       console.error("Erro ao buscar dados do usuário:", erro);
       return res.status(500).json({ success: false, message: "Erro no servidor." });
@@ -610,11 +610,18 @@ connection.query(sql, [cpf], (erro, resultados) => {
 
 // LISTA MESTRA DE ESPORTES (NOVA ROTA)
 app.get("/esportes/mestra", (req, res) => {
-  const todosEsportes = [
-    "Basquete", "Futebol", "Vôlei", "Natação", "Corrida",
-    "Ciclismo", "Tênis de mesa", "E-Sports", "Atletismo", "Handebol"
-  ];
-  res.json(todosEsportes);
+  const sql = "SELECT nome FROM esporte ORDER BY nome ASC";
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar esportes:", err);
+      return res.status(500).json({ error: "Erro ao buscar esportes." });
+    }
+
+    console.log("Esportes encontrados no banco:", results);
+    const esportes = results.map(row => row.nome);
+    res.json(esportes);
+  });
 });
 
 // ==================== ROTA CORRETA DE UPLOAD DE FOTOS/BANNER ====================
@@ -691,6 +698,8 @@ app.put("/usuario/atualizar", (req, res) => {
     res.json({ success: true, message: "Dados do perfil atualizados com sucesso." });
   });
 });
+
+//
 
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;

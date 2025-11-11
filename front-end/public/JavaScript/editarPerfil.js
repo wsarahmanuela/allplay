@@ -63,22 +63,20 @@ const criarTagComRemocao = (nomeEsporte) => {
 };
 
 // Preenche o <ul> customizado com a lista mestra
-const preencherListaDeSugestao = () => {
-    if (!listaSugestoesCustom) return;
-    listaSugestoesCustom.innerHTML = ''; 
+function preencherListaDeSugestao() {
+  const lista = document.getElementById("lista-sugestoes-custom");
+  lista.innerHTML = "";
 
-    LISTA_MESTRA_ESPORTES.forEach(esporte => {
-        const item = document.createElement('li');
-        item.textContent = esporte;
-        
-        item.addEventListener('click', () => {
-            inputNovoEsporte.value = esporte;
-            listaSugestoesCustom.classList.remove('ativo'); 
-        });
-        
-        listaSugestoesCustom.appendChild(item);
+  LISTA_MESTRA_ESPORTES.forEach((esporte) => {
+    const li = document.createElement("li");
+    li.textContent = esporte;
+    li.addEventListener("click", () => {
+      document.getElementById("input-novo-esporte").value = esporte;
+      lista.style.display = "none";
     });
-};
+    lista.appendChild(li);
+  });
+}
 
 // Carrega as tags do usuário
 const carregarTagsIniciais = (esportes) => {
@@ -158,18 +156,20 @@ const caminhoFoto = (nomeArquivo) => {
  * Carrega a lista de todos os esportes disponíveis (Lista Mestra)
  */
 async function carregarEsportesMestres() {
+     console.log("carregarEsportesMestres() foi chamada");
     try {
         const response = await fetch(`${BASE_URL}/esportes/mestra`); 
         if (!response.ok) throw new Error('Falha ao carregar esportes mestres.');
         
         const dadosEsportes = await response.json(); 
-        
+        console.log("Resposta do servidor:", dadosEsportes); 
         LISTA_MESTRA_ESPORTES = Array.isArray(dadosEsportes) ? dadosEsportes : [];
         preencherListaDeSugestao(); 
         
     } catch (error) {
         console.error("Erro ao carregar lista mestra de esportes:", error);
-        LISTA_MESTRA_ESPORTES = ["Basquete", "Futebol", "Vôlei", "Natação", "Corrida"];
+        LISTA_MESTRA_ESPORTES = Array.isArray(dadosEsportes) ? dadosEsportes : [];
+        console.log("Esportes recebidos:", LISTA_MESTRA_ESPORTES);
         preencherListaDeSugestao();
     }
 }

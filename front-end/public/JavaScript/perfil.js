@@ -383,8 +383,9 @@ function configurarBotaoEditar() {
 document.addEventListener("DOMContentLoaded", () => {
     // Chamadas principais
     preencherPerfil();
-    carregarFeed();
+    //carregarFeed();
     carregarEsportes();
+    
     
     // Chamada do botão de edição
     configurarBotaoEditar(); 
