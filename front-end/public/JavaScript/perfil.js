@@ -314,8 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarEsportes();
   console.log("perfil inicializado");
 });
-<<<<<<< HEAD
-=======
+
 
 async function criarPost() {
   const texto = document.getElementById("post-text").value.trim();
@@ -390,4 +389,4 @@ document.addEventListener("DOMContentLoaded", () => {
     // Chamada do botão de edição
     configurarBotaoEditar(); 
 });
->>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
+
