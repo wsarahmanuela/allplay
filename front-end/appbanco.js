@@ -9,6 +9,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 const uploadDir = path.join(__dirname, "uploads");
 // =================== CONFIGURAÇÃO DO MULTER ===================
 const fs = require("fs");
@@ -286,11 +287,6 @@ let query = `
   JOIN usuario u ON p.autor_CPF = u.CPF
   WHERE p.autor_CPF = ?
 `;
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 9e1fe6eee3ee62f21630c36423d79fc6c7055e42
   const params = [cpf];
 
   if (esporte) {
@@ -420,33 +416,29 @@ app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
 });
 
 // ==================== EXCLUIR PUBLICAÇÃO ====================
-app.delete("/publicacoes/:id", (req, res) => {
+app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
-  const sql = "DELETE FROM publicacao WHERE IDpublicacao = ?";
-  connection.query(sql, [id], (erro, resultado) => {
-    if (erro) {
-      console.error("Erro ao excluir publicação:", erro);
-      return res.status(500).json({
-        success: false,
-        message: "Erro no servidor ao excluir a publicação.",
-        erro
-      });
-    }
+  try {
+    // 1️⃣ Apaga primeiro as curtidas dessa publicação
+    await connection
+      .promise()
+      .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
 
-    if (resultado.affectedRows === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Publicação não encontrada.",
-      });
-    }
+    // 2️⃣ Depois apaga a publicação em si
+    await connection
+      .promise()
+      .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
 
-    res.json({
-      success: true,
-      message: "Publicação excluída com sucesso!",
-    });
-  });
+    res.json({ success: true, message: 'Publicação excluída com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao excluir publicação:', error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Erro ao excluir publicação.' });
+  }
 });
+
 
 // ===================== CURTIDAS =====================
 app.get("/publicacoes/:id/curtidas", (req, res) => {
