@@ -287,10 +287,11 @@ let query = `
   WHERE p.autor_CPF = ?
 `;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 9e1fe6eee3ee62f21630c36423d79fc6c7055e42
+
+
+
+
   const params = [cpf];
 
   if (esporte) {

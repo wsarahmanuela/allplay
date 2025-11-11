@@ -40,84 +40,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const foto = document.getElementById("upload-foto").files[0];
     const bio = document.getElementById("bio").value.trim();
-    const nomeUsuario = document.getElementById("usuario").value.trim();
-    // Você pode precisar de outros campos, como 'cidade' ou 'localizacao'
-    // const localizacao = document.getElementById("cidade").value.trim(); 
 
-    if (!foto || !bio || !nomeUsuario) {
-      alert("Preencha todos os campos: Foto, Biografia e Nome de Usuário!");
+    if (!foto || !bio) {
+      alert("Preencha todos os campos: Foto e Biografia!");
       return;
     }
 
-    // =========================================================================
-    // 1. REQUISIÇÃO PARA UPLOAD DA FOTO (Rota: /usuario/upload-perfil/:cpf)
-    // Isso usa FormData e a rota correta para o Multer
-    // =========================================================================
-
+    // === Monta o FormData (dados + arquivo) ===
     const formData = new FormData();
-    // O nome do campo deve ser 'fotoDePerfil' para bater com o seu Node.js
-    formData.append("fotoDePerfil", foto);
+    formData.append("cpf", cpf);
+    formData.append("bio", bio);
+    formData.append("foto", foto); // campo deve ter o mesmo nome usado no upload.single("foto")
 
-    // URL CORRETA: /usuario/upload-perfil/CPF
-    const uploadUrl = `http://localhost:3000/usuario/upload-perfil/${cpf}`;
-
-    console.log("Iniciando upload da foto para:", uploadUrl);
+    console.log("Enviando dados do cadastro:", { cpf, bio, foto: foto.name });
 
     try {
-      // --- PASSO A: Enviar a foto ---
-      const respostaFoto = await fetch(uploadUrl, {
+      const resposta = await fetch("http://localhost:3000/cadastro/foto", {
         method: "POST",
-        body: formData // Envia o arquivo
+        body: formData // NÃO usa headers Content-Type aqui — o browser define automaticamente
       });
 
-      // Garante que a resposta é JSON e não um erro HTML (que causa o SyntaxError)
-      if (!respostaFoto.ok) {
-        // Tenta ler o erro em JSON (se o servidor for bem comportado)
-        // Se falhar, lança um erro com o status HTTP
-        const erroJson = await respostaFoto.json().catch(() => ({ message: `Erro HTTP ${respostaFoto.status}` }));
-        throw new Error("Erro no servidor (Upload): " + erroJson.message);
+      if (!resposta.ok) {
+        const erroJson = await resposta.json().catch(() => ({ message: `Erro HTTP ${resposta.status}` }));
+        throw new Error("Erro no servidor: " + erroJson.message);
       }
 
-      const resultadoFoto = await respostaFoto.json();
-      console.log("Upload da foto concluído:", resultadoFoto.message);
+      const resultado = await resposta.json();
+      console.log("Resposta do servidor:", resultado);
 
-      // =========================================================================
-      // 2. REQUISIÇÃO PARA ATUALIZAR DADOS DE TEXTO (Rota: /usuario/atualizar)
-      // Isso usa JSON e a rota PUT para atualizar bio e nomeUsuario
-      // =========================================================================
-
-      // --- PASSO B: Enviar dados de texto ---
-      const dadosPerfil = {
-        cpf: cpf,
-        nomeUsuario: nomeUsuario,
-        bio: bio,
-        // Se tiver campo de localizacao: localizacao: localizacao
-      };
-
-      const updateUrl = "http://localhost:3000/usuario/atualizar";
-
-      console.log("Enviando atualização de dados:", dadosPerfil)
-
-      const respostaDados = await fetch(updateUrl, {
-        method: "PUT", // Sua rota de atualização é PUT
-        headers: {
-          'Content-Type': 'application/json' // O Express espera JSON nesta rota
-        },
-        body: JSON.stringify(dadosPerfil)
-      });
-
-      // Garante que a resposta é JSON
-      if (!respostaDados.ok) {
-        const erroJson = await respostaDados.json().catch(() => ({ message: `Erro HTTP ${respostaDados.status}` }));
-        throw new Error("Erro no servidor (Dados): " + erroJson.message);
+      if (resultado.success) {
+        alert("Cadastro finalizado com sucesso!");
+        window.location.href = "EscolhaEsporte.html";
+      } else {
+        throw new Error(resultado.message || "Erro desconhecido no servidor.");
       }
-
-      const resultadoDados = await respostaDados.json();
-      console.log("Atualização de dados concluída:", resultadoDados.message);
-
-      // --- PASSO C: Finalização ---
-      alert("Cadastro finalizado com sucesso!");
-      window.location.href = "EscolhaEsporte.html";
 
     } catch (erro) {
       console.error("Erro fatal ao finalizar o cadastro:", erro);
@@ -135,15 +91,11 @@ bio.addEventListener('input', () => {
   const tamanho = bio.value.length;
   contador.textContent = `${tamanho}/${limite}`;
 
-  // Se passar do limite, muda a cor e impede digitação extra
   if (tamanho > limite) {
     contador.style.color = 'red';
-    bio.value = bio.value.substring(0, limite); // corta o excesso
+    bio.value = bio.value.substring(0, limite);
     contador.textContent = `${limite}/${limite}`;
   } else {
     contador.style.color = '#777';
   }
 });
-
-// === AJUSTE AUTOMÁTICO DO NOME DE USUÁRIO (adiciona @) ===
-// (Código original não fornecido, mantendo o comentário)
