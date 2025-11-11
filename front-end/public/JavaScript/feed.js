@@ -231,11 +231,17 @@ div.appendChild(dataDiv);
 
   const btnCurtir = document.createElement("button");
   btnCurtir.classList.add("btn-curtir");
-  btnCurtir.innerHTML = "❤️ Curtir";//COLOCAR ICONE AQUI NATAN DE CORAÇÃO TA BOM NAO ESQUECE 
+  btnCurtir.innerHTML = `
+   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+    stroke-linejoin="round" class="icone-coracao">
+    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+  </svg>
+`; 
 
   const contador = document.createElement("span");
   contador.classList.add("contador-curtidas");
-  contador.textContent = "0 curtidas";
+  contador.textContent = "0 ";
 
   async function atualizarCurtidas() {
     const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
@@ -247,7 +253,11 @@ div.appendChild(dataDiv);
     const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idPublicacao: post.IDpublicacao, cpf: cpfLogado }),
+      body: JSON.stringify({
+      publicacao_ID: post.IDpublicacao,
+      usuario_cpf: cpfLogado,
+    }),
+
     });
     const resultado = await resp.json();
     if (resultado.liked) {

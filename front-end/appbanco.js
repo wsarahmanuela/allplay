@@ -170,9 +170,7 @@ app.get('/teste-banco', (req, res) => {
   });
 });
 
-
-
-//CADASTRO02 -----------------------------------------------------------------f
+//CADASTRO02 -----------------------------------------------------------------
 
 app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
   const { cpf, bio } = req.body;
@@ -222,7 +220,7 @@ app.post('/esportes', (req, res) => {
   });
 });
 
-app.get("/esportes/:cpf", (req, res) => {// Buscar esportes do ususrio pelo CPF
+app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
   connection.query(
@@ -238,10 +236,9 @@ app.get("/esportes/:cpf", (req, res) => {// Buscar esportes do ususrio pelo CPF
       res.json(esportes);
     }
   );
-});//aqui mai mostrar no feed 
+});
 
 // CARREGAR FEED  
-// essa func é importante p carregar as proximas postagens
 async function carregarFeed() {
   console.log("Tentando carregar o feed...");
 
@@ -288,8 +285,6 @@ let query = `
   JOIN usuario u ON p.autor_CPF = u.CPF
   WHERE p.autor_CPF = ?
 `;
-
-
 
   const params = [cpf];
 
@@ -346,35 +341,41 @@ app.post('/publicacoes', (req, res) => {
   });
 });
 
-
+// ===================== LISTAR TODAS AS PUBLICAÇÕES =====================
 app.get('/publicacoes', (req, res) => {
   console.log("GET PUBLICACOES");
 
   const query = `
-  SELECT 
-    p.IDpublicacao,
-    p.conteudo,
-    p.imagem,
-    p.data_publicacao,
-    u.nome,
-    u.nomeUsuario,
-    u.fotoDePerfil
-  FROM publicacao p
-  JOIN usuario u ON p.autor_CPF = u.CPF
-  ORDER BY p.data_publicacao DESC
-`;
-
+    SELECT 
+      p.IDpublicacao,
+      p.conteudo,
+      p.imagem,
+      p.data_publicacao,
+      u.nome,
+      u.nomeUsuario,
+      u.fotoDePerfil,
+      p.autor_CPF AS cpf
+    FROM publicacao p
+    JOIN usuario u ON p.autor_CPF = u.CPF
+    ORDER BY p.data_publicacao DESC
+  `;
 
   connection.query(query, (erro, resultados) => {
     if (erro) {
       console.error('Erro ao buscar publicações:', erro);
-      return res.status(500).json({ success: false, message: 'Erro ao carregar publicações.' });
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao carregar publicações.'
+      });
     }
 
-
-    res.json(resultados);
+    res.json({
+      success: true,
+      posts: resultados
+    });
   });
 });
+
 // =================== PUBLICAR POSTAGEM (com imagem ou texto) ===================
 app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
   const { autor_CPF, conteudo, esporte } = req.body;
@@ -442,7 +443,62 @@ app.delete("/publicacoes/:id", (req, res) => {
   });
 });
 
+// ===================== CURTIDAS =====================
+app.get("/publicacoes/:id/curtidas", (req, res) => {
+  const id = req.params.id;
 
+  const sql = "SELECT COUNT(*) AS total FROM curtida WHERE publicacao_ID = ?";
+  connection.query(sql, [id], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar curtidas:", erro.sqlMessage || erro);
+      return res.status(500).json({ success: false, total: 0 });
+    }
+
+    const total = resultados[0]?.total || 0;
+    res.json({ success: true, total });
+  });
+});
+
+// Curtir ou descurtir uma publicação
+app.post("/publicacoes/curtir", (req, res) => {
+  const { publicacao_ID, usuario_cpf } = req.body;
+
+  // Validação básica
+  if (!publicacao_ID || !usuario_cpf) {
+    return res.status(400).json({ success: false, message: "Dados inválidos." });
+  }
+
+  // Verifica se o usuário já curtiu essa publicação
+  const checkSql = "SELECT * FROM curtida WHERE publicacao_ID = ? AND usuario_cpf = ?";
+  connection.query(checkSql, [publicacao_ID, usuario_cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao verificar curtida:", erro.sqlMessage || erro);
+      return res.status(500).json({ success: false });
+    }
+
+    if (resultados.length > 0) {
+      // Já curtiu → remove a curtida
+      const deleteSql = "DELETE FROM curtida WHERE publicacao_ID = ? AND usuario_cpf = ?";
+      connection.query(deleteSql, [publicacao_ID, usuario_cpf], (erro2) => {
+        if (erro2) {
+          console.error("Erro ao remover curtida:", erro2.sqlMessage || erro2);
+          return res.status(500).json({ success: false });
+        }
+        return res.json({ success: true, liked: false });
+      });
+    } else {
+      // Ainda não curtiu → adiciona curtida
+      const insertSql = "INSERT INTO curtida (publicacao_ID, usuario_cpf) VALUES (?, ?)";
+      connection.query(insertSql, [publicacao_ID, usuario_cpf], (erro3) => {
+        if (erro3) {
+          console.error("Erro ao adicionar curtida:", erro3.sqlMessage || erro3);
+          return res.status(500).json({ success: false });
+        }
+        return res.json({ success: true, liked: true });
+      });
+    }
+  });
+});
 
 
 //================ MAP ================
@@ -455,13 +511,9 @@ app.post('/api/usuarios-proximos', (req, res) => {
     return res.status(400).json({ success: false, message: 'Dados incompletos.' });
   }
 
-  // 1. ATUALIZA a localização do usuário logado
   const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
   connection.query(updateSql, [latitude, longitude, cpf], (err) => {
-    // Se houver erro, apenas logamos, mas continuamos a busca
     if (err) console.error('Erro ao atualizar localização:', err);
-
-    // 2. BUSCA com a Fórmula de Haversine
     const haversineQuery = `
               SELECT
                   u.nome,
@@ -500,10 +552,8 @@ app.post('/api/usuarios-proximos', (req, res) => {
   });
 });
 
-// ROTA 2: BUSCA TODOS OS USUÁRIOS PARA O MAPA (Rota GET que estava dando 404)
 app.get('/api/todos-usuarios-mapa', (req, res) => {
 
-  // SQL: Seleciona nome, latitude e longitude da tabela 'usuario'.
   const sql = `
           SELECT CPF, nome, latitude, longitude
           FROM usuario
@@ -535,9 +585,6 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
     });
   });
 });
-
-
-
 
 
 // barra de pesquisa

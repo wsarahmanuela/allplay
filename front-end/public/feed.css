@@ -569,21 +569,37 @@ i {
 .curtidas {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px; /* espaço entre coração e número */
+  margin-top: 6px;
 }
 
 .btn-curtir {
   background: none;
   border: none;
-  font-size: 16px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  outline: none;
 }
 
-.btn-curtir.curtido {
-  color: red;
+.btn-curtir svg {
+  width: 24px;
+  height: 24px;
+  stroke: #444;
+  fill: none;
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+.btn-curtir:hover svg {
   transform: scale(1.1);
+}
+
+.btn-curtir.curtido svg {
+  fill: red;
+  stroke: red;
 }
 
 .contador-curtidas {
