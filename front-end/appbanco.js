@@ -273,23 +273,6 @@ app.get('/publicacoes/:cpf', (req, res) => {
   console.log(`\n Rota /publicacoes/:cpf chamada com:`);
   console.log(`   CPF: ${cpf}`);
   console.log(`   Esporte: ${esporte || 'todos'}`);
-<<<<<<< HEAD
-let query = `
-  SELECT 
-    p.IDpublicacao,
-    p.conteudo,
-    p.imagem,
-    p.data_publicacao,
-    u.nome,
-    u.nomeUsuario,
-    u.fotoDePerfil,
-    p.esporte,
-    p.autor_CPF AS cpf
-  FROM publicacao p
-  JOIN usuario u ON p.autor_CPF = u.CPF
-  WHERE p.autor_CPF = ?
-`;
-=======
 
   let query = `
     SELECT 
@@ -305,7 +288,6 @@ let query = `
     JOIN usuario u ON p.autor_CPF = u.CPF
     WHERE p.autor_CPF = ?
   `;
->>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
 
   const params = [cpf];
 
@@ -692,11 +674,10 @@ app.put("/usuario/atualizar", (req, res) => {
     WHERE cpf = ?
   `;
 
-<<<<<<< HEAD
+
   connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
-=======
-  connection.query(sql, [nomeUsuario, bio, localizacao || null, cpf], (erro, resultados) => {
->>>>>>> 6880fbb5c7e2182edb3ba1cb2249376315cf7a18
+
+
     if (erro) {
       console.error("Erro ao atualizar perfil:", erro);
       return res.status(500).json({ success: false, message: "Erro ao atualizar dados no servidor." });
