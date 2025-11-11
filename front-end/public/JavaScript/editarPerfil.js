@@ -63,22 +63,20 @@ const criarTagComRemocao = (nomeEsporte) => {
 };
 
 // Preenche o <ul> customizado com a lista mestra
-const preencherListaDeSugestao = () => {
-    if (!listaSugestoesCustom) return;
-    listaSugestoesCustom.innerHTML = ''; 
+function preencherListaDeSugestao() {
+  const lista = document.getElementById("lista-sugestoes-custom");
+  lista.innerHTML = "";
 
-    LISTA_MESTRA_ESPORTES.forEach(esporte => {
-        const item = document.createElement('li');
-        item.textContent = esporte;
-        
-        item.addEventListener('click', () => {
-            inputNovoEsporte.value = esporte;
-            listaSugestoesCustom.classList.remove('ativo'); 
-        });
-        
-        listaSugestoesCustom.appendChild(item);
+  LISTA_MESTRA_ESPORTES.forEach((esporte) => {
+    const li = document.createElement("li");
+    li.textContent = esporte;
+    li.addEventListener("click", () => {
+      document.getElementById("input-novo-esporte").value = esporte;
+      lista.style.display = "none";
     });
-};
+    lista.appendChild(li);
+  });
+}
 
 // Carrega as tags do usuário
 const carregarTagsIniciais = (esportes) => {
@@ -96,6 +94,13 @@ document.querySelector('.btn-cancelar').addEventListener('click', function() {
 
 
 // 3. Lógica de Upload e Preview (AGORA ARMAZENA O ARQUIVO NOVO)
+function caminhoBanner(banner) {
+  // Se não houver banner, retorna string vazia. O CSS deve aplicar o fundo padrão.
+  if (!banner) return ""; 
+  // Usa o endereço completo para garantir o carregamento
+  if (banner.startsWith("http") || banner.startsWith("/")) return banner;
+  return `http://localhost:3000/uploads/${banner}`;
+}
 
 // Listener do Botão do Banner
 if (document.getElementById("btn-alterar-banner")) {
@@ -151,18 +156,20 @@ const caminhoFoto = (nomeArquivo) => {
  * Carrega a lista de todos os esportes disponíveis (Lista Mestra)
  */
 async function carregarEsportesMestres() {
+     console.log("carregarEsportesMestres() foi chamada");
     try {
         const response = await fetch(`${BASE_URL}/esportes/mestra`); 
         if (!response.ok) throw new Error('Falha ao carregar esportes mestres.');
         
         const dadosEsportes = await response.json(); 
-        
+        console.log("Resposta do servidor:", dadosEsportes); 
         LISTA_MESTRA_ESPORTES = Array.isArray(dadosEsportes) ? dadosEsportes : [];
         preencherListaDeSugestao(); 
         
     } catch (error) {
         console.error("Erro ao carregar lista mestra de esportes:", error);
-        LISTA_MESTRA_ESPORTES = ["Basquete", "Futebol", "Vôlei", "Natação", "Corrida"];
+        LISTA_MESTRA_ESPORTES = Array.isArray(dadosEsportes) ? dadosEsportes : [];
+        console.log("Esportes recebidos:", LISTA_MESTRA_ESPORTES);
         preencherListaDeSugestao();
     }
 }
@@ -198,6 +205,16 @@ async function carregarPerfilInicial() {
              const fotoUrl = caminhoFoto(usuario.fotoDePerfil);
              fotoPreview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
         }
+         const bannerPath = caminhoBanner(usuario.bannerURL); 
+          const bannerElement = document.getElementById("banner"); 
+           if (bannerElement) {
+        if (bannerPath) {
+            bannerElement.style.backgroundImage = `url(${bannerPath})`;
+            bannerElement.style.backgroundColor = 'transparent'; // Opcional: Remove cor de fundo
+        } else {
+            bannerElement.style.backgroundImage = 'none'; 
+        }
+    }
         
         // Banner (NOVO: Carrega o bannerUrl que deve ser retornado pelo backend)
         if (usuario.bannerUrl) {
@@ -333,68 +350,65 @@ async function salvarPerfil(e) {
 // =================================================================
 // EVENTOS E INICIALIZAÇÃO
 // =================================================================
-
-// Adiciona o evento de contagem na Bio
-if (bioTextarea) {
-    bioTextarea.addEventListener('input', atualizarContador);
-}
-
-// Lógica de Adição de Tags
-btnAdicionarEsporte.addEventListener('click', (e) => {
-    e.preventDefault(); 
-    const novoEsporte = inputNovoEsporte.value.trim();
-    if (!novoEsporte) return;
-    
-    const esporteValido = LISTA_MESTRA_ESPORTES.find(
-        esporte => esporte.toLowerCase() === novoEsporte.toLowerCase()
-    );
-
-    if (!esporteValido) {
-        alert(`"${novoEsporte}" não é um esporte válido. Por favor, selecione na lista.`);
-        inputNovoEsporte.value = '';
-        return;
-    }
-    const nomeEsporteNormalizado = esporteValido; 
-
-    const jaExiste = Array.from(tagsContainer.querySelectorAll('.tag'))
-        .some(tag => tag.textContent.trim().replace('×', '').toLowerCase() === nomeEsporteNormalizado.toLowerCase());
-
-    if (jaExiste) {
-        alert(`O esporte "${nomeEsporteNormalizado}" já foi adicionado!`);
-        inputNovoEsporte.value = '';
-        return;
-    }
-
-    const novaTag = criarTagComRemocao(nomeEsporteNormalizado);
-    tagsContainer.appendChild(novaTag);
-    inputNovoEsporte.value = '';
-});
-
-
-// Lógica de Exibição do Dropdown
-const inputArea = inputNovoEsporte.closest('.input-com-dropdown');
-if (inputNovoEsporte) {
-    inputNovoEsporte.addEventListener('click', () => {
-        listaSugestoesCustom.classList.toggle('ativo');
-    });
-}
-
-
-document.addEventListener('click', (e) => {
-    if (inputArea && !inputArea.contains(e.target)) {
-        listaSugestoesCustom.classList.remove('ativo');
-    }
-});
-
-
-// Evento Salvar
-if (btnSalvar) {
-    btnSalvar.addEventListener('click', salvarPerfil);
-}
-
-
-// INICIALIZAÇÃO DA PÁGINA
 document.addEventListener("DOMContentLoaded", () => {
+
+    // 1. Inicializações principais
     carregarEsportesMestres();
     carregarPerfilInicial();
+
+    // 2. Contador da biografia
+    if (bioTextarea) {
+        bioTextarea.addEventListener('input', atualizarContador);
+    }
+
+    // 3. Clique no input para abrir lista
+    if (inputNovoEsporte) {
+        inputNovoEsporte.addEventListener('click', (e) => {
+            e.stopPropagation(); // impede que o clique feche instantaneamente
+            listaSugestoesCustom.classList.toggle('ativo');
+        });
+    }
+
+    // 4. Fechar lista ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!listaSugestoesCustom.contains(e.target) && e.target !== inputNovoEsporte) {
+            listaSugestoesCustom.classList.remove('ativo');
+        }
+    });
+
+    // 5. Botão de adicionar esporte
+    btnAdicionarEsporte.addEventListener('click', (e) => {
+        e.preventDefault();
+        const novoEsporte = inputNovoEsporte.value.trim();
+        if (!novoEsporte) return;
+
+        const esporteValido = LISTA_MESTRA_ESPORTES.find(
+            esporte => esporte.toLowerCase() === novoEsporte.toLowerCase()
+        );
+
+        if (!esporteValido) {
+            alert(`"${novoEsporte}" não é um esporte válido. Selecione da lista.`);
+            inputNovoEsporte.value = '';
+            return;
+        }
+
+        const jaExiste = Array.from(tagsContainer.querySelectorAll('.tag'))
+            .some(tag => tag.textContent.trim().replace('×', '').toLowerCase() === esporteValido.toLowerCase());
+
+        if (jaExiste) {
+            alert(`O esporte "${esporteValido}" já foi adicionado!`);
+            inputNovoEsporte.value = '';
+            return;
+        }
+
+        const novaTag = criarTagComRemocao(esporteValido);
+        tagsContainer.appendChild(novaTag);
+        inputNovoEsporte.value = '';
+        listaSugestoesCustom.classList.remove('ativo');
+    });
+
+    // 6. Botão de salvar
+    if (btnSalvar) {
+        btnSalvar.addEventListener('click', salvarPerfil);
+    }
 });

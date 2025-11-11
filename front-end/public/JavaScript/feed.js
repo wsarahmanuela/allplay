@@ -85,6 +85,7 @@ if (Array.isArray(dados)) {
       return;
     }
 
+    // percorre e mostra cada publicação
     posts.forEach(post => {
   const div = document.createElement("div");
   div.classList.add("post");
@@ -276,6 +277,7 @@ div.appendChild(dataDiv);
   feed.appendChild(div);
 });
 
+
   } catch (erro) {
     console.error("Erro ao carregar o feed:", erro);
   }
@@ -436,6 +438,7 @@ async function criarPost() {
     alert("Erro no servidor. Tente novamente.");
   }
 }
+
 
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {

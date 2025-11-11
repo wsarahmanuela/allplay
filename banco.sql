@@ -1,8 +1,10 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+CREATE DATABASE  IF NOT EXISTS `pi_bbd` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `pi_bbd`;
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
--- Host: localhost    Database: pi_bbd
+-- Host: 127.0.0.1    Database: pi_bbd
 -- ------------------------------------------------------
--- Server version	8.0.43
+-- Server version	8.0.42
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -35,6 +37,15 @@ CREATE TABLE `administrador` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `administrador`
+--
+
+LOCK TABLES `administrador` WRITE;
+/*!40000 ALTER TABLE `administrador` DISABLE KEYS */;
+/*!40000 ALTER TABLE `administrador` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `atleta`
 --
 
@@ -51,6 +62,15 @@ CREATE TABLE `atleta` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `atleta`
+--
+
+LOCK TABLES `atleta` WRITE;
+/*!40000 ALTER TABLE `atleta` DISABLE KEYS */;
+/*!40000 ALTER TABLE `atleta` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `clube`
 --
 
@@ -63,6 +83,15 @@ CREATE TABLE `clube` (
   PRIMARY KEY (`IDclube`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `clube`
+--
+
+LOCK TABLES `clube` WRITE;
+/*!40000 ALTER TABLE `clube` DISABLE KEYS */;
+/*!40000 ALTER TABLE `clube` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `clube_esportes`
@@ -80,6 +109,15 @@ CREATE TABLE `clube_esportes` (
   CONSTRAINT `clube_esportes_ibfk_2` FOREIGN KEY (`nome_esporte`) REFERENCES `esporte` (`nome`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `clube_esportes`
+--
+
+LOCK TABLES `clube_esportes` WRITE;
+/*!40000 ALTER TABLE `clube_esportes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `clube_esportes` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `comentario`
@@ -103,6 +141,15 @@ CREATE TABLE `comentario` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `comentario`
+--
+
+LOCK TABLES `comentario` WRITE;
+/*!40000 ALTER TABLE `comentario` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comentario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `conquista`
 --
 
@@ -120,6 +167,43 @@ CREATE TABLE `conquista` (
   CONSTRAINT `conquista_ibfk_1` FOREIGN KEY (`conquistado_por`) REFERENCES `atleta` (`CPF`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `conquista`
+--
+
+LOCK TABLES `conquista` WRITE;
+/*!40000 ALTER TABLE `conquista` DISABLE KEYS */;
+/*!40000 ALTER TABLE `conquista` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `curtida`
+--
+
+DROP TABLE IF EXISTS `curtida`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `curtida` (
+  `idCurtida` int NOT NULL AUTO_INCREMENT,
+  `publicacao_ID` int NOT NULL,
+  `usuario_CPF` varchar(15) DEFAULT NULL,
+  PRIMARY KEY (`idCurtida`),
+  KEY `publicacao_ID` (`publicacao_ID`),
+  KEY `usuario_CPF` (`usuario_CPF`),
+  CONSTRAINT `curtida_ibfk_1` FOREIGN KEY (`publicacao_ID`) REFERENCES `publicacao` (`IDpublicacao`) ON DELETE CASCADE,
+  CONSTRAINT `curtida_ibfk_2` FOREIGN KEY (`usuario_CPF`) REFERENCES `usuario` (`CPF`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `curtida`
+--
+
+LOCK TABLES `curtida` WRITE;
+/*!40000 ALTER TABLE `curtida` DISABLE KEYS */;
+/*!40000 ALTER TABLE `curtida` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `denuncia`
@@ -143,6 +227,15 @@ CREATE TABLE `denuncia` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `denuncia`
+--
+
+LOCK TABLES `denuncia` WRITE;
+/*!40000 ALTER TABLE `denuncia` DISABLE KEYS */;
+/*!40000 ALTER TABLE `denuncia` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `esporte`
 --
 
@@ -157,6 +250,15 @@ CREATE TABLE `esporte` (
   UNIQUE KEY `IDesporte` (`IDesporte`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `esporte`
+--
+
+LOCK TABLES `esporte` WRITE;
+/*!40000 ALTER TABLE `esporte` DISABLE KEYS */;
+/*!40000 ALTER TABLE `esporte` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `evento`
@@ -175,6 +277,15 @@ CREATE TABLE `evento` (
   PRIMARY KEY (`IDevento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `evento`
+--
+
+LOCK TABLES `evento` WRITE;
+/*!40000 ALTER TABLE `evento` DISABLE KEYS */;
+/*!40000 ALTER TABLE `evento` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `evento_convidados`
@@ -197,6 +308,15 @@ CREATE TABLE `evento_convidados` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `evento_convidados`
+--
+
+LOCK TABLES `evento_convidados` WRITE;
+/*!40000 ALTER TABLE `evento_convidados` DISABLE KEYS */;
+/*!40000 ALTER TABLE `evento_convidados` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `grupo`
 --
 
@@ -215,6 +335,15 @@ CREATE TABLE `grupo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `grupo`
+--
+
+LOCK TABLES `grupo` WRITE;
+/*!40000 ALTER TABLE `grupo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `grupo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `grupo_membros`
 --
 
@@ -230,6 +359,15 @@ CREATE TABLE `grupo_membros` (
   CONSTRAINT `grupo_membros_ibfk_2` FOREIGN KEY (`CPF_membro`) REFERENCES `usuario` (`CPF`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `grupo_membros`
+--
+
+LOCK TABLES `grupo_membros` WRITE;
+/*!40000 ALTER TABLE `grupo_membros` DISABLE KEYS */;
+/*!40000 ALTER TABLE `grupo_membros` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `mensagem`
@@ -256,6 +394,15 @@ CREATE TABLE `mensagem` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `mensagem`
+--
+
+LOCK TABLES `mensagem` WRITE;
+/*!40000 ALTER TABLE `mensagem` DISABLE KEYS */;
+/*!40000 ALTER TABLE `mensagem` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `notificacao`
 --
 
@@ -279,6 +426,15 @@ CREATE TABLE `notificacao` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `notificacao`
+--
+
+LOCK TABLES `notificacao` WRITE;
+/*!40000 ALTER TABLE `notificacao` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notificacao` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `professor`
 --
 
@@ -295,6 +451,15 @@ CREATE TABLE `professor` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `professor`
+--
+
+LOCK TABLES `professor` WRITE;
+/*!40000 ALTER TABLE `professor` DISABLE KEYS */;
+/*!40000 ALTER TABLE `professor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `publicacao`
 --
 
@@ -303,14 +468,26 @@ DROP TABLE IF EXISTS `publicacao`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `publicacao` (
   `IDpublicacao` int NOT NULL AUTO_INCREMENT,
-  `data_publicacao` date DEFAULT NULL,
+  `data_publicacao` datetime DEFAULT CURRENT_TIMESTAMP,
   `conteudo` text,
   `autor_CPF` varchar(14) NOT NULL,
+  `imagem` varchar(255) DEFAULT NULL,
+  `esporte` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`IDpublicacao`),
   KEY `autor_CPF` (`autor_CPF`),
   CONSTRAINT `publicacao_ibfk_1` FOREIGN KEY (`autor_CPF`) REFERENCES `usuario` (`CPF`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `publicacao`
+--
+
+LOCK TABLES `publicacao` WRITE;
+/*!40000 ALTER TABLE `publicacao` DISABLE KEYS */;
+INSERT INTO `publicacao` VALUES (29,'2025-10-20 00:00:00','sarah ola','666.666.666-66',NULL,NULL),(31,'2025-10-22 00:00:00','ola srah','666.666.666-66',NULL,NULL),(34,'2025-11-05 00:00:00','hhhh','666.666.666-66',NULL,'Caminhada'),(35,'2025-11-05 00:00:00','sdfdfd','666.666.666-66',NULL,NULL),(39,'2025-11-10 00:00:00','Hj foi tuto','107.683.329-23',NULL,'Yoga'),(40,'2025-11-10 00:00:00','jjjd','107.683.329-23',NULL,NULL),(41,'2025-11-10 00:00:00','kklkkk','107.683.329-23',NULL,NULL),(42,'2025-11-10 00:00:00','kkaka','666.666.666-66',NULL,NULL),(43,'2025-11-10 00:00:00','jajja','666.666.666-66','1762797581081.png',NULL),(44,'2025-11-10 20:59:13','hhhhhhhh','666.666.666-66',NULL,NULL);
+/*!40000 ALTER TABLE `publicacao` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `seguidores`
@@ -330,6 +507,15 @@ CREATE TABLE `seguidores` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `seguidores`
+--
+
+LOCK TABLES `seguidores` WRITE;
+/*!40000 ALTER TABLE `seguidores` DISABLE KEYS */;
+/*!40000 ALTER TABLE `seguidores` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `usuario`
 --
 
@@ -346,11 +532,22 @@ CREATE TABLE `usuario` (
   `fotoDePerfil` varchar(255) DEFAULT NULL,
   `cidade` varchar(255) DEFAULT NULL,
   `nomeUsuario` varchar(100) DEFAULT NULL,
+  `banner` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`CPF`),
   UNIQUE KEY `email` (`email`),
   KEY `localizacaoAtual_id` (`cidade`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuario`
+--
+
+LOCK TABLES `usuario` WRITE;
+/*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
+INSERT INTO `usuario` VALUES ('085.637.499-78','Clara Bianca Kistner','(47) 99953-1753','clarabkistner@gmail.com','clara@','legal as vezes','b22afd23d65d9422ef01b90b1defd3e6','Gaspar','clara',NULL),('107.683.329-23','Daniela Sbizera Justo','(47) 99628-3467','daniela@gmail.com','1234','Bla Bla','1762794782722.png','Blumenau','Dani','1762794835522.jfif'),('127.765.749-16','Sarah','(47) 98862-6995','sarahlinda@gmail.com','1234','bla','1762348974010.png','Blumenal','sarah',NULL),('666.666.666-66','Natan João Vansuita','(88) 88888-8888','vansuita@gmail.com','1234','bla','1761736423042.png',NULL,'nat','1762817361450.jfif');
+/*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `usuario_esportesdeinteresse`
@@ -365,6 +562,16 @@ CREATE TABLE `usuario_esportesdeinteresse` (
   PRIMARY KEY (`CPF_usuario`,`nome_esporte`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuario_esportesdeinteresse`
+--
+
+LOCK TABLES `usuario_esportesdeinteresse` WRITE;
+/*!40000 ALTER TABLE `usuario_esportesdeinteresse` DISABLE KEYS */;
+INSERT INTO `usuario_esportesdeinteresse` VALUES ('085.637.499-78','Futebol'),('085.637.499-78','Handebol'),('085.637.499-78','Tennis de Mesa'),('085.637.499-78','Trilha'),('085.637.499-78','Yoga'),('107.683.329-23','Caminhada'),('107.683.329-23','Corrida'),('107.683.329-23','Natação'),('107.683.329-23','Yoga'),('666.666.666-66','Caminhada');
+/*!40000 ALTER TABLE `usuario_esportesdeinteresse` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -375,4 +582,4 @@ CREATE TABLE `usuario_esportesdeinteresse` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-14 16:12:16
+-- Dump completed on 2025-11-10 21:24:14
