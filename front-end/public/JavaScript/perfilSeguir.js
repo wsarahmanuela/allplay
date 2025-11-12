@@ -24,22 +24,52 @@ function caminhoBanner(banner) {
   return `http://localhost:3000/uploads/${banner}`;
 }
 
-// ===== CAPTURA CPF DO PERFIL VISUALIZADO =====
-const cpfLogado = localStorage.getItem("cpf");
-const perfilVisualizado = localStorage.getItem("perfilVisualizado"); 
-// ou: const cpfVisitado = new URLSearchParams(window.location.search).get("usuario");
+// ===== PEGAR CPF =====
+const params = new URLSearchParams(window.location.search);
+let cpfDaUrl = params.get("cpf"); // cpf vindo da URL
 
-if (!perfilVisualizado) {
-  alert("Erro: Nenhum perfil selecionado!");
+// CPF do usuário logado
+let cpfLogado = null;
+const userLocal = localStorage.getItem("usuarioLogado");
+if (userLocal) {
+  try {
+    const userObj = JSON.parse(userLocal);
+    cpfLogado = userObj.cpf || userObj.CPF || null;
+  } catch {
+    cpfLogado = localStorage.getItem("cpf") || null;
+  }
+}
+
+let cpfPerfil = null;
+
+if (cpfDaUrl && cpfDaUrl.trim() !== "") {
+  cpfPerfil = cpfDaUrl;
+  console.log(" Visualizando perfil de OUTRO usuário:", cpfPerfil);
+}
+else if (cpfLogado) {
+  cpfPerfil = cpfLogado;
+  console.log(" Visualizando perfil PRÓPRIO:", cpfPerfil);
+}
+
+else {
+  alert("Erro: Nenhum perfil encontrado!");
   window.location.href = "home.html";
 }
 
-// ===== PREENCHER PERFIL DO OUTRO USUÁRIO =====
+// Debug:
+console.log("CPF logado:", cpfLogado);
+console.log("CPF sendo exibido:", cpfPerfil);
+
+// ===== FUNÇÃO PARA PREENCHER PERFIL =====
 async function preencherPerfilVisitado() {
   try {
-    const resposta = await fetch(`http://localhost:3000/usuario/${encodeURIComponent(perfilVisualizado)}`);
+    const resposta = await fetch(`http://localhost:3000/usuario/${encodeURIComponent(cpfPerfil)}`);
     const dados = await resposta.json();
-    if (!resposta.ok || !dados.success) return console.error("Erro ao buscar perfil:", dados);
+
+    if (!resposta.ok || !dados.success) {
+      console.error("Erro ao buscar perfil:", dados);
+      return;
+    }
 
     const usuario = dados.usuario || {};
     const nome = usuario.nome || "Usuário sem nome";
@@ -48,7 +78,6 @@ async function preencherPerfilVisitado() {
     const bio = usuario.bio || usuario.biografia || "";
     const bannerPath = caminhoBanner(usuario.banner || usuario.bannerURL);
 
-    // aplica no HTML
     const fotoElem = document.querySelector("#container-meio .usuario-foto img");
     const nomeH3 = document.querySelector("#container-segue .nome h3");
     const arrobaH5 = document.querySelector("#container-segue .nome h5");
@@ -70,18 +99,19 @@ async function preencherPerfilVisitado() {
       }
     }
 
+    console.log(" Perfil carregado com sucesso:", nome);
   } catch (err) {
     console.error("Erro ao carregar perfil visitado:", err);
   }
 }
 
-// ===== CARREGAR POSTS DO OUTRO USUÁRIO =====
+// ===== CARREGAR POSTS DO PERFIL =====
 async function carregarPostsVisitado() {
   const container = document.getElementById("container-baixo");
   if (!container) return console.error("#container-baixo não encontrado no DOM");
 
   try {
-    const resp = await fetch(`http://localhost:3000/publicacoes/${encodeURIComponent(perfilVisualizado)}`);
+    const resp = await fetch(`http://localhost:3000/publicacoes/${encodeURIComponent(cpfPerfil)}`);
     if (!resp.ok) throw new Error("Erro ao buscar publicações");
     const dados = await resp.json();
 
@@ -110,36 +140,32 @@ async function carregarPostsVisitado() {
       const conteudo = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
       const dataRaw = post.data_publicacao || post.data || "";
 
-      // Header
       const header = document.createElement("div");
       header.className = "post-header";
       header.innerHTML = `
         <img class="foto-perfil" src="${escapeHtml(fotoPath)}" alt="${escapeHtml(nome)}">
         <div class="post-info">
           <strong class="nome">${escapeHtml(nome)}</strong>
-          <span class="usuario">@${escapeHtml(username).replace("@","")}</span>
+          <span class="usuario">@${escapeHtml(username).replace("@", "")}</span>
         </div>
       `;
-
-      // (sem menu de excluir, pois é outro perfil)
       card.appendChild(header);
 
-      // Conteúdo
       const conteudoDiv = document.createElement("div");
       conteudoDiv.className = "conteudo";
       conteudoDiv.innerHTML = escapeHtml(conteudo);
       card.appendChild(conteudoDiv);
 
-      // Imagem
       if (post.imagem) {
         const img = document.createElement("img");
         img.className = "post-imagem";
-        img.src = post.imagem.startsWith("http") ? post.imagem : `http://localhost:3000/uploads/${post.imagem}`;
+        img.src = post.imagem.startsWith("http")
+          ? post.imagem
+          : `http://localhost:3000/uploads/${post.imagem}`;
         img.alt = "Imagem do post";
         card.appendChild(img);
       }
 
-      // Data
       const dataDiv = document.createElement("div");
       dataDiv.className = "data";
       if (dataRaw) {
@@ -151,76 +177,10 @@ async function carregarPostsVisitado() {
       }
       card.appendChild(dataDiv);
 
-      // Curtidas
-      const curtidaDiv = document.createElement("div");
-      curtidaDiv.classList.add("curtidas");
-
-      const btnCurtir = document.createElement("button");
-      btnCurtir.classList.add("btn-curtir");
-      btnCurtir.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" class="icone-coracao">
-          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-        </svg>
-      `;
-
-      const contador = document.createElement("span");
-      contador.classList.add("contador-curtidas");
-      contador.textContent = "0 curtidas";
-
-      async function atualizarCurtidas() {
-        const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
-        const dados = await resp.json();
-        contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
-      }
-
-      async function verificarCurtidaUsuario() {
-        const resp = await fetch(
-          `http://localhost:3000/publicacoes/${post.IDpublicacao}/verificar-curtida?cpf=${cpfLogado}`
-        );
-        const dados = await resp.json();
-        const icone = btnCurtir.querySelector(".icone-coracao path");
-        if (dados.jaCurtiu) {
-          btnCurtir.classList.add("curtido");
-          icone.setAttribute("fill", "red");
-        } else {
-          btnCurtir.classList.remove("curtido");
-          icone.setAttribute("fill", "none");
-        }
-      }
-
-      btnCurtir.addEventListener("click", async () => {
-        const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            publicacao_ID: post.IDpublicacao,
-            usuario_cpf: cpfLogado,
-          }),
-        });
-        const resultado = await resp.json();
-        const icone = btnCurtir.querySelector(".icone-coracao path");
-        if (resultado.liked) {
-          btnCurtir.classList.add("curtido");
-          icone.setAttribute("fill", "red");
-        } else {
-          btnCurtir.classList.remove("curtido");
-          icone.setAttribute("fill", "none");
-        }
-        await atualizarCurtidas();
-      });
-
-      curtidaDiv.appendChild(btnCurtir);
-      curtidaDiv.appendChild(contador);
-      card.appendChild(curtidaDiv);
       container.appendChild(card);
-
-      setTimeout(async () => {
-        await atualizarCurtidas();
-        await verificarCurtidaUsuario();
-      }, 100);
     });
+
+    console.log(` ${posts.length} publicações carregadas para CPF ${cpfPerfil}`);
   } catch (err) {
     console.error("Erro ao carregar posts do perfil visitado:", err);
   }
@@ -228,7 +188,10 @@ async function carregarPostsVisitado() {
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("Inicializando perfilseguir...");
+  console.log("CPF da URL:", cpfDaUrl);
+  console.log("CPF logado:", cpfLogado);
+  console.log("CPF sendo usado:", cpfPerfil);
   preencherPerfilVisitado();
   carregarPostsVisitado();
-  console.log("perfilseguir inicializado");
 });

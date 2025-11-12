@@ -272,21 +272,49 @@ app.get('/publicacoes/:cpf', (req, res) => {
   console.log(`   CPF: ${cpf}`);
   console.log(`   Esporte: ${esporte || 'todos'}`);
 
-let query = `
-  SELECT 
-    p.IDpublicacao,
-    p.conteudo,
-    p.imagem,
-    p.data_publicacao,
-    u.nome,
-    u.nomeUsuario,
-    u.fotoDePerfil,
-    p.esporte,
-    p.autor_CPF AS cpf
-  FROM publicacao p
-  JOIN usuario u ON p.autor_CPF = u.CPF
-  WHERE p.autor_CPF = ?
-`;
+  let query = `
+    SELECT 
+      p.IDpublicacao,
+      p.conteudo,
+      p.imagem,
+      p.data_publicacao,
+      u.nome,
+      u.nomeUsuario,
+      u.fotoDePerfil,
+      p.esporte,
+      p.autor_CPF AS cpf
+    FROM publicacao p
+    JOIN usuario u ON p.autor_CPF = u.CPF
+    WHERE p.autor_CPF = ?
+  `;
+
+  const params = [cpf];
+
+  // filtro opcional por esporte
+  if (esporte && esporte.trim() !== "") {
+    query += " AND p.esporte = ?";
+    params.push(esporte);
+  }
+
+  query += " ORDER BY p.data_publicacao DESC";
+
+  connection.query(query, params, (erro, resultados) => {
+    if (erro) {
+      console.error(" Erro ao buscar publicações do usuário:", erro);
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao carregar publicações do usuário."
+      });
+    }
+
+    console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
+    res.json({
+      success: true,
+      posts: resultados
+    });
+  });
+});
+
 // ==================== EXCLUIR PUBLICAÇÃO ====================
 app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
@@ -614,10 +642,10 @@ app.get("/search", (req, res) => {
 
   // Buscar usuários
   const queryUsuarios = `
-    SELECT nome, nomeUsuario, fotoDePerfil
-    FROM usuario
-    WHERE nome LIKE ? OR nomeUsuario LIKE ?
-  `;
+  SELECT nome, nomeUsuario, fotoDePerfil, CPF
+  FROM usuario
+  WHERE nome LIKE ? OR nomeUsuario LIKE ?
+`;
 
   // Buscar posts
   const queryPosts = `
