@@ -778,10 +778,8 @@ app.put("/usuario/atualizar", (req, res) => {
   });
 });
 
-//
-
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando em http://19.168.0.120:${PORT}`);
 });
