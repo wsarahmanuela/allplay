@@ -292,12 +292,10 @@ app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-    // 1️⃣ Apaga primeiro as curtidas dessa publicação
     await connection
       .promise()
       .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
 
-    // 2️⃣ Depois apaga a publicação em si
     await connection
       .promise()
       .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
@@ -763,7 +761,6 @@ app.put("/usuario/atualizar", (req, res) => {
   });
 });
 
-//
 
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;
