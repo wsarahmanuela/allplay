@@ -138,7 +138,15 @@ nav {
 
 /* Último link da seção */
 .imp-links a:last-child {
-    color: #41db51;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    color: #626262;
+    width: fit-content;
+    transition: color 0.3s;
+    cursor: pointer;
+    gap: 15px; /* espaço entre ícone e texto */
 }
 
 /* Linha divisória */
