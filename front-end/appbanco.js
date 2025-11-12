@@ -29,8 +29,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const connection = mysql2.createConnection({
-  host: 'localhost',
-  port: 3309,
+  host: 'allplay-mysql',
+  port: 3306,
   user: 'appuser',
   password: 'appass',
   database: 'pi_bbd'
