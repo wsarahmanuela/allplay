@@ -286,7 +286,7 @@ let query = `
   FROM publicacao p
   JOIN usuario u ON p.autor_CPF = u.CPF
   WHERE p.autor_CPF = ?
-`;
+`;})
 // ==================== EXCLUIR PUBLICAÇÃO ====================
 app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
@@ -665,7 +665,44 @@ app.get("/esportes/mestra", (req, res) => {
     res.json(esportes);
   });
 });
+// ====================ROTA DE SEGUIDORES =======================
+app.get('/seguidores/:cpf', async (req, res) => {
+    const cpf = req.params.cpf;
+    
+    console.log(`\n Rota /seguidores/:cpf chamada com:`);
+    console.log(` CPF: ${cpf}`);
 
+    if (!cpf) {
+        return res.status(400).json({ success: false, message: 'CPF é obrigatório.' });
+    }
+
+    const seguidoresQuery = `
+        SELECT COUNT(*) AS total_seguidores 
+        FROM Seguidores 
+        WHERE CPF_seguido = ?
+    `;
+
+    const seguindoQuery = `
+        SELECT COUNT(*) AS total_seguindo 
+        FROM Seguidores 
+        WHERE CPF_seguidor = ?
+    `;
+
+   
+
+        const totalSeguidores = seguidoresQuery[0]?.total_seguidores || 0;
+        const totalSeguindo = seguindoQuery[0]?.total_seguindo || 0;
+        
+        console.log(` Contagem encontrada: Seguidores: ${totalSeguidores}, Seguindo: ${totalSeguindo}`);
+
+        res.json({
+            success: true,
+            seguidores: totalSeguidores,
+            seguindo: totalSeguindo
+        });
+
+   
+});
 // ==================== ROTA CORRETA DE UPLOAD DE FOTOS/BANNER ====================
 app.post("/usuario/upload-perfil/:cpf", upload.fields([
   { name: 'fotoDePerfil', maxCount: 1 }, 

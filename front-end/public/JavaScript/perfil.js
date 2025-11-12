@@ -71,7 +71,40 @@ async function preencherPerfil() {
     console.error("Erro ao carregar perfil:", err);
   }
 }
+// ===== CARREGAR SEGUIDORES ========
+async function carregarSeguidores() { 
+  
+    
+    try {
+       const cpf = localStorage.getItem("cpf");
+        if (!cpf) {
+            throw new Error("CPF não pode ser nulo.");
+        }
+        const response = await fetch(`/seguidores/${encodeURIComponent(cpf)}`, {
+            method: "GET"
+        });
 
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar contagem. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            console.log(" Contagem de seguidores e seguindo recebida com sucesso.");
+            
+            // Atualize seus elementos HTML:
+            document.getElementById('seguidores').innerText ="seguidores\n " +data.seguidores;
+            document.getElementById('seguindo').innerText ="seguindo\n " +data.seguindo;
+            
+        } else {
+            throw new Error(data.message || 'Resposta da API incompleta.');
+        }
+
+    } catch (erro) {
+        console.error("Erro ao carregar seguidores:", erro);
+    }
+}
 // ===== CARREGAR POSTS =====
 async function carregarPostsDoUsuario(filtroEsporte = "") {
   const cpf = localStorage.getItem("cpf");
@@ -390,8 +423,8 @@ document.addEventListener("DOMContentLoaded", () => {
     preencherPerfil();
     //carregarFeed();
     carregarEsportes();
-    
-    
+    //carregar Seguidores 
+       carregarSeguidores();
     // Chamada do botão de edição
     configurarBotaoEditar(); 
 });
