@@ -1,18 +1,23 @@
-# Use a lightweight Node.js image
+# Usa uma imagem Node.js oficial
 FROM node:18
 
-# Create app directory
+# Cria e define o diretório de trabalho
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
+# Copia os arquivos de dependências
 COPY package*.json ./
+
+# Instala dependências
 RUN npm install
 
-# Copy the rest of the project files
+# Copia todo o projeto
 COPY . .
 
-# Expose port 3000 for your app
+# Expõe a porta da aplicação
 EXPOSE 3000
 
-# Command to start the application
+# Muda o diretório para onde está o app principal
+WORKDIR /usr/src/app/front-end
+
+# Comando de inicialização
 CMD ["node", "appbanco.js"]
