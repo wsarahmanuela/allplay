@@ -30,7 +30,7 @@ const upload = multer({ storage });
 
 const connection = mysql2.createConnection({
   host: 'localhost',
-  port: 3308,
+  port: 3309,
   user: 'appuser',
   password: 'appass',
   database: 'pi_bbd'
