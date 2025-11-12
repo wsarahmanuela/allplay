@@ -287,30 +287,28 @@ let query = `
   JOIN usuario u ON p.autor_CPF = u.CPF
   WHERE p.autor_CPF = ?
 `;
-  const params = [cpf];
+// ==================== EXCLUIR PUBLICAÇÃO ====================
+app.delete('/publicacoes/:id', async (req, res) => {
+  const id = req.params.id;
 
-  if (esporte) {
-    query += ' AND p.esporte = ?';
-    params.push(esporte);
+  try {
+    // 1️⃣ Apaga primeiro as curtidas dessa publicação
+    await connection
+      .promise()
+      .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
+
+    // 2️⃣ Depois apaga a publicação em si
+    await connection
+      .promise()
+      .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
+
+    res.json({ success: true, message: 'Publicação excluída com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao excluir publicação:', error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Erro ao excluir publicação.' });
   }
-
-  query += ' ORDER BY p.data_publicacao DESC';
-
-  connection.query(query, params, (erro, resultados) => {
-    if (erro) {
-      console.error('Erro ao buscar publicações:', erro);
-      return res.status(500).json({
-        success: false,
-        message: 'Erro ao carregar publicações do usuário.',
-      });
-    }
-
-    console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
-    res.json({
-      success: true,
-      posts: resultados,
-    });
-  });
 });
 
 
