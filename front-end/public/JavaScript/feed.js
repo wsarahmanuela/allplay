@@ -53,22 +53,19 @@ async function preencherPerfil() {
 async function carregarFeed(filtroEsporte = "") {
   const urlParams = new URLSearchParams(window.location.search);
   const cpfDaURL = urlParams.get('cpf');
-  
-  // Se tem CPF na URL, carrega posts desse usuário. Senão, carrega feed geral
+ 
   const cpf = cpfDaURL || localStorage.getItem("cpf");
   const feed = document.getElementById("feed");
   if (!feed) return;
 
   try {
     let url;
-    
-    // Se estiver vendo o perfil de alguém específico (tem CPF na URL)
+
     if (cpfDaURL) {
       url = filtroEsporte
         ? `http://localhost:3000/publicacoes/${cpfDaURL}?esporte=${encodeURIComponent(filtroEsporte)}`
         : `http://localhost:3000/publicacoes/${cpfDaURL}`;
     } else {
-      // Feed geral
       url = filtroEsporte
         ? `http://localhost:3000/publicacoes/${cpf}?esporte=${encodeURIComponent(filtroEsporte)}`
         : "http://localhost:3000/publicacoes";
@@ -78,7 +75,7 @@ async function carregarFeed(filtroEsporte = "") {
     if (!resposta.ok) throw new Error("Erro ao buscar publicações");
 
     const dados = await resposta.json();
-    console.log("🔍 Retorno do servidor:", dados);
+    console.log(" Retorno do servidor:", dados);
 
     const cpfLogado = localStorage.getItem("cpf");
     console.log("CPF logado:", cpfLogado);
@@ -99,7 +96,7 @@ async function carregarFeed(filtroEsporte = "") {
     feed.innerHTML = "";
 
     if (!Array.isArray(posts) || posts.length === 0) {
-      feed.innerHTML = "<p>Nenhuma publicação encontrada.</p>";
+      feed.innerHTML = `<p class="mensagem-vazia">Nenhuma publicação encontrada.</p>`;
       return;
     }
 
@@ -111,7 +108,6 @@ async function carregarFeed(filtroEsporte = "") {
         ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
         : "imagens/profile.picture.jpg";
 
-      // Verifica se o post pertence ao usuário logado
       const podeExcluir = post.cpf === cpfLogado;
 
       let menuHtml = "";
@@ -130,7 +126,7 @@ async function carregarFeed(filtroEsporte = "") {
         <div class="post-header">
           <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
           <div class="post-info">
-            <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
+            <strong class="nome">${post.nome || "Usuário sem nome"}${post.esporte ? ` • <span class="categoria">${post.esporte}</span>` : ""}</strong>
             <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
           </div>
           ${menuHtml}
@@ -199,7 +195,6 @@ async function carregarFeed(filtroEsporte = "") {
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
-              second: "2-digit",
               hour12: false,
               timeZone: "America/Sao_Paulo"
             }).format(data);
