@@ -156,7 +156,16 @@ i {
     margin-right: 15px;
 }
 .imp-links a:last-child, i{
-    color: #27df39;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    color: #626262;
+    width: fit-content;
+    transition: color 0.3s;
+    cursor: pointer;
+    gap: 15px; /* espaço entre ícone e texto */
+
 }
 .imp-links, i{
     border-bottom: 1px solid #ccc;

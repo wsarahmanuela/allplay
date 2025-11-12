@@ -180,79 +180,173 @@ async function carregarPostsDoUsuario(filtroEsporte = "") {
       }
 
       // data
-      const dataDiv = document.createElement("div");
-      dataDiv.className = "data";
-      if (dataRaw) {
-        let dataValida = dataRaw;
-        if (typeof dataRaw === "string" && dataRaw.includes("/")) {
-          const [dataParte, tempoParte = "00:00:00"] = dataRaw.split(" ");
-          const [dia, mes, ano] = dataParte.split("/");
-          dataValida = `${ano}-${mes}-${dia} ${tempoParte}`;
-        } else if (typeof dataRaw === "string" && dataRaw.includes("T")) {
-          dataValida = dataRaw.replace("Z", "").replace("T", " ");
-        }
-        const d = new Date(dataValida);
-        dataDiv.textContent = !isNaN(d)
-          ? d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
-          : dataRaw;
-      }
-      card.appendChild(dataDiv);
+      // Função utilitária: converte vários formatos para um Date local seguro
+function parseDateToLocal(input) {
+  if (!input) return null;
 
-        // === CURTIDAS ===
-  const curtidaDiv = document.createElement("div");
-  curtidaDiv.classList.add("curtidas");
+  // se já for Date
+  if (input instanceof Date) return input;
 
-  const btnCurtir = document.createElement("button");
-  btnCurtir.classList.add("btn-curtir");
-  btnCurtir.innerHTML = `
-   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
-    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-    stroke-linejoin="round" class="icone-coracao">
-    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-  </svg>
-`; 
-
-  const contador = document.createElement("span");
-  contador.classList.add("contador-curtidas");
-  contador.textContent = "0 ";
-
-  async function atualizarCurtidas() {
-    const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
-    const dados = await resp.json();
-    contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
+  // number (timestamp)
+  if (!isNaN(Number(input))) {
+    return new Date(Number(input));
   }
 
-  btnCurtir.addEventListener("click", async () => {
-    const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-      publicacao_ID: post.IDpublicacao,
-      usuario_cpf: cpfLogado,
-    }),
+  // string
+  const s = String(input).trim();
 
-    });
-    const resultado = await resp.json();
-    if (resultado.liked) {
-      btnCurtir.classList.add("curtido");
-    } else {
-      btnCurtir.classList.remove("curtido");
+  // 1) formato dd/mm/yyyy [HH:MM:SS]
+  if (s.includes("/") && s.match(/^\d{1,2}\/\d{1,2}\/\d{4}/)) {
+    // separa parte de data e hora
+    const [dataParte, tempoParte = "00:00:00"] = s.split(" ");
+    const [dia, mes, ano] = dataParte.split("/").map(n => parseInt(n, 10));
+    const [hh = "0", mm = "0", ss = "0"] = tempoParte.split(":");
+    return new Date(ano, mes - 1, dia, parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10));
+  }
+
+  // 2) formato ISO com T (ex: 2025-11-12T14:30:00Z ou sem Z)
+  if (s.includes("T")) {
+    // se termina com Z => já é UTC; new Date() entende corretamente
+    // se não termina com Z, muitos navegadores tratam como local, mas pra ser seguro:
+    try {
+      return new Date(s);
+    } catch (e) {
+      // fallback abaixo
     }
-    atualizarCurtidas();
-  });
+  }
 
-  curtidaDiv.appendChild(btnCurtir);
-  curtidaDiv.appendChild(contador);
-  card.appendChild(curtidaDiv); 
-  atualizarCurtidas();
+  // 3) formato yyyy-mm-dd HH:MM:SS (com espaço)
+  if (s.match(/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}(:\d{2})?/)) {
+    const [dataParte, tempoParte = "00:00:00"] = s.split(" ");
+    const [ano, mes, dia] = dataParte.split("-").map(n => parseInt(n, 10));
+    const [hh = "0", mm = "0", ss = "0"] = tempoParte.split(":");
+    return new Date(ano, mes - 1, dia, parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10));
+  }
 
-  container.appendChild(card);
-});
+  // 4) tentativa genérica com Date
+  const tentativa = new Date(s);
+  if (!isNaN(tentativa)) return tentativa;
 
+  // se nada funcionou
+  return null;
+} // data
+const dataDiv = document.createElement("div");
+dataDiv.className = "data";
+if (dataRaw) {
+  // converte para Date local de forma robusta
+  const d = parseDateToLocal(dataRaw);
+
+  if (d && !isNaN(d.getTime())) {
+    dataDiv.textContent = d.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  } else {
+    // se não conseguiu parsear, mostra o raw
+    dataDiv.textContent = dataRaw;
+  }
+}
+card.appendChild(dataDiv);
+
+
+
+      // === CURTIDAS ===
+      const curtidaDiv = document.createElement("div");
+      curtidaDiv.classList.add("curtidas");
+
+      const btnCurtir = document.createElement("button");
+      btnCurtir.classList.add("btn-curtir");
+      btnCurtir.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" class="icone-coracao">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+        </svg>
+      `;
+
+      const contador = document.createElement("span");
+      contador.classList.add("contador-curtidas");
+      contador.textContent = "0 curtidas";
+
+      async function atualizarCurtidas() {
+        try {
+          const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
+          const dados = await resp.json();
+          contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
+        } catch (erro) {
+          console.error("Erro ao atualizar curtidas:", erro);
+        }
+      }
+
+      async function verificarCurtidaUsuario() {
+        try {
+          const resp = await fetch(
+            `http://localhost:3000/publicacoes/${post.IDpublicacao}/verificar-curtida?cpf=${cpfLogado}`
+          );
+          const dados = await resp.json();
+          const icone = btnCurtir.querySelector(".icone-coracao path");
+
+          if (dados.jaCurtiu) {
+            btnCurtir.classList.add("curtido");
+            icone.setAttribute("fill", "red");
+          } else {
+            btnCurtir.classList.remove("curtido");
+            icone.setAttribute("fill", "none");
+          }
+        } catch (erro) {
+          console.error("Erro ao verificar curtida:", erro);
+        }
+      }
+
+      btnCurtir.addEventListener("click", async () => {
+        try {
+          const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              publicacao_ID: post.IDpublicacao,
+              usuario_cpf: cpfLogado,
+            }),
+          });
+
+          const resultado = await resp.json();
+          const icone = btnCurtir.querySelector(".icone-coracao path");
+
+          if (resultado.liked) {
+            btnCurtir.classList.add("curtido");
+            icone.setAttribute("fill", "red");
+          } else {
+            btnCurtir.classList.remove("curtido");
+            icone.setAttribute("fill", "none");
+          }
+
+          await atualizarCurtidas();
+        } catch (erro) {
+          console.error("Erro ao curtir:", erro);
+        }
+      });
+
+      curtidaDiv.appendChild(btnCurtir);
+      curtidaDiv.appendChild(contador);
+      card.appendChild(curtidaDiv);
+      container.appendChild(card);
+
+      setTimeout(async () => {
+        try {
+          await atualizarCurtidas();
+          await verificarCurtidaUsuario();
+        } catch (erro) {
+          console.error("Erro ao inicializar curtidas:", erro);
+        }
+      }, 100);
+    }); 
   } catch (err) {
     console.error("Erro ao carregar posts do usuário:", err);
   }
-}
+} 
 
 // ===== ESPORTES (LADO ESQUERDO) =====
 async function carregarEsportes() {

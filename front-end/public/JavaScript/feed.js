@@ -225,62 +225,108 @@ div.appendChild(dataDiv);
     tag.textContent = post.esporte;
     div.appendChild(tag);
   }
-  // === CURTIDAS ===
-  const curtidaDiv = document.createElement("div");
-  curtidaDiv.classList.add("curtidas");
+// === CURTIDAS ===
+const curtidaDiv = document.createElement("div");
+curtidaDiv.classList.add("curtidas");
 
-  const btnCurtir = document.createElement("button");
-  btnCurtir.classList.add("btn-curtir");
-  btnCurtir.innerHTML = `
-   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+const btnCurtir = document.createElement("button");
+btnCurtir.classList.add("btn-curtir");
+btnCurtir.innerHTML = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
     stroke="currentColor" stroke-width="2" stroke-linecap="round"
     stroke-linejoin="round" class="icone-coracao">
     <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
   </svg>
-`; 
+`;
 
-  const contador = document.createElement("span");
-  contador.classList.add("contador-curtidas");
-  contador.textContent = "0 ";
+const contador = document.createElement("span");
+contador.classList.add("contador-curtidas");
+contador.textContent = "0 curtidas";
 
-  async function atualizarCurtidas() {
+// === FUNÇÃO: Atualizar número total de curtidas ===
+async function atualizarCurtidas() {
+  try {
     const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
     const dados = await resp.json();
     contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
+  } catch (erro) {
+    console.error("Erro ao atualizar curtidas:", erro);
   }
+}
 
-  btnCurtir.addEventListener("click", async () => {
+// === FUNÇÃO: Verificar se o usuário já curtiu (mantém coração vermelho após F5) ===
+async function verificarCurtidaUsuario() {
+  try {
+    const resp = await fetch(
+      `http://localhost:3000/publicacoes/${post.IDpublicacao}/verificar-curtida?cpf=${cpfLogado}`
+    );
+    const dados = await resp.json();
+    const icone = btnCurtir.querySelector(".icone-coracao path");
+
+    if (dados.jaCurtiu) {
+      btnCurtir.classList.add("curtido");
+      icone.setAttribute("fill", "red");
+    } else {
+      btnCurtir.classList.remove("curtido");
+      icone.setAttribute("fill", "none");
+    }
+  } catch (erro) {
+    console.error("Erro ao verificar curtida:", erro);
+  }
+}
+
+// === EVENTO: Clique no botão de curtir ===
+btnCurtir.addEventListener("click", async () => {
+  try {
     const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-      publicacao_ID: post.IDpublicacao,
-      usuario_cpf: cpfLogado,
-    }),
-
+        publicacao_ID: post.IDpublicacao,
+        usuario_cpf: cpfLogado,
+      }),
     });
+
     const resultado = await resp.json();
+    const icone = btnCurtir.querySelector(".icone-coracao path");
+
     if (resultado.liked) {
       btnCurtir.classList.add("curtido");
+      icone.setAttribute("fill", "red");
     } else {
       btnCurtir.classList.remove("curtido");
+      icone.setAttribute("fill", "none");
     }
-    atualizarCurtidas();
-  });
 
-  curtidaDiv.appendChild(btnCurtir);
-  curtidaDiv.appendChild(contador);
-  div.appendChild(curtidaDiv);
-  atualizarCurtidas();
-
-  feed.appendChild(div);
+    await atualizarCurtidas();
+  } catch (erro) {
+    console.error("Erro ao curtir publicação:", erro);
+  }
 });
 
+// === Montagem dos elementos ===
+curtidaDiv.appendChild(btnCurtir);
+curtidaDiv.appendChild(contador);
+div.appendChild(curtidaDiv);
+feed.appendChild(div);
 
+// === Chamada inicial para atualizar estado e contador ===
+setTimeout(async () => {
+  try {
+    await atualizarCurtidas();
+    await verificarCurtidaUsuario();
   } catch (erro) {
-    console.error("Erro ao carregar o feed:", erro);
+    console.error("Erro ao inicializar curtidas:", erro);
   }
+}, 100);
+
+}); 
+
+} catch (erro) {
+  console.error("Erro ao carregar o feed:", erro);
 }
+} 
+
 
 // ================== BARRA DE PESQUISA ==================
 const searchInput = document.getElementById("searchInput");

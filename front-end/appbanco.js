@@ -420,12 +420,10 @@ app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-    // 1️⃣ Apaga primeiro as curtidas dessa publicação
     await connection
       .promise()
       .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
 
-    // 2️⃣ Depois apaga a publicação em si
     await connection
       .promise()
       .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
@@ -456,7 +454,6 @@ app.get("/publicacoes/:id/curtidas", (req, res) => {
   });
 });
 
-// Curtir ou descurtir uma publicação
 app.post("/publicacoes/curtir", (req, res) => {
   const { publicacao_ID, usuario_cpf } = req.body;
 
@@ -474,7 +471,7 @@ app.post("/publicacoes/curtir", (req, res) => {
     }
 
     if (resultados.length > 0) {
-      // Já curtiu → remove a curtida
+      // Já curtiu → remover curtida
       const deleteSql = "DELETE FROM curtida WHERE publicacao_ID = ? AND usuario_cpf = ?";
       connection.query(deleteSql, [publicacao_ID, usuario_cpf], (erro2) => {
         if (erro2) {
@@ -484,7 +481,7 @@ app.post("/publicacoes/curtir", (req, res) => {
         return res.json({ success: true, liked: false });
       });
     } else {
-      // Ainda não curtiu → adiciona curtida
+      // Ainda não curtiu → adicionar curtida
       const insertSql = "INSERT INTO curtida (publicacao_ID, usuario_cpf) VALUES (?, ?)";
       connection.query(insertSql, [publicacao_ID, usuario_cpf], (erro3) => {
         if (erro3) {
@@ -497,6 +494,31 @@ app.post("/publicacoes/curtir", (req, res) => {
   });
 });
 
+app.get("/publicacoes/:id/verificar-curtida", (req, res) => {
+  const id = req.params.id;
+  const cpf = req.query.cpf;
+
+  if (!id || !cpf) {
+    return res.status(400).json({ success: false, message: "Parâmetros inválidos." });
+  }
+
+  const sql = "SELECT * FROM curtida WHERE publicacao_ID = ? AND usuario_cpf = ?";
+  connection.query(sql, [id, cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao verificar curtida:", erro.sqlMessage || erro);
+      return res.status(500).json({ success: false });
+    }
+
+    const jaCurtiu = resultados.length > 0;
+    res.json({ success: true, jaCurtiu });
+  });
+});
+
+app.use(express.static("public"));
+
+app.listen(3000, () => {
+  console.log("Servidor rodando em http://localhost:3000");
+});
 
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)

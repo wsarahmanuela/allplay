@@ -81,7 +81,13 @@
             <a href="#"><img src="imagens/friends.png">Amigos</a>
             <a href="#"><img src="imagens/club.png">Notificação</a>  
             <a href="map.html"><img src="imagens/Design_sem_nome__3_-removebg-preview.png">Localização</a>
-            <a href="feed.html"><img src="imagens/image.png">Feed</a>
+            <a href="feed.html" style="text-decoration: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#000">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/> 
+                </svg>
+                <span>Feed</span>
+            </a>
+
         </div>
         <div class="shortcut-links" id="atalhos-esportes">
             <p>Seus esportes</p>
@@ -117,10 +123,20 @@
               border:1px solid #ccc;">
 
   <div class="add-post-links">
-    <!-- Botão para abrir o seletor de arquivos -->
-    <button type="button" id="btn-imagem" class="add-img" style="background:none; border:none; cursor:pointer;">
-      <i class="fa-solid fa-images" style="color:#0d7000;"></i> Imagem
-    </button>
+   <button type="button" id="btn-imagem" class="add-img" 
+  style="background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:10px; color:#0d7000; padding:0;">
+
+  <!-- Ícone SVG de imagem -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" 
+    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    style="display:block;">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+    <circle cx="8.5" cy="8.5" r="1.5"/>
+    <path d="M21 15l-5-5L5 21"/>
+  </svg>
+
+  <span style="font-size:16px;">Imagem</span>
+</button>
 
     <!-- Input file escondido -->
     <input type="file" id="input-imagem" accept="image/*" style="display:none;">
