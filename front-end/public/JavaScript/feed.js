@@ -1,6 +1,11 @@
-// ================== PREENCHER PERFIL ==================
+// ================== PREENCHER PERFIL (CORRIGIDO) ==================
 async function preencherPerfil() {
-  const cpf = localStorage.getItem("cpf");
+  const urlParams = new URLSearchParams(window.location.search);
+  const cpfDaURL = urlParams.get('cpf');
+  
+  // Se tem CPF na URL, usa ele. Senão, usa o do localStorage
+  const cpf = cpfDaURL || localStorage.getItem("cpf");
+  
   if (!cpf) return;
 
   try {
@@ -44,33 +49,46 @@ async function preencherPerfil() {
   }
 }
 
-// ================== CARREGAR FEED ==================
+// ================== CARREGAR FEED (CORRIGIDO) ==================
 async function carregarFeed(filtroEsporte = "") {
-  const cpf = localStorage.getItem("cpf");
+  const urlParams = new URLSearchParams(window.location.search);
+  const cpfDaURL = urlParams.get('cpf');
+  
+  // Se tem CPF na URL, carrega posts desse usuário. Senão, carrega feed geral
+  const cpf = cpfDaURL || localStorage.getItem("cpf");
   const feed = document.getElementById("feed");
   if (!feed) return;
 
   try {
-    const url = filtroEsporte
-      ? `http://localhost:3000/publicacoes/${cpf}?esporte=${encodeURIComponent(filtroEsporte)}`
-      : "http://localhost:3000/publicacoes";
+    let url;
+    
+    // Se estiver vendo o perfil de alguém específico (tem CPF na URL)
+    if (cpfDaURL) {
+      url = filtroEsporte
+        ? `http://localhost:3000/publicacoes/${cpfDaURL}?esporte=${encodeURIComponent(filtroEsporte)}`
+        : `http://localhost:3000/publicacoes/${cpfDaURL}`;
+    } else {
+      // Feed geral
+      url = filtroEsporte
+        ? `http://localhost:3000/publicacoes/${cpf}?esporte=${encodeURIComponent(filtroEsporte)}`
+        : "http://localhost:3000/publicacoes";
+    }
 
     const resposta = await fetch(url);
     if (!resposta.ok) throw new Error("Erro ao buscar publicações");
 
     const dados = await resposta.json();
-    console.log(" Retorno do servidor:", dados);
+    console.log("🔍 Retorno do servidor:", dados);
 
-    console.log("CPF logado:", localStorage.getItem("cpf"));
+    const cpfLogado = localStorage.getItem("cpf");
+    console.log("CPF logado:", cpfLogado);
 
-if (Array.isArray(dados)) {
-  dados.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
-} else if (Array.isArray(dados.posts)) {
-  dados.posts.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
-}
+    if (Array.isArray(dados)) {
+      dados.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
+    } else if (Array.isArray(dados.posts)) {
+      dados.posts.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
+    }
 
-
-    //  garante que seja sempre um array
     let posts = [];
     if (Array.isArray(dados)) {
       posts = dados;
@@ -78,255 +96,234 @@ if (Array.isArray(dados)) {
       posts = dados.posts;
     }
 
-    feed.innerHTML = ""; // limpa feed antes de exibir novos posts
+    feed.innerHTML = "";
 
     if (!Array.isArray(posts) || posts.length === 0) {
       feed.innerHTML = "<p>Nenhuma publicação encontrada.</p>";
       return;
     }
 
-    // percorre e mostra cada publicação
     posts.forEach(post => {
-  const div = document.createElement("div");
-  div.classList.add("post");
+      const div = document.createElement("div");
+      div.classList.add("post");
 
-  const caminhoFoto = post.fotoDePerfil
-    ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
-    : "imagens/profile.picture.jpg";
+      const caminhoFoto = post.fotoDePerfil
+        ? `http://localhost:3000/uploads/${post.fotoDePerfil}`
+        : "imagens/profile.picture.jpg";
 
-  // CPF do usuário logado
-  const cpfLogado = localStorage.getItem("cpf");
+      // Verifica se o post pertence ao usuário logado
+      const podeExcluir = post.cpf === cpfLogado;
 
-  // Verifica se o post pertence ao usuário logado
-  const podeExcluir = post.cpf === cpfLogado;
+      let menuHtml = "";
+      if (podeExcluir) {
+        menuHtml = `
+          <div class="post-menu">
+            <button class="menu-btn">⋮</button>
+            <div class="menu-opcoes">
+              <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
+            </div>
+          </div>
+        `;
+      }
 
-  // Monta o menu (aparece só pro dono do post)
-  let menuHtml = "";
-  if (podeExcluir) {
-    menuHtml = `
-      <div class="post-menu">
-        <button class="menu-btn">⋮</button>
-        <div class="menu-opcoes">
-          <button class="excluir-btn" data-id="${post.IDpublicacao}">Excluir</button>
+      div.innerHTML = `
+        <div class="post-header">
+          <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
+          <div class="post-info">
+            <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
+            <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
+          </div>
+          ${menuHtml}
         </div>
-      </div>
-    `;
-  }
+      `;
 
-  // Estrutura principal do post
-  div.innerHTML = `
-    <div class="post-header">
-      <img class="foto-perfil" src="${caminhoFoto}" alt="Foto de perfil">
-      <div class="post-info">
-        <strong class="nome">${post.nome || "Usuário sem nome"}</strong>
-        <span class="usuario">@${(post.nomeUsuario || "usuario").replace("@", "")}</span>
-      </div>
-      ${menuHtml}
-    </div>
-  `;
+      if (podeExcluir) {
+        const menuBtn = div.querySelector(".menu-btn");
+        const menuOpcoes = div.querySelector(".menu-opcoes");
 
-  // Se houver botão de menu, adiciona o evento
-  if (podeExcluir) {
-    const menuBtn = div.querySelector(".menu-btn");
-    const menuOpcoes = div.querySelector(".menu-opcoes");
+        menuBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          menuOpcoes.classList.toggle("ativo");
+        });
 
-    menuBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      menuOpcoes.classList.toggle("ativo");
-    });
+        document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
 
-    document.addEventListener("click", () => menuOpcoes.classList.remove("ativo"));
+        const btnExcluir = div.querySelector(".excluir-btn");
+        btnExcluir.addEventListener("click", async () => {
+          if (confirm("Deseja realmente excluir esta publicação?")) {
+            const id = btnExcluir.dataset.id;
+            try {
+              const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
+              const resultado = await resp.json();
+              if (resultado.success) {
+                carregarFeed(filtroEsporte);
+              } else {
+                alert("Erro ao excluir publicação.");
+              }
+            } catch (erro) {
+              console.error("Erro ao excluir:", erro);
+            }
+          }
+        });
+      }
 
-    // Função de exclusão
-    const btnExcluir = div.querySelector(".excluir-btn");
-    btnExcluir.addEventListener("click", async () => {
-      if (confirm("Deseja realmente excluir esta publicação?")) {
-        const id = btnExcluir.dataset.id;
+      const conteudoDiv = document.createElement("div");
+      conteudoDiv.classList.add("conteudo");
+      conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
+      div.appendChild(conteudoDiv);
+
+      if (post.imagem) {
+        const imagemPath = post.imagem.startsWith("/")
+          ? `http://localhost:3000${post.imagem}`
+          : `http://localhost:3000/uploads/${post.imagem}`;
+        const img = document.createElement("img");
+        img.src = imagemPath;
+        img.alt = "Imagem do post";
+        img.classList.add("post-imagem");
+        div.appendChild(img);
+      }
+
+      const dataDiv = document.createElement("div");
+      dataDiv.classList.add("data");
+
+      if (post.data_publicacao) {
         try {
-          const resp = await fetch(`http://localhost:3000/publicacoes/${id}`, { method: "DELETE" });
-          const resultado = await resp.json();
-          if (resultado.success) {
-            carregarFeed(filtroEsporte);
+          const data = new Date(post.data_publicacao);
+
+          if (isNaN(data)) {
+            dataDiv.textContent = "Data inválida";
           } else {
-            alert("Erro ao excluir publicação.");
+            dataDiv.textContent = new Intl.DateTimeFormat("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+              timeZone: "America/Sao_Paulo"
+            }).format(data);
           }
         } catch (erro) {
-          console.error("Erro ao excluir:", erro);
+          console.error("Erro ao formatar data:", erro);
+          dataDiv.textContent = "Data inválida";
+        }
+      } else {
+        const agora = new Date();
+        dataDiv.textContent = new Intl.DateTimeFormat("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "America/Sao_Paulo"
+        }).format(agora);
+      }
+
+      div.appendChild(dataDiv);
+
+      if (post.esporte) {
+        const tag = document.createElement("span");
+        tag.classList.add("tag-esporte");
+        tag.textContent = post.esporte;
+        div.appendChild(tag);
+      }
+
+      const curtidaDiv = document.createElement("div");
+      curtidaDiv.classList.add("curtidas");
+
+      const btnCurtir = document.createElement("button");
+      btnCurtir.classList.add("btn-curtir");
+      btnCurtir.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" class="icone-coracao">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+        </svg>
+      `;
+
+      const contador = document.createElement("span");
+      contador.classList.add("contador-curtidas");
+      contador.textContent = "0 curtidas";
+
+      async function atualizarCurtidas() {
+        try {
+          const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
+          const dados = await resp.json();
+          contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
+        } catch (erro) {
+          console.error("Erro ao atualizar curtidas:", erro);
         }
       }
-    });
-  }
 
-  // Conteúdo do post
-  const conteudoDiv = document.createElement("div");
-  conteudoDiv.classList.add("conteudo");
-  conteudoDiv.innerHTML = post.conteudo && post.conteudo !== "null" ? post.conteudo : "";
-  div.appendChild(conteudoDiv);
+      async function verificarCurtidaUsuario() {
+        try {
+          const resp = await fetch(
+            `http://localhost:3000/publicacoes/${post.IDpublicacao}/verificar-curtida?cpf=${cpfLogado}`
+          );
+          const dados = await resp.json();
+          const icone = btnCurtir.querySelector(".icone-coracao path");
 
-  // Imagem do post
-  if (post.imagem) {
-    const imagemPath = post.imagem.startsWith("/")
-      ? `http://localhost:3000${post.imagem}`
-      : `http://localhost:3000/uploads/${post.imagem}`;
-    const img = document.createElement("img");
-    img.src = imagemPath;
-    img.alt = "Imagem do post";
-    img.classList.add("post-imagem");
-    div.appendChild(img);
-  }
+          if (dados.jaCurtiu) {
+            btnCurtir.classList.add("curtido");
+            icone.setAttribute("fill", "red");
+          } else {
+            btnCurtir.classList.remove("curtido");
+            icone.setAttribute("fill", "none");
+          }
+        } catch (erro) {
+          console.error("Erro ao verificar curtida:", erro);
+        }
+      }
 
-// ================== DATA FORMATADA CORRIGIDA ==================
-const dataDiv = document.createElement("div");
-dataDiv.classList.add("data");
+      btnCurtir.addEventListener("click", async () => {
+        try {
+          const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              publicacao_ID: post.IDpublicacao,
+              usuario_cpf: cpfLogado,
+            }),
+          });
 
-if (post.data_publicacao) {
-  try {
-    // Se vier "2025-11-10T18:00:00.000Z" ou algo similar, só cria o Date normalmente
-    const data = new Date(post.data_publicacao);
+          const resultado = await resp.json();
+          const icone = btnCurtir.querySelector(".icone-coracao path");
 
-    if (isNaN(data)) {
-      dataDiv.textContent = "Data inválida";
-    } else {
-      // Mostra data/hora no fuso do Brasil
-      dataDiv.textContent = new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-        timeZone: "America/Sao_Paulo"
-      }).format(data);
-    }
-  } catch (erro) {
-    console.error("Erro ao formatar data:", erro);
-    dataDiv.textContent = "Data inválida";
-  }
-} else {
-  const agora = new Date();
-  dataDiv.textContent = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit", 
-    hour12: false,
-    timeZone: "America/Sao_Paulo"
-  }).format(agora);
-}
+          if (resultado.liked) {
+            btnCurtir.classList.add("curtido");
+            icone.setAttribute("fill", "red");
+          } else {
+            btnCurtir.classList.remove("curtido");
+            icone.setAttribute("fill", "none");
+          }
 
-div.appendChild(dataDiv);
+          await atualizarCurtidas();
+        } catch (erro) {
+          console.error("Erro ao curtir publicação:", erro);
+        }
+      });
 
-  // Esporte (tag)
-  if (post.esporte) {
-    const tag = document.createElement("span");
-    tag.classList.add("tag-esporte");
-    tag.textContent = post.esporte;
-    div.appendChild(tag);
-  }
-// === CURTIDAS ===
-const curtidaDiv = document.createElement("div");
-curtidaDiv.classList.add("curtidas");
+      curtidaDiv.appendChild(btnCurtir);
+      curtidaDiv.appendChild(contador);
+      div.appendChild(curtidaDiv);
+      feed.appendChild(div);
 
-const btnCurtir = document.createElement("button");
-btnCurtir.classList.add("btn-curtir");
-btnCurtir.innerHTML = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
-    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-    stroke-linejoin="round" class="icone-coracao">
-    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-  </svg>
-`;
-
-const contador = document.createElement("span");
-contador.classList.add("contador-curtidas");
-contador.textContent = "0 curtidas";
-
-// === FUNÇÃO: Atualizar número total de curtidas ===
-async function atualizarCurtidas() {
-  try {
-    const resp = await fetch(`http://localhost:3000/publicacoes/${post.IDpublicacao}/curtidas`);
-    const dados = await resp.json();
-    contador.textContent = `${dados.total} curtida${dados.total !== 1 ? "s" : ""}`;
-  } catch (erro) {
-    console.error("Erro ao atualizar curtidas:", erro);
-  }
-}
-
-// === FUNÇÃO: Verificar se o usuário já curtiu (mantém coração vermelho após F5) ===
-async function verificarCurtidaUsuario() {
-  try {
-    const resp = await fetch(
-      `http://localhost:3000/publicacoes/${post.IDpublicacao}/verificar-curtida?cpf=${cpfLogado}`
-    );
-    const dados = await resp.json();
-    const icone = btnCurtir.querySelector(".icone-coracao path");
-
-    if (dados.jaCurtiu) {
-      btnCurtir.classList.add("curtido");
-      icone.setAttribute("fill", "red");
-    } else {
-      btnCurtir.classList.remove("curtido");
-      icone.setAttribute("fill", "none");
-    }
-  } catch (erro) {
-    console.error("Erro ao verificar curtida:", erro);
-  }
-}
-
-// === EVENTO: Clique no botão de curtir ===
-btnCurtir.addEventListener("click", async () => {
-  try {
-    const resp = await fetch("http://localhost:3000/publicacoes/curtir", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        publicacao_ID: post.IDpublicacao,
-        usuario_cpf: cpfLogado,
-      }),
+      setTimeout(async () => {
+        try {
+          await atualizarCurtidas();
+          await verificarCurtidaUsuario();
+        } catch (erro) {
+          console.error("Erro ao inicializar curtidas:", erro);
+        }
+      }, 100);
     });
 
-    const resultado = await resp.json();
-    const icone = btnCurtir.querySelector(".icone-coracao path");
-
-    if (resultado.liked) {
-      btnCurtir.classList.add("curtido");
-      icone.setAttribute("fill", "red");
-    } else {
-      btnCurtir.classList.remove("curtido");
-      icone.setAttribute("fill", "none");
-    }
-
-    await atualizarCurtidas();
   } catch (erro) {
-    console.error("Erro ao curtir publicação:", erro);
+    console.error("Erro ao carregar o feed:", erro);
   }
-});
-
-// === Montagem dos elementos ===
-curtidaDiv.appendChild(btnCurtir);
-curtidaDiv.appendChild(contador);
-div.appendChild(curtidaDiv);
-feed.appendChild(div);
-
-// === Chamada inicial para atualizar estado e contador ===
-setTimeout(async () => {
-  try {
-    await atualizarCurtidas();
-    await verificarCurtidaUsuario();
-  } catch (erro) {
-    console.error("Erro ao inicializar curtidas:", erro);
-  }
-}, 100);
-
-}); 
-
-} catch (erro) {
-  console.error("Erro ao carregar o feed:", erro);
 }
-} 
-
 
 // ================== BARRA DE PESQUISA ==================
 const searchInput = document.getElementById("searchInput");
@@ -350,7 +347,6 @@ if (searchInput && resultsDiv) {
       if (resultados.usuarios.length === 0 && resultados.posts.length === 0) {
         resultsDiv.textContent = "Nenhum resultado encontrado.";
       } else {
-        // Usuários
         resultados.usuarios.forEach(usuario => {
           const div = document.createElement("div");
           div.classList.add("result-item");
@@ -358,14 +354,20 @@ if (searchInput && resultsDiv) {
             <img src="${usuario.fotoDePerfil ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}` : 'imagens/profile.picture.jpg'}" alt="${usuario.nome}">
             <span>${usuario.nome} (@${usuario.nomeUsuario})</span>
           `;
-          div.addEventListener("click", () => {
-            // exemplo: ir pro perfil do usuário
-            window.location.href = `/perfil.html?cpf=${usuario.CPF}`;
+
+          div.dataset.cpf = usuario.CPF;
+
+          div.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const cpfDoUsuario = div.dataset.cpf;
+            console.log(" Indo para perfil do CPF:", cpfDoUsuario);
+            window.location.href = `/perfil.html?cpf=${encodeURIComponent(cpfDoUsuario)}`;
           });
+
           resultsDiv.appendChild(div);
         });
 
-        // Posts
         resultados.posts.forEach(post => {
           const div = document.createElement("div");
           div.classList.add("result-item");
@@ -393,6 +395,7 @@ if (searchInput && resultsDiv) {
     }
   });
 }
+
 // ================== UPLOAD DE IMAGEM + CRIAR POST ==================
 let imagemSelecionada = null;
 
@@ -446,14 +449,11 @@ async function criarPost() {
     return;
   }
 
-  // aqui ta fazendo que nao é obrigrtorio selecionar um esporte 
   const formData = new FormData();
   formData.append("autor_CPF", cpf);
   formData.append("conteudo", texto || "");
 
-  // Envia o esporte apenas se o usuário escolheu
   if (esporte) formData.append("esporte", esporte);
-
   if (imagemSelecionada) formData.append("imagem", imagemSelecionada);
 
   try {
@@ -474,7 +474,7 @@ async function criarPost() {
       }
       imagemSelecionada = null;
       if (selectEsporte) selectEsporte.value = "";
-      await carregarFeed(); // recarrega o feed geral
+      await carregarFeed();
     } else {
       alert(dados.message || "Erro ao publicar.");
     }
@@ -483,7 +483,6 @@ async function criarPost() {
     alert("Erro no servidor. Tente novamente.");
   }
 }
-
 
 // ================== MOSTRAR ESPORTES ==================
 async function carregarEsportes() {
@@ -525,18 +524,14 @@ async function carregarEsportes() {
         </a>
       `;
 
-      //  Quando clica, o nome fica verde e o feed é filtrado
       div.addEventListener("click", () => {
-        // remove ativo dos outros
         document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
           link.classList.remove("ativo");
         });
 
-        // adiciona ativo ao clicado
         const link = div.querySelector("a");
         link.classList.add("ativo");
 
-        // filtra feed
         carregarFeed(nome);
       });
 

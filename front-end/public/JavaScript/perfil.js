@@ -24,11 +24,30 @@ function caminhoBanner(banner) {
   return `http://localhost:3000/uploads/${banner}`;
 }
 
-// ===== PREENCHER PERFIL =====
+// 🔥 FUNÇÃO NOVA: Pega o CPF correto (URL ou localStorage)
+function obterCPFDaPagina() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const cpfDaURL = urlParams.get('cpf');
+  return cpfDaURL || localStorage.getItem("cpf");
+}
+
+// 🔥 FUNÇÃO NOVA: Verifica se é o próprio perfil
+function ehPerfilProprio() {
+  const cpfDaPagina = obterCPFDaPagina();
+  const cpfLogado = localStorage.getItem("cpf");
+  return cpfDaPagina === cpfLogado;
+}
+
+// ===== PREENCHER PERFIL (CORRIGIDO) =====
 async function preencherPerfil() {
   console.log("preencherPerfil() iniciado");
-  const cpf = localStorage.getItem("cpf");
-  if (!cpf) return console.warn("CPF não encontrado no localStorage");
+  
+  // 🔥 CORREÇÃO: Pega CPF da URL ou localStorage
+  const cpf = obterCPFDaPagina();
+  
+  if (!cpf) return console.warn("CPF não encontrado");
+
+  console.log("🔍 Carregando perfil do CPF:", cpf);
 
   try {
     const resposta = await fetch(`http://localhost:3000/usuario/${encodeURIComponent(cpf)}`);
@@ -67,15 +86,30 @@ async function preencherPerfil() {
     // foto da nav
     const fotoNavbar = document.querySelector(".nav-user-icon img");
     if (fotoNavbar) fotoNavbar.src = foto;
+
+    // 🔥 NOVO: Esconde botão "Editar" se NÃO for seu perfil
+    const btnEditar = document.getElementById('btn-editar-perfil');
+    if (btnEditar) {
+      if (ehPerfilProprio()) {
+        btnEditar.style.display = 'block';
+      } else {
+        btnEditar.style.display = 'none';
+      }
+    }
+
   } catch (err) {
     console.error("Erro ao carregar perfil:", err);
   }
 }
 
-// ===== CARREGAR POSTS =====
+// ===== CARREGAR POSTS (CORRIGIDO) =====
 async function carregarPostsDoUsuario(filtroEsporte = "") {
-  const cpf = localStorage.getItem("cpf");
+  // 🔥 CORREÇÃO: Pega CPF da URL ou localStorage
+  const cpf = obterCPFDaPagina();
+  
   if (!cpf) return console.warn("CPF não encontrado para carregar posts");
+
+  console.log("📝 Carregando posts do CPF:", cpf);
 
   const container = document.getElementById("container-baixo");
   if (!container) return console.error("#container-baixo não encontrado no DOM");
@@ -105,6 +139,8 @@ async function carregarPostsDoUsuario(filtroEsporte = "") {
       posts = posts.filter(p => p.esporte && p.esporte.toLowerCase() === filtroEsporte.toLowerCase());
     }
 
+    const cpfLogado = localStorage.getItem("cpf");
+
     posts.forEach(post => {
       const card = document.createElement("div");
       card.className = "post";
@@ -127,7 +163,6 @@ async function carregarPostsDoUsuario(filtroEsporte = "") {
       `;
 
       // menu de excluir se for o dono
-      const cpfLogado = localStorage.getItem("cpf");
       if (post.cpf && post.cpf === cpfLogado) {
         const menuHtml = document.createElement("div");
         menuHtml.className = "post-menu";
@@ -179,79 +214,63 @@ async function carregarPostsDoUsuario(filtroEsporte = "") {
         card.appendChild(img);
       }
 
-      // data
       // Função utilitária: converte vários formatos para um Date local seguro
-function parseDateToLocal(input) {
-  if (!input) return null;
+      function parseDateToLocal(input) {
+        if (!input) return null;
+        if (input instanceof Date) return input;
+        if (!isNaN(Number(input))) return new Date(Number(input));
 
-  // se já for Date
-  if (input instanceof Date) return input;
+        const s = String(input).trim();
 
-  // number (timestamp)
-  if (!isNaN(Number(input))) {
-    return new Date(Number(input));
-  }
+        // formato dd/mm/yyyy [HH:MM:SS]
+        if (s.includes("/") && s.match(/^\d{1,2}\/\d{1,2}\/\d{4}/)) {
+          const [dataParte, tempoParte = "00:00:00"] = s.split(" ");
+          const [dia, mes, ano] = dataParte.split("/").map(n => parseInt(n, 10));
+          const [hh = "0", mm = "0", ss = "0"] = tempoParte.split(":");
+          return new Date(ano, mes - 1, dia, parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10));
+        }
 
-  // string
-  const s = String(input).trim();
+        // formato ISO com T
+        if (s.includes("T")) {
+          try {
+            return new Date(s);
+          } catch (e) {
+            // continua abaixo
+          }
+        }
 
-  // 1) formato dd/mm/yyyy [HH:MM:SS]
-  if (s.includes("/") && s.match(/^\d{1,2}\/\d{1,2}\/\d{4}/)) {
-    // separa parte de data e hora
-    const [dataParte, tempoParte = "00:00:00"] = s.split(" ");
-    const [dia, mes, ano] = dataParte.split("/").map(n => parseInt(n, 10));
-    const [hh = "0", mm = "0", ss = "0"] = tempoParte.split(":");
-    return new Date(ano, mes - 1, dia, parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10));
-  }
+        // formato yyyy-mm-dd HH:MM:SS
+        if (s.match(/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}(:\d{2})?/)) {
+          const [dataParte, tempoParte = "00:00:00"] = s.split(" ");
+          const [ano, mes, dia] = dataParte.split("-").map(n => parseInt(n, 10));
+          const [hh = "0", mm = "0", ss = "0"] = tempoParte.split(":");
+          return new Date(ano, mes - 1, dia, parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10));
+        }
 
-  // 2) formato ISO com T (ex: 2025-11-12T14:30:00Z ou sem Z)
-  if (s.includes("T")) {
-    // se termina com Z => já é UTC; new Date() entende corretamente
-    // se não termina com Z, muitos navegadores tratam como local, mas pra ser seguro:
-    try {
-      return new Date(s);
-    } catch (e) {
-      // fallback abaixo
-    }
-  }
+        const tentativa = new Date(s);
+        if (!isNaN(tentativa)) return tentativa;
 
-  // 3) formato yyyy-mm-dd HH:MM:SS (com espaço)
-  if (s.match(/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}(:\d{2})?/)) {
-    const [dataParte, tempoParte = "00:00:00"] = s.split(" ");
-    const [ano, mes, dia] = dataParte.split("-").map(n => parseInt(n, 10));
-    const [hh = "0", mm = "0", ss = "0"] = tempoParte.split(":");
-    return new Date(ano, mes - 1, dia, parseInt(hh, 10), parseInt(mm, 10), parseInt(ss, 10));
-  }
+        return null;
+      }
 
-  // 4) tentativa genérica com Date
-  const tentativa = new Date(s);
-  if (!isNaN(tentativa)) return tentativa;
-
-  // se nada funcionou
-  return null;
-} // data
-const dataDiv = document.createElement("div");
-dataDiv.className = "data";
-if (dataRaw) {
-  // converte para Date local de forma robusta
-  const d = parseDateToLocal(dataRaw);
-
-  if (d && !isNaN(d.getTime())) {
-    dataDiv.textContent = d.toLocaleString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  } else {
-    // se não conseguiu parsear, mostra o raw
-    dataDiv.textContent = dataRaw;
-  }
-}
-card.appendChild(dataDiv);
-
-
+      // data
+      const dataDiv = document.createElement("div");
+      dataDiv.className = "data";
+      if (dataRaw) {
+        const d = parseDateToLocal(dataRaw);
+        if (d && !isNaN(d.getTime())) {
+          dataDiv.textContent = d.toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+        } else {
+          dataDiv.textContent = dataRaw;
+        }
+      }
+      card.appendChild(dataDiv);
 
       // === CURTIDAS ===
       const curtidaDiv = document.createElement("div");
@@ -346,14 +365,16 @@ card.appendChild(dataDiv);
   } catch (err) {
     console.error("Erro ao carregar posts do usuário:", err);
   }
-} 
+}
 
-// ===== ESPORTES (LADO ESQUERDO) =====
+// ===== ESPORTES (CORRIGIDO) =====
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
   if (!container) return console.warn("Elemento #atalhos-esportes não encontrado.");
 
-  const cpf = localStorage.getItem("cpf");
+  // 🔥 CORREÇÃO: Pega CPF da URL ou localStorage
+  const cpf = obterCPFDaPagina();
+  
   if (!cpf) {
     container.innerHTML = "<p>CPF não encontrado. Faça login para ver seus esportes.</p>";
     return;
@@ -365,10 +386,15 @@ async function carregarEsportes() {
     const esportes = await resposta.json();
     const caminhoImagens = "ImagensEscolhaEsportes/";
 
-    container.innerHTML = "<p>Seus esportes</p>";
+    // 🔥 NOVO: Muda título se for perfil de outra pessoa
+    const titulo = ehPerfilProprio() ? "Seus esportes" : "Esportes";
+    container.innerHTML = `<p>${titulo}</p>`;
 
     if (!Array.isArray(esportes) || esportes.length === 0) {
-      container.insertAdjacentHTML("beforeend", "<p>Você ainda não escolheu esportes.</p>");
+      const msg = ehPerfilProprio() 
+        ? "Você ainda não escolheu esportes." 
+        : "Este usuário ainda não escolheu esportes.";
+      container.insertAdjacentHTML("beforeend", `<p>${msg}</p>`);
       return;
     }
 
@@ -402,19 +428,11 @@ async function carregarEsportes() {
     });
   } catch (erro) {
     console.error("Erro ao carregar esportes:", erro);
-    container.innerHTML = `<p>Erro ao carregar seus esportes: ${escapeHtml(erro.message)}</p>`;
+    container.innerHTML = `<p>Erro ao carregar esportes: ${escapeHtml(erro.message)}</p>`;
   }
 }
 
-// ===== INICIALIZAÇÃO =====
-document.addEventListener("DOMContentLoaded", () => {
-  preencherPerfil();
-  carregarPostsDoUsuario();
-  carregarEsportes();
-  console.log("perfil inicializado");
-});
-
-
+// ===== CRIAR POST (mantém como está, só posta no seu perfil) =====
 async function criarPost() {
   const texto = document.getElementById("post-text").value.trim();
   const cpf = localStorage.getItem("cpf");
@@ -447,7 +465,7 @@ async function criarPost() {
       document.getElementById("post-text").value = "";
       document.getElementById("input-imagem").value = "";
       imagemSelecionada = null;
-      await carregarFeed();
+      await carregarPostsDoUsuario();
     } else {
       alert(dados.message || "Erro ao publicar.");
     }
@@ -457,36 +475,30 @@ async function criarPost() {
   }
 }
 
-// =================================================================
-// FUNÇÃO DE NAVEGAÇÃO PARA EDIÇÃO DE PERFIL
-// =================================================================
+// ===== BOTÃO EDITAR =====
 function configurarBotaoEditar() {
-    const btnEditar = document.getElementById('btn-editar-perfil');
-    
-    if (btnEditar) {
-        btnEditar.addEventListener('click', () => {
-            console.log('Botão Editar Perfil clicado. Redirecionando...');
-            window.location.href = 'editPerfil.html'; 
-        });
-    } else {
-        console.warn("Elemento com ID 'btn-editar-perfil' não encontrado. O botão de edição pode estar ausente.");
-    }
-}
- var configmenu = document.querySelector(".config-menu");
-  function configuracoesMenuAlter() {
-    configmenu.classList.toggle("config-menu-height");
+  const btnEditar = document.getElementById('btn-editar-perfil');
+  
+  if (btnEditar) {
+    btnEditar.addEventListener('click', () => {
+      console.log('Botão Editar Perfil clicado. Redirecionando...');
+      window.location.href = 'editPerfil.html'; 
+    });
+  } else {
+    console.warn("Elemento com ID 'btn-editar-perfil' não encontrado.");
   }
+}
 
+var configmenu = document.querySelector(".config-menu");
+function configuracoesMenuAlter() {
+  configmenu.classList.toggle("config-menu-height");
+}
 
-// ===== inicialização (Tudo que deve rodar ao carregar a página) =====
+// ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
-    // Chamadas principais
-    preencherPerfil();
-    //carregarFeed();
-    carregarEsportes();
-    
-    
-    // Chamada do botão de edição
-    configurarBotaoEditar(); 
+  preencherPerfil();
+  carregarPostsDoUsuario();
+  carregarEsportes();
+  configurarBotaoEditar(); 
+  console.log("perfil inicializado");
 });
-
