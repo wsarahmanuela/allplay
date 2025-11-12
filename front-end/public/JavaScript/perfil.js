@@ -248,7 +248,32 @@ async function carregarPostsDoUsuario(filtroEsporte = "") {
     console.error("Erro ao carregar posts do usuário:", err);
   }
 }
+// ====== SEGUIDORES E SEGUINDO (Yago) =====
+async function carregarSeguidores(){
+  const cpf = localStorage.getItem("cpf");
+ try {
+      
+      const response = await fetch(`/seguidores/${encodeURIComponent(cpf)}`, {
+            method: "GET"
+        });
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar contagem. Status: ${response.status}`);
+        }
 
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Contagem de seguidores:', data.seguidores);
+            console.log('Contagem de seguindo:', data.seguindo);
+
+            // ATUALIZE SEUS ELEMENTOS HTML AQUI
+            document.getElementById('seguidores').innerText ="seguidores\n " +data.seguidores ;
+            document.getElementById('seguindo').innerText = "seguindo\n "+ data.seguindo ;
+        }
+    } catch (error) {
+        console.error('Erro ao buscar contagem:', error);
+    }
+}
 // ===== ESPORTES (LADO ESQUERDO) =====
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
@@ -309,7 +334,9 @@ async function carregarEsportes() {
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
+
   preencherPerfil();
+  carregarSeguidores();
   carregarPostsDoUsuario();
   carregarEsportes();
   console.log("perfil inicializado");
@@ -349,6 +376,7 @@ async function criarPost() {
       document.getElementById("input-imagem").value = "";
       imagemSelecionada = null;
       await carregarFeed();
+    
     } else {
       alert(dados.message || "Erro ao publicar.");
     }
@@ -385,8 +413,8 @@ document.addEventListener("DOMContentLoaded", () => {
     preencherPerfil();
     //carregarFeed();
     carregarEsportes();
-    
-    
+    //carregar os Seguidores
+     carregarSeguidores();
     // Chamada do botão de edição
     configurarBotaoEditar(); 
 });

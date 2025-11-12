@@ -220,10 +220,30 @@ i {
     font-size: 10px;
     padding: 4px 0;
 }
-.sidebar-ads{
+.ad-carousel {
+    position: relative;
+    overflow: hidden;
+    height: auto; 
+}
+
+
+.ad-slide {
+    display: none;
+    transition: opacity 0.5s ease-in-out; 
+    opacity: 0;
+}
+
+
+.ad-slide.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Garante que a imagem se ajuste */
+.sidebar-ads {
     width: 100%;
-    margin-bottom: 20px;
-    border-radius: 4px;
+    height: auto;
+    display: block;
 }
 .sidebar-text{
     font-size: 12px;

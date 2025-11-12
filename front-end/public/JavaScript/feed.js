@@ -534,9 +534,37 @@ var configmenu = document.querySelector(".config-menu");
 function configuracoesMenuAlter() {
   configmenu.classList.toggle("config-menu-height");
 }
+// ===================== CARROSSEL =======================
+function carregarCarrossel(){
+  const slides = document.querySelectorAll('.ad-slide');
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    const intervalTime = 5000; // 5000ms = 5 segundos
+
+    function showSlide(index) {
+   
+        slides.forEach(slide => {
+            slide.classList.remove('active');
+        });
+ 
+        slides[index].classList.add('active');
+    }
+
+    function nextSlide() {
+
+        currentSlide = (currentSlide + 1) % totalSlides;
+        showSlide(currentSlide);
+    }
+
+
+    setInterval(nextSlide, intervalTime);
+
+    showSlide(currentSlide);
+}
 
 // ================== INICIALIZAÇÃO ==================
 document.addEventListener("DOMContentLoaded", () => {
+  carregarCarrossel();
   preencherPerfil();
   carregarFeed();
   carregarEsportes();

@@ -407,6 +407,7 @@ nav {
 
 .seguindo,
 .seguidores {
+    text-align: center;
     flex: 0 0 48%;
     height: 40px;
     display: flex;

@@ -31,7 +31,7 @@ const upload = multer({ storage });
 const connection = mysql2.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'Glsarah25!',
+  password: 'admin',
   database: 'pi_bbd'
 });
 
@@ -237,7 +237,70 @@ app.get("/esportes/:cpf", (req, res) => {
     }
   );
 });
+// CARREGAR SEGUIDORES 
+const queryPromise = (sql, params) => {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, params, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            resolve(results);
+        });
+    });
+};
 
+app.get('/seguidores/:cpf', async (req, res) => {
+    const cpf = req.params.cpf;
+    
+    console.log(`\n Rota /seguidores/:cpf chamada com:`);
+    console.log(`   CPF: ${cpf}`);
+
+    if (!cpf) {
+        return res.status(400).json({ success: false, message: 'CPF é obrigatório.' });
+    }
+
+    // Consulta A: Contar quantos SEGUIDORES o usuário TEM (ele é o CPF_seguido)
+    const seguidoresQuery = `
+        SELECT COUNT(*) AS total_seguidores 
+        FROM Seguidores 
+        WHERE CPF_seguido = ?
+    `;
+
+    // Consulta B: Contar quantos o usuário ESTÁ SEGUINDO (ele é o CPF_seguidor)
+    const seguindoQuery = `
+        SELECT COUNT(*) AS total_seguindo 
+        FROM Seguidores 
+        WHERE CPF_seguidor = ?
+    `;
+
+    try {
+        // Executa as duas consultas em PARALELO e espera o resultado de ambas
+        const [resultadosSeguidores, resultadosSeguindo] = await Promise.all([
+            queryPromise(seguidoresQuery, [cpf]),
+            queryPromise(seguindoQuery, [cpf])
+        ]);
+
+        const totalSeguidores = resultadosSeguidores[0]?.total_seguidores || 0;
+        const totalSeguindo = resultadosSeguindo[0]?.total_seguindo || 0;
+        
+        console.log(` Contagem encontrada: Seguidores: ${totalSeguidores}, Seguindo: ${totalSeguindo}`);
+
+        res.json({
+            success: true,
+            seguidores: totalSeguidores,
+            seguindo: totalSeguindo
+        });
+
+    } catch (erro) {
+        console.error('Erro ao buscar contagens de seguidores:', erro);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Erro no servidor ao buscar a contagem.',
+            // Opcional, mas útil para debug
+            error: erro.message 
+        });
+    }
+});
 // CARREGAR FEED  
 async function carregarFeed() {
   console.log("Tentando carregar o feed...");
@@ -287,10 +350,6 @@ let query = `
   WHERE p.autor_CPF = ?
 `;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 9e1fe6eee3ee62f21630c36423d79fc6c7055e42
   const params = [cpf];
 
   if (esporte) {
@@ -731,12 +790,12 @@ app.put("/usuario/atualizar", (req, res) => {
 
   const sql = `
         UPDATE usuario 
-        SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
+        SET nomeUsuario = ?, bio = ?, 
         WHERE cpf = ?
     `;
 
 
-  connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
+  connection.query(sql, [, nomeUsuario, bio, cpf], (erro, resultados) => {
 
     if (erro) {
       console.error("Erro ao atualizar perfil:", erro);
