@@ -319,7 +319,76 @@ async function carregarFeed(filtroEsporte = "") {
     console.error("Erro ao carregar o feed:", erro);
   }
 }
+// ================== PREVIEW + REMOVER IMAGEM ==================
+document.addEventListener("DOMContentLoaded", () => {
 
+  const inputImagem = document.getElementById("input-imagem");
+  const preview = document.getElementById("preview-imagem");
+
+  if (!inputImagem || !preview) {
+    console.warn("Elementos de imagem não encontrados.");
+    return;
+  }
+
+  let btnRemover = document.createElement("button");
+  btnRemover.id = "btn-remover-imagem";
+  btnRemover.innerHTML = "✕";
+
+  Object.assign(btnRemover.style, {
+    position: "absolute",
+    top: "8px",
+    right: "8px",
+    background: "rgba(0,0,0,0.6)",
+    color: "white",
+    border: "none",
+    borderRadius: "50%",
+    width: "30px",
+    height: "30px",
+    cursor: "pointer",
+    display: "none",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "16px",
+    padding: "0",
+    zIndex: "100"
+  });
+
+  const previewContainer = preview.parentElement;
+  previewContainer.style.position = "relative";
+  previewContainer.appendChild(btnRemover);
+
+  inputImagem.addEventListener("change", (e) => {
+    const arquivo = e.target.files[0];
+
+    if (arquivo) {
+      imagemSelecionada = arquivo;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        preview.src = ev.target.result;
+        preview.style.display = "block";
+        btnRemover.style.display = "flex";
+      };
+
+      reader.readAsDataURL(arquivo);
+
+    } else {
+      limparPreview();
+    }
+  });
+
+  function limparPreview() {
+    imagemSelecionada = null;
+    preview.src = "";
+    preview.style.display = "none";
+    inputImagem.value = "";
+    btnRemover.style.display = "none";
+  }
+
+  btnRemover.addEventListener("click", () => {
+    limparPreview();
+  });
+});
 // ================== BARRA DE PESQUISA ==================
 const searchInput = document.getElementById("searchInput");
 const resultsDiv = document.getElementById("resultsDiv");
