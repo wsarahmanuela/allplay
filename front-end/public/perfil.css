@@ -86,7 +86,8 @@ nav {
     outline: none;
     border: 0;
 }
-.config-menu{
+
+.config-menu {
     position: absolute;
     width: 90%;
     max-width: 350px;
@@ -99,9 +100,11 @@ nav {
     max-height: 0;
     transition: max-height 0.3s;
 }
-.config-menu-height{
+
+.config-menu-height {
     max-height: 450px;
 }
+
 /* ======================= CONTAINER GERAL DA PÁGINA ======================= */
 .container {
     display: flex;
@@ -114,7 +117,6 @@ nav {
 }
 
 /* ======================= LATERAL ESQUERDA ======================= */
-
 .left-sidebar {
     flex: none;
     width: 200px;
@@ -123,8 +125,6 @@ nav {
     align-self: flex-start;
 }
 
-
-/* Links principais */
 .imp-links a,
 .shortcut-links a {
     text-decoration: none;
@@ -138,39 +138,26 @@ nav {
     transition: color 0.3s;
 }
 
-/* Ícones */
 .imp-links a img,
 .shortcut-links a img {
     width: 25px;
     margin-right: 15px;
 }
 
-/* Hover */
 .imp-links a:hover,
 .shortcut-links a:hover {
     color: #0f9800;
 }
 
-/* Último link da seção */
 .imp-links a:last-child {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-    color: #626262;
-    width: fit-content;
-    transition: color 0.3s;
-    cursor: pointer;
-    gap: 15px; /* espaço entre ícone e texto */
+    gap: 15px;
 }
 
-/* Linha divisória */
 .imp-links {
     border-bottom: 1px solid #ccc;
     padding-bottom: 10px;
 }
 
-/* Título "Seus esportes" */
 .shortcut-links p {
     margin: 25px 0;
     color: #626262;
@@ -178,7 +165,6 @@ nav {
     font-family: 'Poppins', sans-serif;
 }
 
-/* Ícones maiores nos esportes */
 .shortcut-links a img {
     width: 30px;
     margin-right: 15px;
@@ -192,7 +178,6 @@ nav {
     width: 100%;
 }
 
-/* CONTÊINER PRINCIPAL (BANNER/GRADIENTE) */
 #container-meio {
     background: linear-gradient(90deg, #fff, #a1ebc0, #58EF7B, #2BA848, #0D7826);
     border-radius: 10px;
@@ -203,10 +188,9 @@ nav {
     justify-content: flex-start;
     padding: 1rem;
     position: relative;
-    top:5px;
+    top: 5px;
 }
 
-/* BANNER (PARA RECEBER IMAGEM VIA JS) */
 #banner-perfil {
     width: 100%;
     height: 100%;
@@ -219,7 +203,6 @@ nav {
     border-radius: 10px;
 }
 
-/* CONTÊINER DA FOTO DE PERFIL */
 .usuario-foto {
     position: absolute;
     bottom: -65px;
@@ -227,7 +210,6 @@ nav {
     z-index: 2;
 }
 
-/* IMAGEM DA FOTO DE PERFIL */
 .usuario-foto img {
     width: 150px;
     height: 150px;
@@ -236,11 +218,9 @@ nav {
     margin-top: 250px;
 }
 
-/* NOME E BOTÃO EDITAR */
 #container-segue {
     display: flex;
     justify-content: space-between;
-
     position: relative;
     margin-left: 200px;
     margin-top: 15px;
@@ -251,6 +231,19 @@ nav {
     flex-direction: column;
 }
 
+.nome h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.nome h5 {
+    margin: 0;
+    color: #333;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
 .seguir h3 {
     margin-left: 220px;
     background-color: #41db51;
@@ -259,24 +252,6 @@ nav {
     cursor: pointer;
     font-size: 1rem;
 }
-
-.nome h5 {
-    margin: 0;
-    color: #333;
-    font-weight: 500;
-    font-size: 1rem;
-    display: flex;
-}
-
-.nome h3 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
-    display: flex;
-    
-}
-
-
 
 /* ======================= ÁREA DE PUBLICAÇÕES ======================= */
 #container-baixo {
@@ -307,7 +282,6 @@ nav {
     opacity: 0.7;
 }
 
-
 /* ======================= CONTAINER CENTRAL PERFIL ======================= */
 .perfil-container {
     display: flex;
@@ -321,90 +295,25 @@ nav {
     padding: 0 20px;
 }
 
-/* Garante que o conteúdo principal fique centralizado */
 .main-content {
     flex: 1;
     max-width: 1000px;
 }
 
-/* Define largura fixa para a lateral direita e espaçamento */
-#container-direita {
-    flex: none;
-    width: 280px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 2px 8px rgba(0, 0, 0, 0.08);
-    height: fit-content;
-    margin-top: 5px;
-}
-
-/* Publicação */
-.publicacao-card {
-    background: #fff;
-    width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-}
-
-.publicacao-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.publicacao-header img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.publicacao-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.publicacao-info .nome {
-    font-weight: 600;
-    color: #222;
-}
-
-.publicacao-info .username {
-    font-size: 14px;
-    color: #666;
-}
-
-.publicacao-conteudo {
-    font-size: 15px;
-    color: #333;
-    margin-left: 55px;
-    line-height: 1.5;
-}
-
-.publicacao-data {
-    font-size: 13px;
-    color: #777;
-    margin-left: 55px;
-    margin-top: 5px;
-}
-
 /* ======================= LATERAL DIREITA ======================= */
 #container-direita {
+    flex: none;
+    width: 300px;
     background: #fff;
     border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     padding: 1rem;
-    width: 18vw;
-    min-width: 200px;
-    height: 80vh;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-height: fit-content;
+    height: auto;
+    margin-top: 5px;
 }
 
 .seguindo-seguidores {
@@ -457,10 +366,8 @@ nav {
     border-radius: 12px;
     font-family: 'Poppins', sans-serif;
     text-align: center;
-    box-sizing: border-box;
 }
 
-/* Biografia */
 .biografia h2 {
     font-size: 24px;
     color: #333;
@@ -480,54 +387,237 @@ nav {
     color: #000;
 }
 
-/* Clubes */
+/* ======================= CLUBES ======================= */
 .clubes {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-    box-sizing: border-box;
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .clubes h2 {
-    grid-column: 1 / -1;
-    font-size: 24px;
+    margin: 0 0 15px 0;
+    font-size: 18px;
     color: #333;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #2BA848;
-    display: inline-block;
-    padding-bottom: 5px;
+    font-weight: 600;
 }
 
 .clube-card {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-left: 3px solid #00c853;
+    transition: all 0.2s ease;
     width: 100%;
-    padding: 15px 10px;
-    border-radius: 12px;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    box-sizing: border-box;
+}
+
+.clube-card:last-child {
+    margin-bottom: 0;
+}
+
+.clube-card:hover {
+    background: #e8f5e9;
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(0, 200, 83, 0.15);
 }
 
 .clube-card p {
-    font-size: 14px;
-    color: #555;
-    margin: 5px 0;
+    margin: 0;
+    line-height: 1.5;
 }
 
-.clube-card p strong {
-    color: #000;
+.clube-card p:first-child {
+    font-size: 15px;
+    color: #333;
+    font-weight: 600;
 }
-/*------ Post (Estilo da Primeira Imagem/Feed) ------ */
-.post {
-  background-color: #fff;
-  padding: 15px;
-  margin-bottom: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-  font-family: "Poppins", sans-serif;
+
+.clube-card p:last-child {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
 }
+
+/* ======================= MODAL ======================= */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.ativo {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #e53935;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #0d7826;
+}
+
+.divisor {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+}
+
+.divisor::before,
+.divisor::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: #ddd;
+}
+
+.divisor::before {
+    left: 0;
+}
+
+.divisor::after {
+    right: 0;
+}
+
+.divisor span {
+    background: white;
+    padding: 0 12px;
+    color: #999;
+    font-size: 13px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-cancelar-modal,
+.btn-salvar-modal {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancelar-modal {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #666;
+}
+
+.btn-cancelar-modal:hover {
+    background: #e0e0e0;
+}
+
+.btn-salvar-modal {
+    background: #0d7826;
+    border: none;
+    color: white;
+}
+
+.btn-salvar-modal:hover {
+    background: #0a5c1e;
+}
+
+.btn-salvar-modal:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* ======================= POST/PUBLICAÇÃO ======================= */
 .post {
     width: 100%;
     max-width: none;
@@ -540,26 +630,7 @@ nav {
     font-family: "Poppins", sans-serif;
 }
 
-.post-imagem {
-    width: 100%;
-    max-height: 400px;
-    border-radius: 10px;
-    margin-top: 10px;
-    object-fit: cover;
-}
-
-
 .post-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.foto-perfil {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -580,26 +651,10 @@ nav {
 }
 
 .post-info .nome {
-  font-weight: 600;
-  font-size: 15px;
-  color: #000;
+    font-weight: 600;
+    font-size: 15px;
+    color: #000;
 }
-
-.post-info .usuario {
-  font-size: 14px;
-  color: #555;
-  align-self: self-start;
-}
-
-.conteudo {
-  margin-top: 10px;
-  font-size: 15px;
-  color: #111;
-  white-space: pre-wrap;
-  align-self: self-start;
-  margin-left: 20px;
-}
-
 
 .post-info .usuario {
     font-size: 14px;
@@ -608,9 +663,18 @@ nav {
 
 .conteudo {
     margin-top: 10px;
+    margin-left: 20px;
     font-size: 15px;
     color: #111;
     white-space: pre-wrap;
+}
+
+.post-imagem {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 10px;
+    margin-top: 10px;
+    object-fit: cover;
 }
 
 .data {
@@ -630,11 +694,10 @@ nav {
     border: none;
     font-size: 20px;
     cursor: pointer;
-    color: #000000;
+    color: #000;
 }
 
 .menu-opcoes {
-
     display: none;
     position: absolute;
     right: 0;
@@ -642,7 +705,7 @@ nav {
     background: white;
     border: 1px solid #ddd;
     border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(255, 3, 3, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
 
@@ -664,67 +727,44 @@ nav {
 .menu-opcoes button:hover {
     background: #f5f5f5;
 }
+
+/* ======================= CURTIDAS ======================= */
 .curtidas {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .btn-curtir {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.btn-curtir.curtido {
-  color: red;
-  transform: scale(1.1);
-}
-
-.contador-curtidas {
-  font-size: 14px;
-  color: #555;
-}
-.curtidas {
-  display: flex;
-  align-items: center;
-  gap: 6px; /* espaço entre coração e número */
-  margin-top: 6px;
-}
-
-.btn-curtir {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  outline: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    outline: none;
 }
 
 .btn-curtir svg {
-  width: 24px;
-  height: 24px;
-  stroke: #444;
-  fill: none;
-  transition: all 0.3s ease;
-  overflow: visible;
+    width: 24px;
+    height: 24px;
+    stroke: #444;
+    fill: none;
+    transition: all 0.3s ease;
 }
 
 .btn-curtir:hover svg {
-  transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 .btn-curtir.curtido svg {
-  fill: red;
-  stroke: red;
+    fill: red;
+    stroke: red;
 }
 
 .contador-curtidas {
-  font-size: 14px;
-  color: #555;
+    font-size: 14px;
+    color: #555;
 }

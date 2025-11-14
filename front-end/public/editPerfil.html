@@ -75,23 +75,19 @@
         <section class="esportes">
             <h3>Esportes Favoritos</h3>
 
-            <div class="tags">
+            <!-- Tags de esportes escolhidos -->
+            <div class="tags"></div>
 
+            <!-- Campo com dropdown personalizado -->
+            <div class="input-com-dropdown">
+                <input type="text" id="input-novo-esporte" placeholder="Selecione um esporte" readonly />
+                <span class="dropdown-arrow">▼</span>
+
+                <!-- Lista de esportes -->
+                <ul id="lista-sugestoes-custom" class="lista-sugestoes">
+                    <!-- Os esportes serão inseridos aqui via JS -->
+                </ul>
             </div>
-
-            <div class="add-esporte">
-                    <div class="input-com-dropdown">
-                        <input type="text" id="input-novo-esporte" placeholder="Adicionar outro esporte...">
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                         <ul id="lista-sugestoes-custom" class="lista-sugestoes"></ul>
-                        </ul>
-                    </div>
-                <button id="btn-adicionar-esporte">Adicionar</button>
-            </div>
-
-            <datalist id="lista-esportes">
-            </datalist>
-
         </section>
 
         <!-- Clubes que frequento -->
@@ -99,16 +95,54 @@
             <h3>Clubes que frequento</h3>
             <div class="lista-clubes">
                 <div class="clube">
-                    <p><strong>Tupi Gaspar</strong><br><small>Futebol</small></p>
-                    <button class="remover">&times;</button>
-                </div>
-                <div class="clube">
-                    <p><strong>AESC</strong><br><small>Vôlei</small></p>
-                    <button class="remover">&times;</button>
+
                 </div>
             </div>
             <button class="btn-adicionar">Adicionar clube</button>
         </section>
+
+        <div id="modal-clube" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Adicionar Clube</h3>
+                    <button class="modal-close" id="fechar-modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Opção 1: Selecionar clube existente -->
+                    <div class="form-group">
+                        <label>Selecione um clube existente:</label>
+                        <select id="select-clube-existente">
+                            <option value="">-- Selecione um clube --</option>
+                            <!-- Será preenchido via JavaScript -->
+                        </select>
+                    </div>
+
+                    <div class="divisor">
+                        <span>OU</span>
+                    </div>
+
+                    <!-- Opção 2: Cadastrar novo clube -->
+                    <div class="form-group">
+                        <label>Nome do novo clube:</label>
+                        <input type="text" id="input-nome-clube" placeholder="Ex: Tupi Gaspar">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Esporte principal:</label>
+                        <select id="select-esporte-clube">
+                            <option value="">-- Selecione o esporte --</option>
+                            <!-- Será preenchido com os esportes da lista mestra -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-cancelar-modal" id="cancelar-clube">Cancelar</button>
+                    <button class="btn-salvar-modal" id="salvar-clube">Adicionar</button>
+                </div>
+            </div>
+        </div>
 
     </main>
 
