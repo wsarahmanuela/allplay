@@ -319,7 +319,7 @@ async function carregarFeed(filtroEsporte = "") {
     console.error("Erro ao carregar o feed:", erro);
   }
 }
-// ================== PREVIEW + REMOVER IMAGEM ==================
+// ==================  REMOVER IMAGEM ==================
 document.addEventListener("DOMContentLoaded", () => {
 
   const inputImagem = document.getElementById("input-imagem");
