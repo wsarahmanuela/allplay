@@ -174,15 +174,16 @@ app.get('/teste-banco', (req, res) => {
 //CADASTRO02 -----------------------------------------------------------------
 
 app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
-  const { cpf, bio } = req.body;
+  const { cpf, bio, nomeUsuario } = req.body; // ✅ Adicione nomeUsuario aqui
   const foto = req.file ? req.file.filename : null;
 
-  if (!cpf || !bio || !foto) {
+  if (!cpf || !bio || !foto || !nomeUsuario) { // ✅ Valide o nomeUsuario também
     return res.status(400).json({ success: false, message: "Dados incompletos." });
   }
 
-  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ? WHERE cpf = ?";
-  connection.query(sql, [bio, foto, cpf], (erro) => {
+  // ✅ Adicione nomeUsuario no UPDATE
+  const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ?, nomeUsuario = ? WHERE cpf = ?";
+  connection.query(sql, [bio, foto, nomeUsuario, cpf], (erro) => {
     if (erro) {
       console.error(erro);
       return res.status(500).json({ success: false, message: "Erro ao salvar no banco." });
@@ -221,22 +222,30 @@ app.post('/esportes', (req, res) => {
   });
 });
 
-app.get("/esportes/:cpf", (req, res) => {
-  const cpf = req.params.cpf;
+app.get("/esportes/mestra", (req, res) => {
+  const sql = "SELECT * FROM esporte ORDER BY nome ASC";
 
-  connection.query(
-    "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
-    [cpf],
-    (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
-      }
+  console.log("🔍 Executando query:", sql);
 
-      const esportes = rows.map(r => r.nome_esporte);
-      res.json(esportes);
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ Erro ao buscar esportes:", err);
+      return res.status(500).json({ error: "Erro ao buscar esportes." });
     }
-  );
+
+    console.log("✅ Resultados brutos do banco:", results);
+    console.log("📊 Número de registros:", results.length);
+
+    if (results.length > 0) {
+      console.log("📝 Primeiro registro:", results[0]);
+      console.log("🔑 Colunas disponíveis:", Object.keys(results[0]));
+    }
+
+    const esportes = results.map(row => row.nome);
+    console.log("📤 Enviando para o frontend:", esportes);
+
+    res.json(esportes);
+  });
 });
 
 // CARREGAR FEED  
@@ -261,7 +270,7 @@ async function carregarFeed() {
   } catch (erro) {
     console.error("Erro fatal ao carregar o feed:", erro);
   }
-}
+};
 
 // ===================== PUBLICAÇÕES DO USUÁRIO =====================
 app.get('/publicacoes/:cpf', (req, res) => {
@@ -319,24 +328,29 @@ app.get('/publicacoes/:cpf', (req, res) => {
 app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
-  try {
-    await connection
-      .promise()
-      .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
-
-    await connection
-      .promise()
-      .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
-
-    res.json({ success: true, message: 'Publicação excluída com sucesso!' });
-  } catch (error) {
-    console.error('Erro ao excluir publicação:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Erro ao excluir publicação.' });
+  if (esporte) {
+    query += ' AND p.esporte = ?';
+    params.push(esporte);
   }
-});
 
+  query += " ORDER BY p.data_publicacao DESC";
+
+  connection.query(query, params, (erro, resultados) => {
+    if (erro) {
+      console.error(" Erro ao buscar publicações do usuário:", erro);
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao carregar publicações do usuário."
+      });
+    }
+
+    console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
+    res.json({
+      success: true,
+      posts: resultados
+    });
+  });
+});
 
 // PUBLICACOES -------------------------------------------------------------
 app.post('/publicacoes', (req, res) => {
@@ -677,7 +691,7 @@ app.get("/search", (req, res) => {
 app.get("/usuario/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
-const sql = "SELECT nome, nomeUsuario, fotoDePerfil, bio, banner AS bannerURL, cidade FROM usuario WHERE cpf = ?"
+  const sql = "SELECT nome, nomeUsuario, fotoDePerfil, bio, banner AS bannerURL, cidade FROM usuario WHERE cpf = ?"
 
   connection.query(sql, [cpf], (erro, resultados) => {
     if (erro) {
@@ -698,30 +712,32 @@ const sql = "SELECT nome, nomeUsuario, fotoDePerfil, bio, banner AS bannerURL, c
 
 //==============EDITAR PERFIL==============
 
-// LISTA MESTRA DE ESPORTES (NOVA ROTA)
-app.get("/esportes/mestra", (req, res) => {
-  const sql = "SELECT nome FROM esporte ORDER BY nome ASC";
+app.get("/esportes/:cpf", (req, res) => {
+  const cpf = req.params.cpf;
 
-  connection.query(sql, (err, results) => {
-    if (err) {
-      console.error("Erro ao buscar esportes:", err);
-      return res.status(500).json({ error: "Erro ao buscar esportes." });
+  connection.query(
+    "SELECT nome_esporte FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?",
+    [cpf],
+    (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ mensagem: "Erro ao buscar esportes" });
+      }
+
+      const esportes = rows.map(r => r.nome_esporte);
+      res.json(esportes);
     }
-
-    console.log("Esportes encontrados no banco:", results);
-    const esportes = results.map(row => row.nome);
-    res.json(esportes);
-  });
+  );
 });
 
 // ==================== ROTA CORRETA DE UPLOAD DE FOTOS/BANNER ====================
 app.post("/usuario/upload-perfil/:cpf", upload.fields([
-  { name: 'fotoDePerfil', maxCount: 1 }, 
-  { name: 'banner', maxCount: 1 }     
+  { name: 'fotoDePerfil', maxCount: 1 },
+  { name: 'banner', maxCount: 1 }
 ]), (req, res) => {
   const cpf = req.params.cpf;
   const fotoDePerfilFile = req.files?.fotoDePerfil?.[0];
-  const bannerFile = req.files?.banner?.[0]; 
+  const bannerFile = req.files?.banner?.[0];
 
   if (!cpf) {
     return res.status(400).json({ success: false, message: "CPF é obrigatório." });
@@ -732,7 +748,7 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
 
   // 1. Verifica e adiciona o banner
   if (bannerFile) {
-    updates.push("banner = ?"); 
+    updates.push("banner = ?");
     params.push(bannerFile.filename);
   }
 
@@ -786,6 +802,209 @@ app.put("/usuario/atualizar", (req, res) => {
     }
 
     res.json({ success: true, message: "Dados do perfil atualizados com sucesso." });
+  });
+});
+
+
+// ==================== ROTAS DE CLUBES ====================
+// Adicione estas rotas no seu arquivo appbanco.js (Node.js)
+
+// 1. BUSCAR TODOS OS CLUBES CADASTRADOS
+app.get("/clubes/todos", (req, res) => {
+  const sql = "SELECT IDclube, nome, esporteClube FROM clube ORDER BY nome ASC";
+  
+  connection.query(sql, (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar clubes:", erro);
+      return res.status(500).json({ success: false, message: "Erro ao buscar clubes." });
+    }
+    
+    res.json(resultados);
+  });
+});
+
+// 2. BUSCAR CLUBES DE UM USUÁRIO ESPECÍFICO
+app.get("/usuario/:cpf/clubes", (req, res) => {
+  const cpf = req.params.cpf;
+  
+  const sql = `
+    SELECT c.IDclube, c.nome, c.esporteClube
+    FROM clube c
+    INNER JOIN usuario_clube uc ON c.IDclube = uc.IDclube
+    WHERE uc.cpf_usuario = ?
+    ORDER BY c.nome ASC
+  `;
+  
+  connection.query(sql, [cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar clubes do usuário:", erro);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Erro ao buscar clubes do usuário." 
+      });
+    }
+    
+    res.json({ success: true, clubes: resultados });
+  });
+});
+
+// 3. ADICIONAR CLUBE EXISTENTE AO USUÁRIO
+app.post("/usuario/clube/adicionar", (req, res) => {
+  const { cpf, idClube } = req.body;
+  
+  if (!cpf || !idClube) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "CPF e ID do clube são obrigatórios." 
+    });
+  }
+  
+  // Verifica se o usuário já tem esse clube
+  const checkSql = "SELECT * FROM usuario_clube WHERE cpf_usuario = ? AND IDclube = ?";
+  
+  connection.query(checkSql, [cpf, idClube], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao verificar clube:", erro);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Erro ao verificar clube." 
+      });
+    }
+    
+    if (resultados.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Você já adicionou este clube." 
+      });
+    }
+    
+    // Adiciona o clube ao usuário
+    const insertSql = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
+    
+    connection.query(insertSql, [cpf, idClube], (erro2) => {
+      if (erro2) {
+        console.error("Erro ao adicionar clube ao usuário:", erro2);
+        return res.status(500).json({ 
+          success: false, 
+          message: "Erro ao adicionar clube." 
+        });
+      }
+      
+      res.json({ success: true, message: "Clube adicionado com sucesso!" });
+    });
+  });
+});
+
+// 4. CRIAR NOVO CLUBE E ADICIONAR AO USUÁRIO
+app.post("/usuario/clube/criar", (req, res) => {
+  const { cpf, nomeClube, esporte } = req.body;
+  
+  if (!cpf || !nomeClube || !esporte) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "CPF, nome do clube e esporte são obrigatórios." 
+    });
+  }
+  
+  // Verifica se o clube já existe
+  const checkSql = "SELECT IDclube FROM clube WHERE nome = ? AND esporteClube = ?";
+  
+  connection.query(checkSql, [nomeClube, esporte], (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao verificar clube existente:", erro);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Erro ao verificar clube." 
+      });
+    }
+    
+    if (resultados.length > 0) {
+      // Clube já existe, apenas adiciona ao usuário
+      const idClubeExistente = resultados[0].IDclube;
+      
+      const insertRelacao = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
+      connection.query(insertRelacao, [cpf, idClubeExistente], (erro2) => {
+        if (erro2) {
+          console.error("Erro ao adicionar clube existente:", erro2);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Erro ao adicionar clube." 
+          });
+        }
+        
+        res.json({ 
+          success: true, 
+          message: "Clube adicionado com sucesso!" 
+        });
+      });
+      
+    } else {
+      // Cria novo clube
+      const insertClube = "INSERT INTO clube (nome, esporteClube) VALUES (?, ?)";
+      
+      connection.query(insertClube, [nomeClube, esporte], (erro3, resultado) => {
+        if (erro3) {
+          console.error("Erro ao criar novo clube:", erro3);
+          return res.status(500).json({ 
+            success: false, 
+            message: "Erro ao criar clube." 
+          });
+        }
+        
+        const novoIdClube = resultado.insertId;
+        
+        // Adiciona o novo clube ao usuário
+        const insertRelacao = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
+        
+        connection.query(insertRelacao, [cpf, novoIdClube], (erro4) => {
+          if (erro4) {
+            console.error("Erro ao adicionar novo clube ao usuário:", erro4);
+            return res.status(500).json({ 
+              success: false, 
+              message: "Erro ao adicionar clube." 
+            });
+          }
+          
+          res.json({ 
+            success: true, 
+            message: "Clube criado e adicionado com sucesso!" 
+          });
+        });
+      });
+    }
+  });
+});
+
+// 5. REMOVER CLUBE DO USUÁRIO
+app.delete("/usuario/clube/remover", (req, res) => {
+  const { cpf, idClube } = req.body;
+  
+  if (!cpf || !idClube) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "CPF e ID do clube são obrigatórios." 
+    });
+  }
+  
+  const sql = "DELETE FROM usuario_clube WHERE cpf_usuario = ? AND IDclube = ?";
+  
+  connection.query(sql, [cpf, idClube], (erro, resultado) => {
+    if (erro) {
+      console.error("Erro ao remover clube:", erro);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Erro ao remover clube." 
+      });
+    }
+    
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Clube não encontrado para este usuário." 
+      });
+    }
+    
+    res.json({ success: true, message: "Clube removido com sucesso!" });
   });
 });
 

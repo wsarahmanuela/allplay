@@ -176,25 +176,3 @@ input[type="text"]:focus {
   margin-top: 3px;
 }
 
-.butao {
-  background-color: #00c853;
-  color: white;
-  border: none;
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 15px;
-  margin-top: 25px;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  font-weight: 600;
-}
-
-.butao:hover {
-  background-color: #00b34a;
-  transform: scale(1.02);
-}
-
-.butao:active {
-  transform: scale(0.98);
-}

@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const leitor = new FileReader();
 
       leitor.addEventListener("load", function () {
-        // Esconde o ícone e mostra a imagem escolhida
         icone.style.display = "none";
         fotoPreview.style.backgroundImage = `url(${this.result})`;
         fotoPreview.style.backgroundSize = "cover";
@@ -20,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       leitor.readAsDataURL(arquivo);
     } else {
-      // Se o usuário cancelar, volta ao estado original
       icone.style.display = "flex";
       fotoPreview.style.backgroundImage = "none";
     }
@@ -33,16 +31,18 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const cpf = localStorage.getItem("cpf");
+    const nomeUsuario = document.getElementById("usuario").value.trim();
+    const foto = document.getElementById("upload-foto").files[0];
+    const bio = document.getElementById("bio").value.trim();
+
+    // === Validação dos campos ===
     if (!cpf) {
       alert("Erro: CPF não encontrado. Faça o cadastro novamente.");
       return;
     }
 
-    const foto = document.getElementById("upload-foto").files[0];
-    const bio = document.getElementById("bio").value.trim();
-
-    if (!foto || !bio) {
-      alert("Preencha todos os campos: Foto e Biografia!");
+    if (!foto || !bio || !nomeUsuario) {
+      alert("Preencha todos os campos: Foto, Nome de usuário e Biografia!");
       return;
     }
 
@@ -50,14 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData();
     formData.append("cpf", cpf);
     formData.append("bio", bio);
-    formData.append("foto", foto); // campo deve ter o mesmo nome usado no upload.single("foto")
+    formData.append("foto", foto);
+    formData.append("nomeUsuario", nomeUsuario); // <-- Adicionamos aqui!
 
-    console.log("Enviando dados do cadastro:", { cpf, bio, foto: foto.name });
+    console.log("Enviando dados do cadastro:", { cpf, nomeUsuario, bio, foto: foto.name });
 
     try {
       const resposta = await fetch("http://localhost:3000/cadastro/foto", {
         method: "POST",
-        body: formData // NÃO usa headers Content-Type aqui — o browser define automaticamente
+        body: formData
       });
 
       if (!resposta.ok) {
@@ -74,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         throw new Error(resultado.message || "Erro desconhecido no servidor.");
       }
-
+      
     } catch (erro) {
       console.error("Erro fatal ao finalizar o cadastro:", erro);
       alert("Erro ao finalizar o cadastro: " + erro.message);
