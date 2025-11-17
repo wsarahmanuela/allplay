@@ -68,6 +68,7 @@ nav {
     display: flex;
     align-items: center;
     padding: 0 15px;
+    position: relative;
 }
 .search-box img{
     width: 18px; 

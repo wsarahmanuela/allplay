@@ -246,7 +246,65 @@ app.get("/esportes/mestra", (req, res) => {
     res.json(esportes);
   });
 });
+const queryPromise = (sql, params) => {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, params, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            resolve(results);
+        });
+    });
+};
 
+app.get('/seguidores/:cpf', async (req, res) => {
+    const cpf = req.params.cpf;
+    
+    console.log(`\n Rota /seguidores/:cpf chamada com:`);
+    console.log(`   CPF: ${cpf}`);
+
+    if (!cpf) {
+        return res.status(400).json({ success: false, message: 'CPF é obrigatório.' });
+    }
+    const seguidoresQuery = `
+        SELECT COUNT(*) AS total_seguidores 
+        FROM Seguidores 
+        WHERE CPF_seguido = ?
+    `;
+    const seguindoQuery = `
+        SELECT COUNT(*) AS total_seguindo 
+        FROM Seguidores 
+        WHERE CPF_seguidor = ?
+    `;
+
+    try {
+
+        const [resultadosSeguidores, resultadosSeguindo] = await Promise.all([
+            queryPromise(seguidoresQuery, [cpf]),
+            queryPromise(seguindoQuery, [cpf])
+        ]);
+
+        const totalSeguidores = resultadosSeguidores[0]?.total_seguidores || 0;
+        const totalSeguindo = resultadosSeguindo[0]?.total_seguindo || 0;
+        
+        console.log(` Contagem encontrada: Seguidores: ${totalSeguidores}, Seguindo: ${totalSeguindo}`);
+
+        res.json({
+            success: true,
+            seguidores: totalSeguidores,
+            seguindo: totalSeguindo
+        });
+
+    } catch (erro) {
+        console.error('Erro ao buscar contagens de seguidores:', erro);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Erro no servidor ao buscar a contagem.',
+            // Opcional, mas útil para debug
+            error: erro.message 
+        });
+    }
+});
 // CARREGAR FEED  
 async function carregarFeed() {
   console.log("Tentando carregar o feed...");
@@ -1003,6 +1061,118 @@ app.delete("/usuario/clube/remover", (req, res) => {
   });
 });
 
+// ==================== ROTA DE EXCLUSÃO DE CONTA ====================
+
+app.delete('/usuario/excluir-conta', async (req, res) => {
+  const { cpf, confirmacao } = req.body;
+
+  console.log('\n🗑️ Solicitação de exclusão de conta recebida');
+  console.log('   CPF:', cpf);
+  console.log('   Confirmação:', confirmacao);
+
+  // Validações
+  if (!cpf || !confirmacao) {
+    return res.status(400).json({
+      success: false,
+      message: 'CPF e confirmação são obrigatórios.'
+    });
+  }
+
+  if (confirmacao !== 'EXCLUIR') {
+    return res.status(400).json({
+      success: false,
+      message: 'Confirmação inválida.'
+    });
+  }
+
+  try {
+    // Iniciar transação para garantir que todos os dados sejam excluídos
+    await connection.promise().beginTransaction();
+
+    // 1. Excluir curtidas do usuário
+    await connection.promise().query(
+      'DELETE FROM curtida WHERE usuario_cpf = ?',
+      [cpf]
+    );
+    console.log('   ✓ Curtidas excluídas');
+
+    // 2. Excluir curtidas nas publicações do usuário
+    await connection.promise().query(
+      'DELETE FROM curtida WHERE publicacao_ID IN (SELECT IDpublicacao FROM publicacao WHERE autor_CPF = ?)',
+      [cpf]
+    );
+    console.log('   ✓ Curtidas nas publicações excluídas');
+
+    // 3. Excluir publicações do usuário
+    await connection.promise().query(
+      'DELETE FROM publicacao WHERE autor_CPF = ?',
+      [cpf]
+    );
+    console.log('   ✓ Publicações excluídas');
+
+    // 4. Excluir esportes de interesse do usuário
+    await connection.promise().query(
+      'DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?',
+      [cpf]
+    );
+    console.log('   ✓ Esportes de interesse excluídos');
+
+    // 5. Excluir relação usuário-clube
+    await connection.promise().query(
+      'DELETE FROM usuario_clube WHERE cpf_usuario = ?',
+      [cpf]
+    );
+    console.log('   ✓ Relação com clubes excluída');
+
+    // 6. Excluir seguidores (quem segue o usuário)
+    await connection.promise().query(
+      'DELETE FROM Seguidores WHERE CPF_seguido = ?',
+      [cpf]
+    );
+    console.log('   ✓ Seguidores excluídos');
+
+    // 7. Excluir seguindo (quem o usuário segue)
+    await connection.promise().query(
+      'DELETE FROM Seguidores WHERE CPF_seguidor = ?',
+      [cpf]
+    );
+    console.log('   ✓ Seguindo excluído');
+
+    // 8. Por fim, excluir o usuário
+    const [resultadoUsuario] = await connection.promise().query(
+      'DELETE FROM usuario WHERE CPF = ?',
+      [cpf]
+    );
+
+    if (resultadoUsuario.affectedRows === 0) {
+      await connection.promise().rollback();
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não encontrado.'
+      });
+    }
+    console.log('   ✓ Usuário excluído');
+
+    // Confirmar transação
+    await connection.promise().commit();
+    console.log('✅ Conta excluída com sucesso!\n');
+
+    res.json({
+      success: true,
+      message: 'Conta excluída com sucesso!'
+    });
+
+  } catch (erro) {
+    // Reverter transação em caso de erro
+    await connection.promise().rollback();
+    
+    console.error('❌ Erro ao excluir conta:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao excluir conta. Tente novamente.'
+    });
+  }
+});
 
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;

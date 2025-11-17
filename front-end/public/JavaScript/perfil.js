@@ -68,7 +68,7 @@ function parseDateToLocal(input) {
   return null;
 }
 
-// 🔥 NOVA FUNÇÃO: Obtém CPF da URL ou localStorage
+//  NOVA FUNÇÃO: Obtém CPF da URL ou localStorage
 function obterCPFDaPagina() {
   // Tenta pegar CPF da URL (?cpf=123456789)
   const urlParams = new URLSearchParams(window.location.search);
@@ -85,7 +85,7 @@ function obterCPFDaPagina() {
   return cpfLocal;
 }
 
-// 🔥 NOVA FUNÇÃO: Verifica se é o perfil do usuário logado
+//  NOVA FUNÇÃO: Verifica se é o perfil do usuário logado
 function ehPerfilProprio() {
   const cpfPagina = obterCPFDaPagina();
   const cpfLogado = localStorage.getItem('cpf');
@@ -100,7 +100,7 @@ async function preencherPerfil() {
   
   if (!cpf) return console.warn("CPF não encontrado");
 
-  console.log("🔍 Carregando perfil do CPF:", cpf);
+  console.log(" Carregando perfil do CPF:", cpf);
 
   try {
     const resposta = await fetch(`${BASE_URL}/usuario/${encodeURIComponent(cpf)}`);
@@ -141,7 +141,6 @@ async function preencherPerfil() {
     console.error("Erro ao carregar perfil:", err);
   }
 }
-//======================= BOATO DE EDITAR==============
 
 // ======================= CURTIDAS =======================
 function criarSistemaCurtidas(post, card, cpfLogado) {
@@ -385,7 +384,32 @@ function criarHeaderPost(post, filtroEsporte) {
 
   return header;
 }
+// ====== SEGUIDORES E SEGUINDO (Yago) =====
+async function carregarSeguidores(){
+  const cpf = localStorage.getItem("cpf");
+ try {
+      
+      const response = await fetch(`/seguidores/${encodeURIComponent(cpf)}`, {
+            method: "GET"
+        });
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar contagem. Status: ${response.status}`);
+        }
 
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Contagem de seguidores:', data.seguidores);
+            console.log('Contagem de seguindo:', data.seguindo);
+
+            // ATUALIZE SEUS ELEMENTOS HTML AQUI
+            document.getElementById('seguidores').innerText ="seguidores\n " +data.seguidores ;
+            document.getElementById('seguindo').innerText = "seguindo\n "+ data.seguindo ;
+        }
+    } catch (error) {
+        console.error('Erro ao buscar contagem:', error);
+    }
+}
 // ======================= ESPORTES =======================
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
@@ -608,5 +632,8 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarClubesNoPerfil();
   criarBotaoEditar(); 
   configurarMenuConfiguracao();
+  carregarSeguidores();
+  carregarClubesNoPerfil();
+  configurarBotaoEditar();
   console.log("perfil inicializado");
 });

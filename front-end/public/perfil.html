@@ -26,9 +26,23 @@
                 <img src="imagens/search.image.png" alt="Search">
                 <input type="text" placeholder="Search">
             </div>
+
+            <!-- ÍCONE DO USUÁRIO -->
             <div class="nav-user-icon online" onclick="configuracoesMenuAlter()">
                 <img src="imagens/profile.picture.jpg" alt="Usuário">
             </div>
+
+            <!-- ===================== MENU DE CONFIGURAÇÕES ===================== -->
+            <div class="config-menu">
+                <div class="config-menu-inner">
+                    <div class="config-menu-user-info">
+                        <img src="imagens/profile.picture.jpg" alt="">
+                        <p>Seu Perfil</p>
+                    </div>
+                </div>
+            </div>
+            <!-- ===================== FIM DO MENU DE CONFIGURAÇÕES ===================== -->
+
         </div>
     </nav>
 
@@ -47,11 +61,11 @@
             </div>
             <div class="shortcut-links" id="atalhos-esportes">
                 <p>Seus esportes</p>
-                <!--AQUI VAI FICAR OS ESPORTES -->
+                <!-- Esportes aparecem aqui -->
             </div>
         </div>
 
-        <!-- CONTAINER CENTRAL ADICIONADO -->
+        <!-- CENTRO -->
         <div class="perfil-container">
             <div class="main-content">
                 <div id="perfil-wrapper">
@@ -81,12 +95,12 @@
             </div>
 
             <div id="container-direita">
-                <div class="seguindo-seguidores">
+                 <div class="seguindo-seguidores">
                     <div class="seguindo">
-                        <h4>0 seguindo</h4>
+                        <h4 id="seguindo">seguindo</h4>
                     </div>
                     <div class="seguidores">
-                        <h4>0 seguidores</h4>
+                        <h4 id="seguidores">seguidores</h4>
                     </div>
                 </div>
 
@@ -102,11 +116,10 @@
 
                 <div class="clubes">
                     <h2>Clubes que frequento</h2>
-                    <!-- Os clubes serão inseridos aqui via JavaScript -->
+                    <!-- via JS -->
                 </div>
             </div>
         </div>
-        <!-- FIM DO CONTAINER CENTRAL -->
     </div>
 
     <script src="JavaScript/perfil.js"></script>
