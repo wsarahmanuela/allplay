@@ -222,20 +222,68 @@ nav {
 }
 
 /* NOME E BOTÃO EDITAR */
+/* ---------- CONTAINER NOME + BOTÃO (substituir regras antigas) ---------- */
 #container-segue {
     display: flex;
-    justify-content: space-between;
-    gap: 13rem;
+    align-items: center;           /* alinha verticalmente nome e botão */
+    justify-content: space-between;/* nome à esquerda, botão à direita */
     position: relative;
-    margin-left: 200px;
+    margin-left: 200px;            /* mantém posição horizontal atual do nome */
     margin-top: 15px;
+    width: calc(100% - 200px);     /* evita que o botão "vaze" pra fora */
+    box-sizing: border-box;
 }
 
+/* mantém a coluna do nome sem crescer demais */
 .nome {
     display: flex;
     flex-direction: column;
+    flex: 0 1 auto;      /* não empurra o botão */
+    min-width: 0;        /* importante para truncar se necessário */
 }
 
+/* area onde o JS injeta o botão (garante comportamento consistente) */
+#area-botao-seguir {
+    flex: 0 0 auto;      /* ocupa somente o espaço do botão */
+    margin-left: 20px;   /* pequeno espaçamento entre nome e botão */
+    display: flex;
+    align-items: center;
+}
+
+/* botão criado pelo JS (ou .seguir h3 antigo) */
+#area-botao-seguir button,
+.seguir h3 {
+    white-space: nowrap;         /* não quebra linha */
+    display: inline-block;
+    background-color: #007bff;   /* cor padrão azul (ajuste se quiser) */
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* quando estiver no estado "seguindo" */
+#area-botao-seguir button.seguindo,
+.seguir h3.seguindo {
+    background-color: #4caf50;
+}
+
+/* responsivo: em telas muito pequenas, reduz o tamanho do botão */
+@media (max-width: 720px) {
+    #container-segue {
+        margin-left: 120px;            /* ajusta caso a foto ocupe menos espaço */
+        width: calc(100% - 120px);
+        gap: 8px;
+    }
+
+    #area-botao-seguir button,
+    .seguir h3 {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
 .seguir h3 {
     margin-left: 220px;
     background-color: #41db51;
@@ -276,7 +324,6 @@ nav {
     flex-direction: column;
     align-items: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
     height: auto;
     justify-content: flex-start;
 }
@@ -373,10 +420,10 @@ nav {
 }
 
 .publicacao-data {
-    font-size: 13px;
-    color: #777;
-    margin-left: 55px;
-    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #666;
+    align-self: center;
+    margin-top: 8px;
 }
 
 /* ======================= LATERAL DIREITA ======================= */
@@ -505,15 +552,8 @@ nav {
 }
 /*------ Post (Estilo da Primeira Imagem/Feed) ------ */
 .post {
-  background-color: #fff;
-  padding: 15px;
-  margin-bottom: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-  font-family: "Poppins", sans-serif;
-}
-.post {
+      width: 100%;
+    max-width: none;
     background-color: #fff;
     padding: 15px;
     margin-bottom: 12px;
@@ -522,6 +562,7 @@ nav {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     font-family: "Poppins", sans-serif;
 }
+
 
 .post-imagem {
     width: 100%;
@@ -536,6 +577,7 @@ nav {
   display: flex;
   align-items: center;
   gap: 10px;
+  
 }
 
 .foto-perfil {
@@ -580,14 +622,7 @@ nav {
   white-space: pre-wrap;
 }
 
-.data {
-  margin-top: 6px;
-  font-size: 13px;
-  color: #777;
-    font-weight: 600;
-    font-size: 15px;
-    color: #000;
-}
+
 
 .post-info .usuario {
     font-size: 14px;
@@ -605,7 +640,6 @@ nav {
     color: #666;
     font-size: 0.85rem;
     margin-top: 8px;
-    text-align: right;
     margin-top: 6px;
     font-size: 13px;
     color: #777;
@@ -654,4 +688,43 @@ nav {
 
 .menu-opcoes button:hover {
     background: #f5f5f5;
+}
+.curtidas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.btn-curtir {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    outline: none;
+}
+
+.btn-curtir svg {
+    width: 24px;
+    height: 24px;
+    stroke: #444;
+    fill: none;
+    transition: all 0.3s ease;
+}
+
+.btn-curtir:hover svg {
+    transform: scale(1.1);
+}
+
+.btn-curtir.curtido svg {
+    fill: red;
+    stroke: red;
+}
+
+.contador-curtidas {
+    font-size: 14px;
+    color: #555;
 }

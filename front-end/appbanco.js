@@ -174,14 +174,13 @@ app.get('/teste-banco', (req, res) => {
 //CADASTRO02 -----------------------------------------------------------------
 
 app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
-  const { cpf, bio, nomeUsuario } = req.body; // ✅ Adicione nomeUsuario aqui
+  const { cpf, bio, nomeUsuario } = req.body; 
   const foto = req.file ? req.file.filename : null;
 
-  if (!cpf || !bio || !foto || !nomeUsuario) { // ✅ Valide o nomeUsuario também
+  if (!cpf || !bio || !foto || !nomeUsuario) { 
     return res.status(400).json({ success: false, message: "Dados incompletos." });
   }
 
-  // ✅ Adicione nomeUsuario no UPDATE
   const sql = "UPDATE usuario SET bio = ?, fotoDePerfil = ?, nomeUsuario = ? WHERE cpf = ?";
   connection.query(sql, [bio, foto, nomeUsuario, cpf], (erro) => {
     if (erro) {
@@ -229,20 +228,20 @@ app.get("/esportes/mestra", (req, res) => {
 
   connection.query(sql, (err, results) => {
     if (err) {
-      console.error("❌ Erro ao buscar esportes:", err);
+      console.error(" Erro ao buscar esportes:", err);
       return res.status(500).json({ error: "Erro ao buscar esportes." });
     }
 
-    console.log("✅ Resultados brutos do banco:", results);
-    console.log("📊 Número de registros:", results.length);
+    console.log(" Resultados brutos do banco:", results);
+    console.log(" Número de registros:", results.length);
 
     if (results.length > 0) {
-      console.log("📝 Primeiro registro:", results[0]);
-      console.log("🔑 Colunas disponíveis:", Object.keys(results[0]));
+      console.log(" Primeiro registro:", results[0]);
+      console.log(" Colunas disponíveis:", Object.keys(results[0]));
     }
 
     const esportes = results.map(row => row.nome);
-    console.log("📤 Enviando para o frontend:", esportes);
+    console.log(" Enviando para o frontend:", esportes);
 
     res.json(esportes);
   });
@@ -495,12 +494,10 @@ app.get("/publicacoes/:id/curtidas", (req, res) => {
 app.post("/publicacoes/curtir", (req, res) => {
   const { publicacao_ID, usuario_cpf } = req.body;
 
-  // Validação básica
   if (!publicacao_ID || !usuario_cpf) {
     return res.status(400).json({ success: false, message: "Dados inválidos." });
   }
 
-  // Verifica se o usuário já curtiu essa publicação
   const checkSql = "SELECT * FROM curtida WHERE publicacao_ID = ? AND usuario_cpf = ?";
   connection.query(checkSql, [publicacao_ID, usuario_cpf], (erro, resultados) => {
     if (erro) {
@@ -509,7 +506,6 @@ app.post("/publicacoes/curtir", (req, res) => {
     }
 
     if (resultados.length > 0) {
-      // Já curtiu → remover curtida
       const deleteSql = "DELETE FROM curtida WHERE publicacao_ID = ? AND usuario_cpf = ?";
       connection.query(deleteSql, [publicacao_ID, usuario_cpf], (erro2) => {
         if (erro2) {
@@ -519,7 +515,6 @@ app.post("/publicacoes/curtir", (req, res) => {
         return res.json({ success: true, liked: false });
       });
     } else {
-      // Ainda não curtiu → adicionar curtida
       const insertSql = "INSERT INTO curtida (publicacao_ID, usuario_cpf) VALUES (?, ?)";
       connection.query(insertSql, [publicacao_ID, usuario_cpf], (erro3) => {
         if (erro3) {

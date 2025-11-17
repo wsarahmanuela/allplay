@@ -141,6 +141,7 @@ async function preencherPerfil() {
     console.error("Erro ao carregar perfil:", err);
   }
 }
+//======================= BOATO DE EDITAR==============
 
 // ======================= CURTIDAS =======================
 function criarSistemaCurtidas(post, card, cpfLogado) {
@@ -447,6 +448,48 @@ async function carregarEsportes() {
     container.innerHTML = `<p>Erro ao carregar esportes: ${escapeHtml(erro.message)}</p>`;
   }
 }
+//==esporte direito===
+// ======================= ESPORTES DO LADO DIREITO =======================
+async function carregarEsportesDireita() {
+  const container = document.getElementById("esportes-direita");
+
+  if (!container) {
+    console.warn("Elemento #esportes-direita não encontrado.");
+    return;
+  }
+
+  const cpf = obterCPFDaPagina();
+  if (!cpf) return;
+
+  try {
+    const resp = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpf)}`);
+    if (!resp.ok) throw new Error("Erro ao buscar esportes.");
+
+    const esportes = await resp.json();
+
+    container.innerHTML = ""; // limpar
+
+    if (!Array.isArray(esportes) || esportes.length === 0) {
+      container.innerHTML = `<p style="text-align:center; color:#888;">Sem esportes</p>`;
+      return;
+    }
+
+    esportes.forEach(esporte => {
+      const btn = document.createElement("button");
+      btn.classList.add("btn-esporte-direita");
+      btn.textContent = esporte;
+
+      btn.addEventListener("click", () => {
+        carregarPostsDoUsuario(esporte);
+      });
+
+      container.appendChild(btn);
+    });
+
+  } catch (err) {
+    console.error("Erro ao carregar esportes da direita:", err);
+  }
+}
 
 // ======================= CLUBES =======================
 async function carregarClubesNoPerfil() {
@@ -513,35 +556,57 @@ async function carregarClubesNoPerfil() {
 }
 
 // ======================= NAVEGAÇÃO =======================
-function configurarBotaoEditar() {
-  const btnEditar = document.getElementById('btn-editar-perfil');
-  
-  if (btnEditar) {
-    btnEditar.addEventListener('click', () => {
-      console.log('Botão Editar Perfil clicado. Redirecionando...');
-      window.location.href = 'editPerfil.html'; 
-    });
-  } else {
-    console.warn("Elemento com ID 'btn-editar-perfil' não encontrado.");
+function criarBotaoEditar() {
+  // só mostra se for o perfil do próprio usuário
+  if (!ehPerfilProprio()) return;
+
+  const container = document.querySelector("#container-segue");
+  if (!container) {
+    console.warn("container-segue não encontrado");
+    return;
   }
+
+  // procura área do botão
+  let area = document.querySelector("#area-botao-seguir");
+
+  // se não existir, cria
+  if (!area) {
+    area = document.createElement("div");
+    area.id = "area-botao-seguir";
+    area.style.display = "flex";
+    area.style.alignItems = "center";
+    area.style.marginLeft = "20px";
+
+    container.appendChild(area);
+  }
+
+  // criar botão
+  const botao = document.createElement("button");
+  botao.id = "btn-editar-perfil";
+  botao.className = "botao-editar";
+  botao.textContent = "Editar";
+
+  botao.addEventListener("click", () => {
+    console.log("Redirecionando para editPerfil.html");
+    window.location.href = "editPerfil.html";
+  });
+
+  // inserir na área correta
+  area.appendChild(botao);
+}
+function configurarMenuConfiguracao() {
+  console.log("configurarMenuConfiguracao() não implementada");
 }
 
-function configurarMenuConfiguracao() {
-  const configMenu = document.querySelector(".config-menu");
-  window.configuracoesMenuAlter = function() {
-    if (configMenu) {
-      configMenu.classList.toggle("config-menu-height");
-    }
-  };
-}
 
 // ======================= INICIALIZAÇÃO =======================
 document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();
   carregarPostsDoUsuario();
   carregarEsportes();
+  carregarEsportesDireita();
   carregarClubesNoPerfil();
-  configurarBotaoEditar();
+  criarBotaoEditar(); 
   configurarMenuConfiguracao();
   console.log("perfil inicializado");
 });

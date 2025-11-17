@@ -37,23 +37,26 @@
                 <a href="#"><img src="imagens/club.png" alt="">Notificação</a>
                 <a href="map.html"><img src="imagens/Design_sem_nome__3_-removebg-preview.png">Localização</a>
                 <a href="feed.html" style="text-decoration: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#000">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/> 
-                </svg>
-                <span>Feed</span>
-            </a>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#000">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/> 
+                    </svg>
+                    <span>Feed</span>
+                </a>
             </div>
+
             <div class="shortcut-links" id="atalhos-esportes">
-                <p>Seus esportes</p>
-                <!--AQUI VAI FICAR OS ESPORTES -->
+                <p>Esportes</p>
             </div>
         </div>
 
-        <!-- CONTAINER CENTRAL ADICIONADO -->
         <div class="perfil-container">
             <div class="main-content">
                 <div id="perfil-wrapper">
-                    <div id="container-meio"> 
+
+                    <div id="container-meio">
+                        <!-- BANNER (imagem de fundo) -->
+                        <div id="banner-perfil"></div>
+                        
                         <div class="usuario-foto">
                             <img src="imagens/profile.picture.jpg" alt="usuario">
                         </div>
@@ -61,12 +64,12 @@
 
                     <div id="container-segue">
                         <div class="nome">
-                            <h3>Nome Completo</h3>
-                            <h5>@nome_usuário</h5>
+                            <h3 id="nomeUsuario">Nome Completo</h3>
+                            <h5 id="arrobaUsuario">@nome_usuário</h5>
                         </div>
-                        <div class="seguir">
-                            <h3>seguir</h3>
-                        </div>   
+
+                        <!-- AQUI FICA O BOTÃO DE SEGUIR -->
+                        <div id="area-botao-seguir"></div>
                     </div>
                 </div>
 
@@ -77,8 +80,8 @@
 
             <div id="container-direita"> 
                 <div class="seguindo-seguidores">
-                    <div class="seguindo"><h4>0 seguindo</h4></div>
-                    <div class="seguidores"><h4>0 seguidores</h4></div>
+                    <div class="seguindo"><h4 id="qtdSeguindo">0 seguindo</h4></div>
+                    <div class="seguidores"><h4 id="qtdSeguidores">0 seguidores</h4></div>
                 </div>
 
                 <div class="esportes">
@@ -97,18 +100,9 @@
 
                 <div class="clubes">
                     <h2>Clubes que frequento</h2>
-                    <div class="clube-card">
-                        <p><strong>Tupi Gaspar</strong></p>
-                        <p>Futebol</p>
-                    </div>
-                    <div class="clube-card">
-                        <p><strong>AEEG</strong></p>
-                        <p>Vôlei</p>
-                    </div>
                 </div>
             </div>
         </div>
-        <!-- FIM DO CONTAINER CENTRAL -->
     </div>
 
     <script src="JavaScript/perfilSeguir.js"></script>
