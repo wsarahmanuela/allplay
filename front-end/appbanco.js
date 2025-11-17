@@ -31,7 +31,7 @@ const upload = multer({ storage });
 const connection = mysql2.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'admin',
+  password: 'Glsarah25!',
   database: 'pi_bbd'
 });
 
