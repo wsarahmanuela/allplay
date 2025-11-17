@@ -625,6 +625,101 @@ async function adicionarClube() {
         }
     }
 }
+   // Script de Exclusão de Conta
+        const btnExcluirConta = document.getElementById('btn-excluir-conta');
+        const modalConfirmacao = document.getElementById('modal-confirmacao-exclusao');
+        const btnCancelarExclusao = document.getElementById('cancelar-exclusao');
+        const btnConfirmarExclusao = document.getElementById('confirmar-exclusao');
+        const inputConfirmacao = document.getElementById('input-confirmacao');
+
+        // Abrir modal de confirmação
+        btnExcluirConta.addEventListener('click', () => {
+            modalConfirmacao.classList.add('ativo');
+            inputConfirmacao.value = '';
+            btnConfirmarExclusao.disabled = true;
+        });
+
+        // Fechar modal
+        btnCancelarExclusao.addEventListener('click', () => {
+            modalConfirmacao.classList.remove('ativo');
+        });
+
+        // Fechar modal ao clicar fora
+        modalConfirmacao.addEventListener('click', (e) => {
+            if (e.target === modalConfirmacao) {
+                modalConfirmacao.classList.remove('ativo');
+            }
+        });
+
+        // Verificar digitação para habilitar botão
+        inputConfirmacao.addEventListener('input', () => {
+            btnConfirmarExclusao.disabled = inputConfirmacao.value !== 'EXCLUIR';
+        });
+
+        // Confirmar exclusão
+        btnConfirmarExclusao.addEventListener('click', async () => {
+            if (inputConfirmacao.value !== 'EXCLUIR') {
+                return;
+            }
+
+            try {
+                // Desabilitar botão durante o processo
+                btnConfirmarExclusao.disabled = true;
+                btnConfirmarExclusao.textContent = 'Excluindo...';
+
+                // Pegar o CPF do usuário logado (do localStorage)
+                const cpfUsuario = localStorage.getItem('cpf');
+                
+                if (!cpfUsuario) {
+                    alert('Erro: Usuário não identificado. Faça login novamente.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Fazer requisição para o backend
+                const response = await fetch(`${BASE_URL}/usuario/excluir-conta`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cpf: cpfUsuario,
+                        confirmacao: 'EXCLUIR'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Erro ao excluir conta');
+                }
+
+                // Limpar dados locais
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Limpar cookies
+                document.cookie.split(";").forEach((c) => {
+                    document.cookie = c
+                        .replace(/^ +/, "")
+                        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+
+                // Mostrar mensagem de sucesso
+                alert('Sua conta foi excluída com sucesso. Você será redirecionado.');
+                
+                // Redirecionar para a página inicial
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                console.error('Erro ao excluir conta:', error);
+                alert('Ocorreu um erro ao excluir sua conta: ' + error.message);
+                
+                // Reabilitar botão em caso de erro
+                btnConfirmarExclusao.disabled = false;
+                btnConfirmarExclusao.textContent = 'Excluir Permanentemente';
+            }
+        });
 
 // =================================================================
 // EVENTOS E INICIALIZAÇÃO
@@ -645,6 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarEsportesMestres();
     carregarPerfilInicial();
     carregarClubesDoUsuario();
+    
 
     // Contador da biografia
     if (bioTextarea) {

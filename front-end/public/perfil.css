@@ -56,14 +56,7 @@ nav {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-
-.nav-user-icon img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    cursor: pointer;
-    object-fit: cover;
+    position: relative;
 }
 
 .search-box {
@@ -87,22 +80,112 @@ nav {
     border: 0;
 }
 
-.config-menu {
-    position: absolute;
-    width: 90%;
-    max-width: 350px;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-    border-radius: 4px;
-    overflow: hidden;
-    top: 108%;
-    right: 5%;
-    max-height: 0;
-    transition: max-height 0.3s;
+/* ===================== ÍCONE DO USUÁRIO ===================== */
+.nav-user-icon {
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    position: relative;
 }
 
-.config-menu-height {
-    max-height: 450px;
+.nav-user-icon img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    object-fit: cover;
+}
+
+.nav-user-icon.online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid #0f9800;
+}
+
+/* ===================== MENU DE CONFIGURAÇÕES (DROPDOWN) ===================== */
+.config-menu {
+    position: absolute;
+    top: 70px;
+    right: 5%;
+    width: 300px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+}
+
+/* Classe que ativa o menu */
+.config-menu.config-menu-height {
+    max-height: 500px;
+    padding: 15px 0;
+    margin-top: 10px;
+}
+
+.config-menu-inner {
+    padding: 0 20px;
+}
+
+.config-menu-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.config-menu-user-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0f9800;
+}
+
+.config-menu-user-info p {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+}
+
+.config-menu hr {
+    border: none;
+    border-top: 1px solid #e5e5e5;
+    margin: 10px 0;
+}
+
+.config-item {
+    display: block;
+    padding: 12px 15px;
+    margin: 5px 0;
+    text-decoration: none;
+    color: #333;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.config-item:hover {
+    background: #f0f0f0;
+    transform: translateX(3px);
+}
+
+.config-item.sair {
+    color: #e53935;
+    font-weight: 600;
+}
+
+.config-item.sair:hover {
+    background: #ffebee;
 }
 
 /* ======================= CONTAINER GERAL DA PÁGINA ======================= */
@@ -321,6 +404,7 @@ nav {
     gap: 10px;
     align-items: center;
     justify-content: space-between;
+    text-align: center;
 }
 
 .seguindo,
@@ -768,3 +852,5 @@ nav {
     font-size: 14px;
     color: #555;
 }
+
+/* ======================= RESPONSIVO ======================= */
