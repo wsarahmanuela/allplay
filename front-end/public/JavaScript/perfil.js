@@ -472,7 +472,7 @@ async function carregarEsportes() {
     container.innerHTML = `<p>Erro ao carregar esportes: ${escapeHtml(erro.message)}</p>`;
   }
 }
-//==esporte direito===
+
 // ======================= ESPORTES DO LADO DIREITO =======================
 async function carregarEsportesDireita() {
   const container = document.getElementById("esportes-direita");

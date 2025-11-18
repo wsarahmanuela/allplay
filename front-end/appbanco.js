@@ -224,7 +224,7 @@ app.post('/esportes', (req, res) => {
 app.get("/esportes/mestra", (req, res) => {
   const sql = "SELECT * FROM esporte ORDER BY nome ASC";
 
-  console.log("🔍 Executando query:", sql);
+  console.log(" Executando query:", sql);
 
   connection.query(sql, (err, results) => {
     if (err) {
@@ -301,6 +301,148 @@ app.get('/seguidores/:cpf', async (req, res) => {
             success: false, 
             message: 'Erro no servidor ao buscar a contagem.',
             // Opcional, mas útil para debug
+            error: erro.message 
+        });
+    }
+});
+// Rota para seguir um usuário
+app.post('/seguir', async (req, res) => {
+    const { cpf_seguidor, cpf_seguido } = req.body;
+    
+    console.log(`\n Rota /seguir chamada com:`);
+    console.log(`   CPF Seguidor: ${cpf_seguidor}`);
+    console.log(`   CPF Seguido: ${cpf_seguido}`);
+
+    // Validações
+    if (!cpf_seguidor || !cpf_seguido) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'CPF do seguidor e CPF do seguido são obrigatórios.' 
+        });
+    }
+
+    if (cpf_seguidor === cpf_seguido) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Você não pode seguir a si mesmo.' 
+        });
+    }
+
+    try {
+        // Verificar se já está seguindo
+        const verificarQuery = `
+            SELECT * FROM Seguidores 
+            WHERE CPF_seguidor = ? AND CPF_seguido = ?
+        `;
+        
+        const jaSegue = await queryPromise(verificarQuery, [cpf_seguidor, cpf_seguido]);
+
+        if (jaSegue.length > 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Você já está seguindo este usuário.' 
+            });
+        }
+
+        // Inserir o novo seguidor
+        const inserirQuery = `
+            INSERT INTO Seguidores (CPF_seguidor, CPF_seguido) 
+            VALUES (?, ?)
+        `;
+        
+        await queryPromise(inserirQuery, [cpf_seguidor, cpf_seguido]);
+
+        console.log(` Usuário ${cpf_seguidor} agora segue ${cpf_seguido}`);
+
+        res.json({
+            success: true,
+            message: 'Você está seguindo este usuário!'
+        });
+
+    } catch (erro) {
+        console.error(' Erro ao seguir usuário:', erro);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Erro no servidor ao seguir o usuário.',
+            error: erro.message 
+        });
+    }
+});
+// Rota para verificar se um usuário segue outro
+app.get('/segue/:cpf_seguidor/:cpf_seguido', async (req, res) => {
+    const { cpf_seguidor, cpf_seguido } = req.params;
+    
+    console.log(`\n🔍 Verificando se ${cpf_seguidor} segue ${cpf_seguido}`);
+    
+    try {
+        const query = `
+            SELECT * FROM Seguidores 
+            WHERE CPF_seguidor = ? AND CPF_seguido = ?
+        `;
+        
+        const resultado = await queryPromise(query, [cpf_seguidor, cpf_seguido]);
+        
+        const segue = resultado.length > 0;
+        
+        console.log(`✅ Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
+        
+        res.json({ 
+            success: true, 
+            segue: segue 
+        });
+        
+    } catch (erro) {
+        console.error('❌ Erro ao verificar follow:', erro);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Erro ao verificar follow',
+            error: erro.message 
+        });
+    }
+});
+
+// Rota para deixar de seguir um usuário
+app.delete('/seguir', async (req, res) => {
+    const { cpf_seguidor, cpf_seguido } = req.body;
+    
+    console.log(`\n Rota DELETE /seguir chamada com:`);
+    console.log(`   CPF Seguidor: ${cpf_seguidor}`);
+    console.log(`   CPF Seguido: ${cpf_seguido}`);
+
+    if (!cpf_seguidor || !cpf_seguido) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'CPF do seguidor e CPF do seguido são obrigatórios.' 
+        });
+    }
+
+    try {
+        const deletarQuery = `
+            DELETE FROM Seguidores 
+            WHERE CPF_seguidor = ? AND CPF_seguido = ?
+        `;
+        
+        const resultado = await queryPromise(deletarQuery, [cpf_seguidor, cpf_seguido]);
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Você não estava seguindo este usuário.' 
+            });
+        }
+
+        console.log(` Usuário ${cpf_seguidor} deixou de seguir ${cpf_seguido}`);
+
+        res.json({
+            success: true,
+            message: 'Você deixou de seguir este usuário!'
+        });
+
+    } catch (erro) {
+        console.error(' Erro ao deixar de seguir:', erro);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Erro no servidor ao deixar de seguir.',
             error: erro.message 
         });
     }

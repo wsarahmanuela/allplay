@@ -378,21 +378,22 @@ async function criarBotaoSeguir() {
 
   areaNome.innerHTML = "";
 
+  // Se for o próprio perfil, mostra botão de editar
   if (cpfPerfil === cpfLogado) {
     const btnEditar = document.createElement("button");
     btnEditar.id = "btn-editar";
-    btnEditar.textContent = "Editar perfil";
+    btnEditar.textContent = "Editar";
     btnEditar.style.padding = "8px 16px";
     btnEditar.style.borderRadius = "8px";
     btnEditar.style.border = "none";
     btnEditar.style.cursor = "pointer";
     btnEditar.style.fontSize = "16px";
-    btnEditar.style.background = "#333";
+    btnEditar.style.background = "#37bb1c";
     btnEditar.style.color = "white";
     btnEditar.style.marginLeft = "10px";
 
     btnEditar.addEventListener("click", () => {
-      window.location.href = "editarPerfil.html";
+      window.location.href = "editPerfil.html";
     });
 
     areaNome.appendChild(btnEditar);
@@ -401,89 +402,174 @@ async function criarBotaoSeguir() {
 
   removerBotoesEditarSeNaoForProprio();
 
+  // Criar botão de seguir
   const btn = document.createElement("button");
   btn.id = "btn-seguir";
-  btn.textContent = "Seguir";
+  btn.textContent = "Carregando...";
+  btn.disabled = true;
   btn.style.padding = "8px 16px";
   btn.style.borderRadius = "8px";
   btn.style.border = "none";
   btn.style.cursor = "pointer";
   btn.style.fontSize = "16px";
-  btn.style.background = "#007bff";
+  btn.style.background = "#ccc";
   btn.style.color = "white";
   btn.style.marginLeft = "10px";
 
   areaNome.appendChild(btn);
 
+  // Verificar se já está seguindo
   try {
+    console.log(`Verificando se ${cpfLogado} segue ${cpfPerfil}`);
+    
     const resp = await fetch(`${BASE_URL}/segue/${cpfLogado}/${cpfPerfil}`);
     const dados = await resp.json();
 
-    if (dados.segue === true) {
+    console.log("Resposta da verificação:", dados);
+
+    if (dados.success && dados.segue === true) {
       btn.textContent = "Seguindo";
       btn.style.background = "#4caf50";
+      btn.dataset.seguindo = "true";
+    } else {
+      btn.textContent = "Seguir";
+      btn.style.background = "#007bff";
+      btn.dataset.seguindo = "false";
     }
+    
+    btn.disabled = false;
+    btn.style.cursor = "pointer";
+    
   } catch (err) {
     console.error("Erro ao verificar follow:", err);
+    btn.textContent = "Seguir";
+    btn.style.background = "#007bff";
+    btn.dataset.seguindo = "false";
+    btn.disabled = false;
+    btn.style.cursor = "pointer";
   }
 
+  // Adicionar evento de clique
   btn.addEventListener("click", async () => {
+    const estaSeguindo = btn.dataset.seguindo === "true";
+    
+    // Desabilitar botão durante a requisição
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+    btn.style.cursor = "not-allowed";
+    
     try {
-      if (btn.textContent === "Seguir") {
+      if (!estaSeguindo) {
+        // SEGUIR
+        console.log(`Tentando seguir ${cpfPerfil}`);
+        
         const resp = await fetch(`${BASE_URL}/seguir`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            seguidor: cpfLogado,
-            seguido: cpfPerfil
+            cpf_seguidor: cpfLogado,
+            cpf_seguido: cpfPerfil
           })
         });
 
-        if (resp.ok) {
+        const resultado = await resp.json();
+        
+        if (resp.ok && resultado.success) {
           btn.textContent = "Seguindo";
           btn.style.background = "#4caf50";
+          btn.dataset.seguindo = "true";
+          console.log("Agora seguindo o usuário");
+          
+          // Atualizar contador de seguidores
+          await atualizarContadores();
+        } else {
+          alert(resultado.message || "Erro ao seguir usuário");
         }
+        
       } else {
-        const resp = await fetch(`${BASE_URL}/deixarseguir`, {
+        // DEIXAR DE SEGUIR
+        console.log(`Tentando deixar de seguir ${cpfPerfil}`);
+        
+        const resp = await fetch(`${BASE_URL}/seguir`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            seguidor: cpfLogado,
-            seguido: cpfPerfil
+            cpf_seguidor: cpfLogado,
+            cpf_seguido: cpfPerfil
           })
         });
 
-        if (resp.ok) {
+        const resultado = await resp.json();
+        
+        if (resp.ok && resultado.success) {
           btn.textContent = "Seguir";
           btn.style.background = "#007bff";
+          btn.dataset.seguindo = "false";
+          console.log("Deixou de seguir o usuário");
+          
+          // Atualizar contador de seguidores
+          await atualizarContadores();
+        } else {
+          alert(resultado.message || "Erro ao deixar de seguir");
         }
       }
     } catch (err) {
       console.error("Erro ao seguir/deixar seguir:", err);
+      alert("Erro ao processar ação. Tente novamente.");
+    } finally {
+      // Reabilitar botão
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
   });
 }
 
-// CARREGAR ESPORTES DO USUARIO VISITADO
-async function carregarEsportesDoVisitado() {
-  const container = document.getElementById("atalhos-esportes");
-  if (!container) return console.warn("Elemento #atalhos-esportes nao encontrado.");
+// ATUALIZAR CONTADORES DE SEGUIDORES E SEGUINDO
+async function atualizarContadores() {
+  try {
+    const resp = await fetch(`${BASE_URL}/seguidores/${cpfPerfil}`);
+    const dados = await resp.json();
+    
+    if (dados.success) {
+      const seguidoresElem = document.querySelector("#seguidores-count");
+      const seguindoElem = document.querySelector("#seguindo-count");
+      
+      if (seguidoresElem) {
+        seguidoresElem.textContent = dados.seguidores || 0;
+      }
+      
+      if (seguindoElem) {
+        seguindoElem.textContent = dados.seguindo || 0;
+      }
+      
+      console.log(`Contadores atualizados: ${dados.seguidores} seguidores, ${dados.seguindo} seguindo`);
+    }
+  } catch (err) {
+    console.error("Erro ao atualizar contadores:", err);
+  }
+}
 
-  if (!cpfPerfil) {
-    container.innerHTML = "<p>CPF nao encontrado.</p>";
+// ======================= CARREGAR MEUS ESPORTES (LADO ESQUERDO - #atalhos-esportes) =======================
+async function carregarMeusEsportes() {
+  const container = document.getElementById("atalhos-esportes");
+  if (!container) return console.warn("Elemento #atalhos-esportes não encontrado.");
+
+  if (!cpfLogado) {
+    container.innerHTML = "<p>Faça login para ver seus esportes.</p>";
     return;
   }
 
   try {
-    const resposta = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpfPerfil)}`);
-    if (!resposta.ok) throw new Error("Erro ao buscar esportes.");
+    const resposta = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpfLogado)}`);
+    if (!resposta.ok) throw new Error("Erro ao buscar seus esportes.");
     const esportes = await resposta.json();
     const caminhoImagens = "ImagensEscolhaEsportes/";
 
-    container.innerHTML = `<p>Esportes</p>`;
+    container.innerHTML = `<p>Seus esportes</p>`;
 
     if (!Array.isArray(esportes) || esportes.length === 0) {
-      container.insertAdjacentHTML("beforeend", `<p>Este usuario ainda nao escolheu esportes.</p>`);
+      container.insertAdjacentHTML("beforeend", `<p>Você ainda não escolheu esportes.</p>`);
       return;
     }
 
@@ -505,13 +591,70 @@ async function carregarEsportesDoVisitado() {
         </a>
       `;
 
+      div.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.querySelectorAll("#atalhos-esportes .atalho-esporte-link").forEach(a => a.classList.remove("ativo"));
+        div.querySelector("a").classList.add("ativo");
+        // Aqui você pode filtrar SEUS posts por esporte se desejar
+      });
+
       container.appendChild(div);
     });
 
-    console.log("Esportes do usuario visitado carregados com sucesso");
+    console.log(`${esportes.length} SEUS esportes carregados no lado esquerdo`);
   } catch (erro) {
-    console.error("Erro ao carregar esportes:", erro);
+    console.error("Erro ao carregar seus esportes:", erro);
     container.innerHTML = `<p>Erro ao carregar esportes: ${escapeHtml(erro.message)}</p>`;
+  }
+}
+
+// ======================= CARREGAR ESPORTES DO VISITADO (LADO DIREITO - .esportes) =======================
+async function carregarEsportesDoVisitado() {
+  const container = document.querySelector(".esportes");
+
+  if (!container) {
+    console.warn("Elemento .esportes não encontrado.");
+    return;
+  }
+
+  // IMPORTANTE: Só mostrar se houver CPF na URL (visitando outra pessoa)
+  if (!cpfDaUrl || cpfDaUrl === cpfLogado) {
+    console.log("Próprio perfil ou sem visitante - não mostra esportes da direita");
+    container.style.display = "none"; // Esconder se for próprio perfil
+    return;
+  }
+
+  console.log("Carregando esportes do CPF visitado:", cpfDaUrl);
+
+  try {
+    // Usar cpfDaUrl diretamente, não cpfPerfil
+    const resp = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpfDaUrl)}`);
+    if (!resp.ok) throw new Error("Erro ao buscar esportes.");
+
+    const esportes = await resp.json();
+
+    // Limpar esportes estáticos
+    container.innerHTML = "";
+    container.style.display = "block"; // Garantir que está visível
+
+    if (!Array.isArray(esportes) || esportes.length === 0) {
+      container.innerHTML = `<p style="text-align:center; color:#888; padding:20px;">Nenhum esporte escolhido</p>`;
+      return;
+    }
+
+    // Criar os elementos de esporte
+    esportes.forEach(esporte => {
+      const div = document.createElement("div");
+      div.classList.add("esporte");
+      div.textContent = esporte;
+      container.appendChild(div);
+    });
+
+    console.log(`✅ ${esportes.length} esportes do visitado carregados:`, esportes);
+
+  } catch (err) {
+    console.error("Erro ao carregar esportes do visitado:", err);
+    container.innerHTML = `<p style="text-align:center; color:#e53935; padding:20px;">Erro ao carregar esportes</p>`;
   }
 }
 
@@ -540,7 +683,7 @@ async function carregarClubesDoVisitado() {
     
     console.log("Clubes do usuario visitado carregados:", clubes);
     
-    containerClubes.innerHTML = '<h2>Clubes que frequento Agora</h2>';
+    containerClubes.innerHTML = '<h2>Clubes que frequento</h2>';
     
     if (clubes.length === 0) {
       containerClubes.innerHTML += `
@@ -569,7 +712,7 @@ async function carregarClubesDoVisitado() {
     const containerClubes = document.querySelector(".clubes");
     if (containerClubes) {
       containerClubes.innerHTML = `
-        <h2>Clubes que frequento Agora</h2>
+        <h2>Clubes que frequento</h2>
         <p style="color: #e53935; text-align: center; padding: 20px 0;">
           Erro ao carregar clubes. Tente novamente.
         </p>
@@ -586,11 +729,12 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("CPF sendo usado:", cpfPerfil);
 
   removerBotoesEditarSeNaoForProprio();
-
   preencherPerfilVisitado();
   carregarFotoNavbar();
   carregarPostsVisitado();
   criarBotaoSeguir();
-  carregarEsportesDoVisitado();
+  carregarMeusEsportes();           // ← LADO ESQUERDO: seus esportes
+  carregarEsportesDoVisitado();     // ← LADO DIREITO: esportes do visitado
   carregarClubesDoVisitado();
+  atualizarContadores();
 });
