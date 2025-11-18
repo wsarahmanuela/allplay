@@ -768,3 +768,46 @@ nav {
     font-size: 14px;
     color: #555;
 }
+#resultsDiv {
+  position: absolute;
+  top: 45px; 
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  max-height: 300px;
+  display: none; /* começa escondido */
+  z-index: 1000;
+}
+
+/* cada item do resultado */
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition:  0.2s;
+}
+
+.result-item:hover {
+  background: #f2f2f2;
+}
+
+.result-item img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.result-item span {
+  font-size: 14px;
+  color: #333;
+}
+.search-container {
+    position: relative;
+    display: inline-block;
+}
