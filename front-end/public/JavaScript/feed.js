@@ -319,7 +319,7 @@ async function carregarFeed(filtroEsporte = "") {
     console.error("Erro ao carregar o feed:", erro);
   }
 }
-// ================== PREVIEW + REMOVER IMAGEM ==================
+// ==================  REMOVER IMAGEM ==================
 document.addEventListener("DOMContentLoaded", () => {
 
   const inputImagem = document.getElementById("input-imagem");
@@ -426,7 +426,7 @@ if (searchInput && resultsDiv) {
             e.stopPropagation();
             const cpfDoUsuario = div.dataset.cpf;
             console.log(" Indo para perfil do CPF:", cpfDoUsuario);
-            window.location.href = `/perfil.html?cpf=${encodeURIComponent(cpfDoUsuario)}`;
+            window.location.href = `/perfilSeguir.html?cpf=${encodeURIComponent(cpfDoUsuario)}`;
           });
 
           resultsDiv.appendChild(div);

@@ -1,0 +1,659 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+body {
+    background: #efefef;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #0f9800;
+    padding: 5px 5%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo h1 {
+    font-size: 30px;
+    margin-right: 50px;
+    color: white;
+}
+
+.nav-left,  .nav-right{
+    display: flex;
+    align-items: center;
+}
+
+.nav-left ul {
+    display: flex;
+    align-items: center;
+}
+
+.nav-left ul li {
+    list-style: none;
+}
+
+.nav-left ul li img {
+    width: 28px;
+    margin: 0 15px;
+    cursor: pointer;
+}
+.nav-user-icon img{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover; 
+}
+.nav-user-icon{
+    margin-left: 30px;
+    margin-top: 5px;
+
+}
+.search-box{
+    background: #efefef;
+    width: 350px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    position: relative;
+}
+.search-box img{
+    width: 18px; 
+}
+.search-box input{
+    width: 100%;
+    background: transparent;
+    padding: 10px;
+    outline: none;
+    border: 0;
+}
+.online{
+    position: relative;
+}
+.online::after{
+    content: '';
+    width: 7px;
+    height: 7px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #41db51;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.container{
+    background-color: #e1e1e1;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between; 
+    align-items: flex-start;
+    gap: 20px; /* controla a distância entre as colunas */
+    padding: 15px 5%;
+}
+.left-sidebar {
+    flex: none;
+    width: 200px; /* tamanho fixo */
+    position: sticky;
+    top: 70px;
+    align-self: flex-start;
+}
+.right-sidebar{
+    background-color: #ffffff;
+    flex: none;
+    width: 500px;       /* largura reduzida e fixa */
+    position: sticky;
+    top: 70px;
+    align-self: flex-start;
+    padding: 20px;
+    border-radius: 4px;
+}
+.main-content{
+    flex: 1;            /* ocupa todo o espaço restante */
+    max-width: 900px;   /* mais largo que antes (era 700px) */
+    margin: 0;  
+
+}
+.imp-links a,
+.shortcut-links a,
+i {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    color: #626262;
+    width: fit-content;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+/* Quando o usuário passa o mouse */
+.imp-links a:hover,
+.shortcut-links a:hover {
+    color: #35e247; /* verde no hover */
+}
+
+/* Quando o usuário clica e o item fica ativo */
+.imp-links a.ativo,
+.shortcut-links a.ativo {
+    color: #35e247; 
+    font-weight: 600;
+}
+
+.imp-links a img, i{
+    width: 25px;
+    margin-right: 15px;
+}
+.imp-links a:last-child, i{
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    color: #626262;
+    width: fit-content;
+    transition: color 0.3s;
+    cursor: pointer;
+    gap: 15px; /* espaço entre ícone e texto */
+
+}
+.imp-links, i{
+    border-bottom: 1px solid #ccc;
+}
+.shortcut-links a img, i{
+    width: 30px;
+    margin-right: 15px;
+}
+.shortcut-links p, i{
+    margin: 25px 0;
+    color: #626262;
+    font-weight: 900;
+}
+.sidebar-titulo{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+.sidebar-titulo h4{
+    font-weight: 600;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;;
+}
+.sidebar-titulo a{
+    text-decoration: none;
+    color: #0f9800;
+    font-size: 12px;
+}
+.event{
+    display: flex;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+.left-event{
+    border-radius: 10px;
+    height: 65px;
+    width: 75px;
+    margin-right: 15px;
+    padding-top: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.event p{
+    font-size: 12px;
+}
+.event a{
+    font-size: 12px;
+    text-decoration: none;
+    color: #41db51;
+}
+.left-event span{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #41db51;
+    color: #fff;
+    font-size: 10px;
+    padding: 4px 0;
+}
+.sidebar-ads{
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.sidebar-text{
+    font-size: 12px;
+    color: #626262;
+    margin-top: -15px;      /* afasta do topo da imagem */
+    margin-bottom: 8px;
+}
+.online-list{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.online-list .online img{
+    width: 40px;
+    border-radius: 50%;
+}
+.online-list .online{
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+.online-list .online::after{
+    top: unset;
+    bottom: 5px;
+}
+.conteudo-post{
+    width: 100%;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 20px;
+}
+.perfil-usuario{
+    display: flex;
+    align-items: center;
+}
+.perfil-usuario img{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover; /*imagem fica cortada certinha p n destorcer*/
+}
+.perfil-usuario p{
+    margin-bottom: -5px;
+    font-weight: 500;
+    color: #626262;
+}
+.perfil-usuario small{
+    font-size: 12px;
+}
+
+.post-input-container{
+    padding-left: 55px;
+    padding-top: 20px;
+}
+.post-input-container textarea{
+    width: 100%;
+    border: 0;
+    outline: 0;
+    border-bottom: 1px solid #ccc;
+    background: transparent;
+    resize: none;
+}
+.add-post-links{
+    display: flex;
+    margin-top: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+.add-post-links a{
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    color: #626262;
+    margin-right: 30px;
+    font-size: 13px;
+}
+
+.post-btn {
+    background: #0f9800;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+    display: block; /* garante que não fique espremido */
+    margin-left: auto;
+}
+
+.post-btn:hover {
+    background: #41db51;
+}
+.post-container{
+    width: 100%;
+    background: #fff;
+    border-radius: 6px;
+    padding: 20px;
+    color: #626262;
+    margin: 20px 0;
+}
+.perfil-usuario span{
+    font-size: 13px;
+    color: #626262;
+}
+.post-text{
+    color: #9a9a9a;
+    margin: 15px 0;
+    font-size: 15px;
+}
+.post-text2{
+    color: #9a9a9a;
+    margin: 15px 0;
+    font-size: 15px;
+}
+.post-text2 a{
+    color: #1876f2;
+    text-decoration: none;
+}
+.post-img{
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+.post-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.icons-atividade div i{
+    width: 18px;
+    margin-right: 10px;
+}
+.icons-atividade div{
+    display: inline-flex;
+    align-items: center;
+    margin-right: 30px;
+}
+.config-menu{
+    position: absolute;
+    width: 90%;
+    max-width: 350px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    overflow: hidden;
+    top: 108%;
+    right: 5%;
+    max-height: 0;
+    transition: max-height 0.3s;
+}
+.config-menu-height{
+    max-height: 450px;
+}
+.perfil-usuario a{
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    color: #626262;
+    font-size: 13px;
+}
+.config-menu-inner{
+    padding: 20px;
+
+}
+.config-menu hr{
+    border: 0;
+    height: 1px;
+    background: #9a9a9a;
+    margin: 15px 0;
+}
+.config-links{
+    display: flex;
+    align-items: center;
+    margin: 2px 0;
+}
+.config-links .config-icon{
+    width: 38px;
+    margin-right: 15px;
+    border-radius: 50%;
+}
+.config-links a{
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #626262;
+
+}
+
+
+
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #000000;
+}
+
+.menu-opcoes {
+  
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 25px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(255, 3, 3, 0.1);
+  z-index: 10;
+}
+
+.menu-opcoes.ativo {
+  display: block;
+}
+
+
+.menu-opcoes button:hover {
+  background: #f5f5f5;
+} /* POP UP barra de pesuisa*/
+#resultsDiv {
+  position: absolute;
+  top: 45px; 
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  max-height: 300px;
+  display: none; /* começa escondido */
+  z-index: 1000;
+}
+
+/* cada item do resultado */
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition:  0.2s;
+}
+
+.result-item:hover {
+  background: #f2f2f2;
+}
+
+.result-item img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.result-item span {
+  font-size: 14px;
+  color: #333;
+}
+.search-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* ================== CONTAINER PRINCIPAL ================== */
+.main-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 10px 0;
+    font-family: "Poppins", sans-serif;
+}
+
+/* === CARD DO USUÁRIO === */
+.user-card {
+    width: 100%;
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.10);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* Hover do card */
+.user-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+}
+
+/* === AVATAR === */
+.user-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #eaeaea;
+    transition: transform 0.25s ease;
+}
+
+.user-card:hover .user-avatar {
+    transform: scale(1.05);
+}
+
+/* === INFORMAÇÕES === */
+.user-info {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.user-info h3 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.user-card:hover .user-info h3 {
+    color: #0d7000;
+}
+
+.user-info .arroba {
+    font-size: 14px;
+    color: #666;
+    margin: 2px 0 10px;
+}
+
+/* === TAGS === */
+.tags {
+    display: flex;
+    gap: 8px;
+}
+
+.tag {
+    background: #e7ffe5;
+    color: #006f1d;
+    padding: 4px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: background 0.25s ease, transform 0.2s ease;
+}
+
+/* Hover nas tags */
+.tag:hover {
+    background: #d5ffd0;
+    transform: scale(1.08);
+}
+
+/* === AÇÕES === */
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* === Botão de mensagem === */
+.msg-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.msg-btn:hover {
+    background: #e2e2e2;
+    transform: scale(1.12);
+}
+
+.msg-btn:active {
+    transform: scale(0.95);
+}
+
+/* === Botão Seguir / Seguindo === */
+.follow-btn {
+    padding: 8px 14px;
+    background: #0d8500;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 
+        background 0.25s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Clique */
+.follow-btn:active {
+    transform: scale(0.92);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+}
+
+/* Estado "Seguindo" */
+.follow-btn.seguido {
+    background: #dcdcdc;
+    color: #000;
+}
+
+/* Hover geral */
+.follow-btn:hover {
+    filter: brightness(0.95);
+}
+
+/* Hover específico do botão "Seguindo" */
+.follow-btn.seguido:hover {
+    background: #bfbfbf;
+}

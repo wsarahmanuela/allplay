@@ -1,20 +1,20 @@
 // URLs e Variáveis
 const BASE_URL = 'http://localhost:3000';
-let LISTA_MESTRA_ESPORTES = []; 
+let LISTA_MESTRA_ESPORTES = [];
 
 // VARIÁVEIS DE ESTADO PARA O UPLOAD DE ARQUIVOS
-let arquivoBannerParaUpload = null; 
-let arquivoFotoParaUpload = null; 
+let arquivoBannerParaUpload = null;
+let arquivoFotoParaUpload = null;
 
 // Elementos de Esporte
 const inputNovoEsporte = document.getElementById('input-novo-esporte');
 const tagsContainer = document.querySelector('.tags');
-const listaSugestoesCustom = document.getElementById('lista-sugestoes-custom'); 
+const listaSugestoesCustom = document.getElementById('lista-sugestoes-custom');
 
 // Elementos de Edição
 const bioTextarea = document.getElementById('bio-textarea');
 const bioRestante = document.getElementById('bio-restante');
-const LIMITE_CARACTERES = 300; 
+const LIMITE_CARACTERES = 300;
 
 // Campos de Input
 const inputNomeUsuario = document.getElementById('nome-usuario');
@@ -57,20 +57,20 @@ const removerTag = (event) => {
 const criarTagComRemocao = (nomeEsporte) => {
     const novaTag = document.createElement('span');
     novaTag.classList.add('tag');
-    novaTag.textContent = nomeEsporte; 
+    novaTag.textContent = nomeEsporte;
 
     const btnRemover = document.createElement('button');
     btnRemover.textContent = '×';
     btnRemover.classList.add('remover-tag');
     btnRemover.addEventListener('click', removerTag);
-    
+
     novaTag.appendChild(btnRemover);
     return novaTag;
 };
 
 const atualizarContadorEsportes = () => {
     const qtdAtual = tagsContainer.querySelectorAll('.tag').length;
-    
+
     let contador = document.getElementById('contador-esportes');
     if (!contador) {
         contador = document.createElement('p');
@@ -79,9 +79,9 @@ const atualizarContadorEsportes = () => {
         contador.style.marginTop = '10px';
         tagsContainer.parentElement.appendChild(contador);
     }
-    
+
     contador.textContent = `${qtdAtual}/${MAX_ESPORTES} esportes selecionados`;
-    
+
     if (qtdAtual >= MAX_ESPORTES) {
         contador.style.color = '#e53935';
         inputNovoEsporte.disabled = true;
@@ -104,7 +104,7 @@ function preencherListaDeSugestao() {
     LISTA_MESTRA_ESPORTES.forEach((esporte) => {
         const li = document.createElement("li");
         li.textContent = esporte;
-        
+
         li.addEventListener("click", () => {
             const qtdAtual = tagsContainer.querySelectorAll('.tag').length;
             if (qtdAtual >= MAX_ESPORTES) {
@@ -112,23 +112,23 @@ function preencherListaDeSugestao() {
                 lista.classList.remove('ativo');
                 return;
             }
-            
+
             const jaExiste = Array.from(tagsContainer.querySelectorAll('.tag'))
                 .some(tag => tag.textContent.trim().replace('×', '').toLowerCase() === esporte.toLowerCase());
-            
+
             if (jaExiste) {
                 alert(`O esporte "${esporte}" já foi adicionado!`);
                 lista.classList.remove('ativo');
                 return;
             }
-            
+
             const novaTag = criarTagComRemocao(esporte);
             tagsContainer.appendChild(novaTag);
             inputNovoEsporte.value = '';
             lista.classList.remove('ativo');
             atualizarContadorEsportes();
         });
-        
+
         lista.appendChild(li);
     });
 }
@@ -144,14 +144,14 @@ const carregarTagsIniciais = (esportes) => {
 
 // Botão de cancelar
 if (document.querySelector('.btn-cancelar')) {
-    document.querySelector('.btn-cancelar').addEventListener('click', function() {
+    document.querySelector('.btn-cancelar').addEventListener('click', function () {
         window.history.back();
     });
 }
 
 // Upload e Preview de Imagens
 function caminhoBanner(banner) {
-    if (!banner) return ""; 
+    if (!banner) return "";
     if (banner.startsWith("http") || banner.startsWith("/")) return banner;
     return `${BASE_URL}/uploads/${banner}`;
 }
@@ -164,9 +164,9 @@ if (uploadBanner) {
     uploadBanner.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         arquivoBannerParaUpload = file;
-        
+
         const reader = new FileReader();
         reader.onload = (ev) => {
             bannerImg.src = ev.target.result;
@@ -184,7 +184,7 @@ if (uploadFoto) {
     uploadFoto.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         arquivoFotoParaUpload = file;
 
         const reader = new FileReader();
@@ -208,21 +208,21 @@ const caminhoFoto = (nomeArquivo) => {
 async function carregarEsportesMestres() {
     console.log("carregarEsportesMestres() foi chamada");
     try {
-        const response = await fetch(`${BASE_URL}/esportes/mestra`); 
+        const response = await fetch(`${BASE_URL}/esportes/mestra`);
         if (!response.ok) throw new Error('Falha ao carregar esportes mestres.');
-        
-        const dadosEsportes = await response.json(); 
-        console.log("Resposta do servidor:", dadosEsportes); 
-        
+
+        const dadosEsportes = await response.json();
+        console.log("Resposta do servidor:", dadosEsportes);
+
         if (Array.isArray(dadosEsportes) && dadosEsportes.length > 0) {
             LISTA_MESTRA_ESPORTES = dadosEsportes;
             console.log("✅ Esportes carregados:", LISTA_MESTRA_ESPORTES);
-            preencherListaDeSugestao(); 
+            preencherListaDeSugestao();
         } else {
             console.warn("⚠️ Nenhum esporte encontrado");
             LISTA_MESTRA_ESPORTES = [];
         }
-        
+
     } catch (error) {
         console.error("❌ Erro ao carregar esportes:", error);
         LISTA_MESTRA_ESPORTES = [];
@@ -238,9 +238,9 @@ async function carregarPerfilInicial() {
     }
 
     try {
-        let resposta = await fetch(`${BASE_URL}/usuario/${encodeURIComponent(cpf)}`); 
+        let resposta = await fetch(`${BASE_URL}/usuario/${encodeURIComponent(cpf)}`);
         if (!resposta.ok) throw new Error('Falha ao carregar dados principais.');
-        
+
         let dadosPerfil = await resposta.json();
         const usuario = dadosPerfil.usuario || {};
 
@@ -254,32 +254,32 @@ async function carregarPerfilInicial() {
             const fotoUrl = caminhoFoto(usuario.fotoDePerfil);
             fotoPreview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
         }
-        
-        const bannerPath = caminhoBanner(usuario.bannerURL); 
-        const bannerElement = document.getElementById("banner"); 
+
+        const bannerPath = caminhoBanner(usuario.bannerURL);
+        const bannerElement = document.getElementById("banner");
         if (bannerElement) {
             if (bannerPath) {
                 bannerElement.style.backgroundImage = `url(${bannerPath})`;
                 bannerElement.style.backgroundColor = 'transparent';
             } else {
-                bannerElement.style.backgroundImage = 'none'; 
+                bannerElement.style.backgroundImage = 'none';
             }
         }
-        
+
         if (usuario.bannerUrl) {
             const bannerUrl = caminhoFoto(usuario.bannerUrl);
             bannerImg.src = bannerUrl;
             bannerImg.classList.add('loaded');
         } else {
-            bannerImg.src = ''; 
+            bannerImg.src = '';
             bannerImg.classList.remove('loaded');
         }
 
-        resposta = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpf)}`); 
+        resposta = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpf)}`);
         if (!resposta.ok) throw new Error('Falha ao carregar esportes favoritos.');
 
         const esportesFavoritos = await resposta.json();
-        
+
         if (Array.isArray(esportesFavoritos)) {
             carregarTagsIniciais(esportesFavoritos);
         }
@@ -298,7 +298,7 @@ async function fazerUploadImagens(cpf) {
     if (!arquivoBannerParaUpload && !arquivoFotoParaUpload) {
         return { success: true, message: "Nenhuma imagem para upload." };
     }
-    
+
     const formData = new FormData();
     if (arquivoBannerParaUpload) {
         formData.append("banner", arquivoBannerParaUpload);
@@ -308,7 +308,7 @@ async function fazerUploadImagens(cpf) {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/usuario/upload-perfil/${encodeURIComponent(cpf)}`, { 
+        const response = await fetch(`${BASE_URL}/usuario/upload-perfil/${encodeURIComponent(cpf)}`, {
             method: 'POST',
             body: formData,
         });
@@ -317,7 +317,7 @@ async function fazerUploadImagens(cpf) {
         if (!resultado.success) {
             throw new Error(resultado.message || "Erro desconhecido ao enviar imagens.");
         }
-        
+
         arquivoBannerParaUpload = null;
         arquivoFotoParaUpload = null;
         return resultado;
@@ -330,13 +330,13 @@ async function fazerUploadImagens(cpf) {
 
 async function salvarPerfil(e) {
     e.preventDefault();
-    
+
     const btnSalvar = document.querySelector('.btn-salvar');
     if (!btnSalvar) {
         console.error("Botão salvar não encontrado!");
         return;
     }
-    
+
     const cpf = localStorage.getItem("cpf");
     if (!cpf) return alert("CPF não encontrado. Não é possível salvar.");
 
@@ -364,25 +364,25 @@ async function salvarPerfil(e) {
     try {
         btnSalvar.textContent = 'Salvando...';
         btnSalvar.disabled = true;
-        
+
         await fazerUploadImagens(cpf);
 
-        let response = await fetch(`${BASE_URL}/usuario/atualizar`, { 
-            method: 'PUT', 
+        let response = await fetch(`${BASE_URL}/usuario/atualizar`, {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dadosPrincipais),
         });
 
         if (!response.ok) throw new Error('Falha ao salvar dados principais.');
-        
-        response = await fetch(`${BASE_URL}/esportes`, { 
+
+        response = await fetch(`${BASE_URL}/esportes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cpf: cpf, esportes: esportesAtuais }),
         });
 
         if (!response.ok) throw new Error('Falha ao salvar esportes.');
-        
+
         alert("Perfil atualizado com sucesso!");
         window.location.href = 'perfil.html';
 
@@ -403,10 +403,10 @@ async function carregarClubesExistentes() {
     try {
         const response = await fetch(`${BASE_URL}/clubes/todos`);
         if (!response.ok) throw new Error('Erro ao carregar clubes');
-        
+
         const clubes = await response.json();
         const selectClubeExistente = document.getElementById('select-clube-existente');
-        
+
         if (selectClubeExistente) {
             selectClubeExistente.innerHTML = '<option value="">-- Selecione um clube --</option>';
             clubes.forEach(clube => {
@@ -416,7 +416,7 @@ async function carregarClubesExistentes() {
                 selectClubeExistente.appendChild(option);
             });
         }
-        
+
     } catch (error) {
         console.error('Erro ao carregar clubes existentes:', error);
     }
@@ -438,16 +438,16 @@ function preencherEsportesDoModal() {
 async function carregarClubesDoUsuario() {
     const cpf = localStorage.getItem('cpf');
     if (!cpf) return;
-    
+
     try {
         const response = await fetch(`${BASE_URL}/usuario/${encodeURIComponent(cpf)}/clubes`);
         if (!response.ok) throw new Error('Erro ao carregar clubes do usuário');
-        
+
         const data = await response.json();
         clubesDoUsuario = data.clubes || [];
-        
+
         renderizarClubes();
-        
+
     } catch (error) {
         console.error('Erro ao carregar clubes do usuário:', error);
         clubesDoUsuario = [];
@@ -457,27 +457,27 @@ async function carregarClubesDoUsuario() {
 function renderizarClubes() {
     const listaClubescont = document.querySelector('.lista-clubes');
     if (!listaClubescont) return;
-    
+
     listaClubescont.innerHTML = '';
-    
+
     if (clubesDoUsuario.length === 0) {
         listaClubescont.innerHTML = '<p style="color: #999; text-align: center;">Nenhum clube adicionado ainda.</p>';
         return;
     }
-    
+
     clubesDoUsuario.forEach(clube => {
         const divClube = document.createElement('div');
         divClube.classList.add('clube');
         divClube.dataset.idclube = clube.IDclube;
-        
+
         divClube.innerHTML = `
             <p><strong>${clube.nome}</strong><br><small>${clube.esporteClube}</small></p>
             <button class="remover" data-idclube="${clube.IDclube}">&times;</button>
         `;
-        
+
         const btnRemover = divClube.querySelector('.remover');
         btnRemover.addEventListener('click', () => removerClube(clube.IDclube));
-        
+
         listaClubescont.appendChild(divClube);
     });
 }
@@ -485,24 +485,24 @@ function renderizarClubes() {
 async function removerClube(idClube) {
     const cpf = localStorage.getItem('cpf');
     if (!cpf) return;
-    
+
     const confirmar = confirm('Tem certeza que deseja remover este clube?');
     if (!confirmar) return;
-    
+
     try {
         const response = await fetch(`${BASE_URL}/usuario/clube/remover`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cpf, idClube })
         });
-        
+
         if (!response.ok) throw new Error('Erro ao remover clube');
-        
+
         clubesDoUsuario = clubesDoUsuario.filter(c => c.IDclube !== idClube);
         renderizarClubes();
-        
+
         alert('Clube removido com sucesso!');
-        
+
     } catch (error) {
         console.error('Erro ao remover clube:', error);
         alert('Erro ao remover clube. Tente novamente.');
@@ -531,7 +531,7 @@ function limparCamposModal() {
     const selectClubeExistente = document.getElementById('select-clube-existente');
     const inputNomeClube = document.getElementById('input-nome-clube');
     const selectEsporteClube = document.getElementById('select-esporte-clube');
-    
+
     if (selectClubeExistente) selectClubeExistente.value = '';
     if (inputNomeClube) inputNomeClube.value = '';
     if (selectEsporteClube) selectEsporteClube.value = '';
@@ -541,12 +541,12 @@ function limparCamposModal() {
 function atualizarContadorClube() {
     const contador = document.getElementById('contador-clube');
     const inputNomeClube = document.getElementById('input-nome-clube');
-    
+
     if (!contador || !inputNomeClube) return;
-    
+
     const atual = inputNomeClube.value.length;
     contador.textContent = `${atual}/${LIMITE_CARACTERES_CLUBE} caracteres`;
-    
+
     if (atual >= LIMITE_CARACTERES_CLUBE) {
         contador.style.color = '#e53935';
     } else {
@@ -560,34 +560,34 @@ async function adicionarClube() {
         alert('CPF não encontrado. Faça login novamente.');
         return;
     }
-    
+
     const selectClubeExistente = document.getElementById('select-clube-existente');
     const inputNomeClube = document.getElementById('input-nome-clube');
     const selectEsporteClube = document.getElementById('select-esporte-clube');
     const salvarClube = document.getElementById('salvar-clube');
-    
+
     const clubeExistenteId = selectClubeExistente?.value;
     const nomeNovoClube = inputNomeClube?.value.trim();
     const esporteNovoClube = selectEsporteClube?.value;
-    
+
     if (!clubeExistenteId && !nomeNovoClube) {
         alert('Selecione um clube existente ou preencha o nome do novo clube.');
         return;
     }
-    
+
     if (nomeNovoClube && !esporteNovoClube) {
         alert('Selecione o esporte do novo clube.');
         return;
     }
-    
+
     try {
         if (salvarClube) {
             salvarClube.textContent = 'Salvando...';
             salvarClube.disabled = true;
         }
-        
+
         let response;
-        
+
         if (clubeExistenteId) {
             response = await fetch(`${BASE_URL}/usuario/clube/adicionar`, {
                 method: 'POST',
@@ -598,23 +598,23 @@ async function adicionarClube() {
             response = await fetch(`${BASE_URL}/usuario/clube/criar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    cpf, 
-                    nomeClube: nomeNovoClube, 
-                    esporte: esporteNovoClube 
+                body: JSON.stringify({
+                    cpf,
+                    nomeClube: nomeNovoClube,
+                    esporte: esporteNovoClube
                 })
             });
         }
-        
+
         if (!response.ok) {
             const erro = await response.json();
             throw new Error(erro.message || 'Erro ao adicionar clube');
         }
-        
+
         alert('Clube adicionado com sucesso!');
         fecharModalClube();
         await carregarClubesDoUsuario();
-        
+
     } catch (error) {
         console.error('Erro ao adicionar clube:', error);
         alert('Erro: ' + error.message);
@@ -625,6 +625,101 @@ async function adicionarClube() {
         }
     }
 }
+// Script de Exclusão de Conta
+const btnExcluirConta = document.getElementById('btn-excluir-conta');
+const modalConfirmacao = document.getElementById('modal-confirmacao-exclusao');
+const btnCancelarExclusao = document.getElementById('cancelar-exclusao');
+const btnConfirmarExclusao = document.getElementById('confirmar-exclusao');
+const inputConfirmacao = document.getElementById('input-confirmacao');
+
+// Abrir modal de confirmação
+btnExcluirConta.addEventListener('click', () => {
+    modalConfirmacao.classList.add('ativo');
+    inputConfirmacao.value = '';
+    btnConfirmarExclusao.disabled = true;
+});
+
+// Fechar modal
+btnCancelarExclusao.addEventListener('click', () => {
+    modalConfirmacao.classList.remove('ativo');
+});
+
+// Fechar modal ao clicar fora
+modalConfirmacao.addEventListener('click', (e) => {
+    if (e.target === modalConfirmacao) {
+        modalConfirmacao.classList.remove('ativo');
+    }
+});
+
+// Verificar digitação para habilitar botão
+inputConfirmacao.addEventListener('input', () => {
+    btnConfirmarExclusao.disabled = inputConfirmacao.value !== 'EXCLUIR';
+});
+
+// Confirmar exclusão
+btnConfirmarExclusao.addEventListener('click', async () => {
+    if (inputConfirmacao.value !== 'EXCLUIR') {
+        return;
+    }
+
+    try {
+        // Desabilitar botão durante o processo
+        btnConfirmarExclusao.disabled = true;
+        btnConfirmarExclusao.textContent = 'Excluindo...';
+
+        // Pegar o CPF do usuário logado (do localStorage)
+        const cpfUsuario = localStorage.getItem('cpf');
+
+        if (!cpfUsuario) {
+            alert('Erro: Usuário não identificado. Faça login novamente.');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Fazer requisição para o backend
+        const response = await fetch(`${BASE_URL}/usuario/excluir-conta`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                cpf: cpfUsuario,
+                confirmacao: 'EXCLUIR'
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Erro ao excluir conta');
+        }
+
+        // Limpar dados locais
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Limpar cookies
+        document.cookie.split(";").forEach((c) => {
+            document.cookie = c
+                .replace(/^ +/, "")
+                .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+
+        // Mostrar mensagem de sucesso
+        alert('Sua conta foi excluída com sucesso. Você será redirecionado.');
+
+        // Redirecionar para a página inicial
+        window.location.href = 'index.html';
+
+    } catch (error) {
+        console.error('Erro ao excluir conta:', error);
+        alert('Ocorreu um erro ao excluir sua conta: ' + error.message);
+
+        // Reabilitar botão em caso de erro
+        btnConfirmarExclusao.disabled = false;
+        btnConfirmarExclusao.textContent = 'Excluir Permanentemente';
+    }
+});
 
 // =================================================================
 // EVENTOS E INICIALIZAÇÃO
@@ -640,11 +735,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectClubeExistente = document.getElementById('select-clube-existente');
     const inputNomeClube = document.getElementById('input-nome-clube');
     const selectEsporteClube = document.getElementById('select-esporte-clube');
-    
+
     // Inicializações principais
     carregarEsportesMestres();
     carregarPerfilInicial();
     carregarClubesDoUsuario();
+
 
     // Contador da biografia
     if (bioTextarea) {
@@ -673,7 +769,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSalvar.addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
+
             try {
                 await salvarPerfil(e);
             } catch (error) {
@@ -714,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const temClubeExistente = selectClubeExistente.value !== '';
             inputNomeClube.disabled = temClubeExistente;
             selectEsporteClube.disabled = temClubeExistente;
-            
+
             if (temClubeExistente) {
                 inputNomeClube.value = '';
                 selectEsporteClube.value = '';
@@ -724,11 +820,11 @@ document.addEventListener("DOMContentLoaded", () => {
         inputNomeClube.addEventListener('input', () => {
             const temNomeNovo = inputNomeClube.value.trim() !== '';
             selectClubeExistente.disabled = temNomeNovo;
-            
+
             if (temNomeNovo) {
                 selectClubeExistente.value = '';
             }
-            
+
             atualizarContadorClube();
         });
     }

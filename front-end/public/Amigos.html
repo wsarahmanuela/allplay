@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Play</title>
-    <link rel="stylesheet" href="feed.css">
+    <link rel="stylesheet" href="Amigos.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <script src="https://kit.fontawesome.com/93596a3fd2.js" crossorigin="anonymous"></script>
@@ -97,105 +97,134 @@
             </div>
         </div>
 
-        <!-- CONTEÚDO PRINCIPAL -->
-        <div class="main-content">
-            <div class="conteudo-post">
-                <div class="perfil-usuario">
-                    <img id="fotoUsuarioPost" src="imagens/profile.picture.jpg" alt="Foto do usuário">
-                    <div id="nome_usuario">Usuário sem nome</div>
-                    <div class="esporte-select">
-                        <label for="esportes">🏅</label>
-                        <select id="esportes">
-                            <option value="">Selecionar esporte</option><!--AQUI O USUARIO VAI ESCOLHER O ESPORTE -->
-                        </select>
+    <div class="main-content">
+
+            <!-- CARD 1 -->
+            <div class="user-card">
+                <img class="user-avatar" src="imagens/user1.png">
+
+                <div class="user-info">
+                    <h3>Natan João Vansulta</h3>
+                    <p class="arroba">@nat</p>
+
+                    <div class="tags">
+                        <span class="tag">Surf</span>
+                        <span class="tag">Vôlei</span>
                     </div>
                 </div>
 
-                <div class="post-input-container">
-                    <textarea id="post-text" rows="3" placeholder="O que deseja compartilhar?"></textarea>
+                <div class="actions">
+                    
+                    <button class="follow-btn seguido">Seguindo</button>
+                </div>
+            </div>
 
-                    <!-- Preview da imagem -->
-                    <img id="preview-imagem" style="display:none; 
-              width:100%; 
-              max-height:300px; 
-              border-radius:12px; 
-              margin-top:10px; 
-              object-fit:cover;
-              border:1px solid #ccc;">
+            <!-- CARD 2 -->
+            <div class="user-card">
+                <img class="user-avatar" src="imagens/user2.png">
 
-                    <div class="add-post-links">
-                        <button type="button" id="btn-imagem" class="add-img"
-                            style="background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:10px; color:#0d7000; padding:0;">
+                <div class="user-info">
+                    <h3>Maria Claraa</h3>
+                    <p class="arroba">@clarinhaa</p>
 
-                            <!-- Ícone SVG de imagem -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" style="display:block;">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                <path d="M21 15l-5-5L5 21" />
-                            </svg>
-
-                            <span style="font-size:16px;">Imagem</span>
-                        </button>
-
-                        <!-- Input file escondido -->
-                        <input type="file" id="input-imagem" accept="image/*" style="display:none;">
-
-                        <button type="button" class="post-btn" onclick="criarPost()">Postar</button>
+                    <div class="tags">
+                        <span class="tag">Yoga</span>
+                        <span class="tag">Trilha</span>
                     </div>
                 </div>
+
+                <div class="actions">
+                   
+                    <button class="follow-btn seguido">Seguindo</button>
+                </div>
             </div>
 
-            <!-- FEED DINÂMICO -->
-            <div id="feed">
-                <!-- Aqui o JS vai adicionar os posts -->
+            <!-- CARD 3 -->
+            <div class="user-card">
+                <img class="user-avatar" src="imagens/user3.png">
+
+                <div class="user-info">
+                    <h3>Pedro Santos</h3>
+                    <p class="arroba">@pedrosantos</p>
+
+                    <div class="tags">
+                        <span class="tag">Surf</span>
+                        <span class="tag">Skate</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    
+                    <button class="follow-btn seguido">Seguindo</button>
+                </div>
+            </div>
+
+            <!-- CARD 4 -->
+            <div class="user-card">
+                <img class="user-avatar" src="imagens/user4.png">
+
+                <div class="user-info">
+                    <h3>Ana Silva</h3>
+                    <p class="arroba">@anasilva</p>
+
+                    <div class="tags">
+                        <span class="tag">Vôlei</span>
+                        <span class="tag">Natação</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    
+                    <button class="follow-btn seguido">Seguindo</button>
+                </div>
+            </div>
+
+    </div>
+
+
+    <!-- COLUNA DIREITA -->
+    <div class="right-sidebar">
+        <div class="sidebar-titulo">
+            <h4>Eventos</h4>
+            <h5> Postar Eventos</h5>
+            <a href="#">Ver tudo</a>
+        </div>
+
+        <div class="event">
+            <div class="left-event">
+                <h3>18</h3>
+                <span>Setembro</span>
+            </div>
+            <div class="right-event">
+                <h4>Patota</h4>
+                <p><i class="fa-solid fa-location-dot"></i> Atlético Tupi - Gaspar</p>
+                <a href="#">Mais informações</a>
             </div>
         </div>
 
-        <!-- COLUNA DIREITA -->
-        <div class="right-sidebar">
-            <div class="sidebar-titulo">
-                <h4>Eventos</h4>
-                <h5> Postar Eventos</h5>
-                <a href="#">Ver tudo</a>
+        <div class="event">
+            <div class="left-event">
+                <h3>24</h3>
+                <span>Novembro</span>
             </div>
-
-            <div class="event">
-                <div class="left-event">
-                    <h3>18</h3>
-                    <span>Setembro</span>
-                </div>
-                <div class="right-event">
-                    <h4>Patota</h4>
-                    <p><i class="fa-solid fa-location-dot"></i> Atlético Tupi - Gaspar</p>
-                    <a href="#">Mais informações</a>
-                </div>
-            </div>
-
-            <div class="event">
-                <div class="left-event">
-                    <h3>24</h3>
-                    <span>Novembro</span>
-                </div>
-                <div class="right-event">
-                    <h4>Corrida</h4>
-                    <p><i class="fa-solid fa-location-dot"></i> Parque Ramiro - Bnu</p>
-                    <a href="#">Mais informações</a>
-                </div>
-            </div>
-
-            <div class="sidebar-titulo">
-                <h4>Anúncios</h4>
-                <a href="#">Fechar</a>
-            </div>
-            <p class="sidebar-text">Matricule seus filhos na escolinha de futebol mais próxima: </p>
-            <img src="imagens/criancas.jpg" class="sidebar-ads">
-
-            <div class="sidebar-titulo">
-                <a href="#">Ver mais</a>
+            <div class="right-event">
+                <h4>Corrida</h4>
+                <p><i class="fa-solid fa-location-dot"></i> Parque Ramiro - Bnu</p>
+                <a href="#">Mais informações</a>
             </div>
         </div>
+
+        <div class="sidebar-titulo">
+            <h4>Anúncios</h4>
+            <a href="#">Fechar</a>
+        </div>
+        <p class="sidebar-text">Matricule seus filhos na escolinha de futebol mais próxima: </p>
+        <img src="imagens/criancas.jpg" class="sidebar-ads">
+
+        <div class="sidebar-titulo">
+            <a href="#">Ver mais</a>
+        </div>
+    </div>
     </div>
 
     <script src="JavaScript/feed.js"></script>

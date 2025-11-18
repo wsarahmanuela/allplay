@@ -144,6 +144,66 @@
             </div>
         </div>
 
+        <section class="zona-perigo">
+            <h3>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Zona de Perigo
+            </h3>
+            
+            <div class="zona-perigo-content">
+                <div class="zona-perigo-info">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div class="zona-perigo-texto">
+                        <p><strong>Atenção:</strong> A exclusão da conta é permanente e irreversível.</p>
+                        <p>Ao excluir sua conta, você perderá acesso a:</p>
+                        <ul>
+                            <li>Todo o histórico de atividades</li>
+                            <li>Conexões com clubes e esportes</li>
+                            <li>Dados do perfil e configurações</li>
+                            <li>Conteúdos salvos e compartilhados</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button class="btn-excluir-conta" id="btn-excluir-conta">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Excluir minha conta
+                </button>
+            </div>
+        </section>
+
+        <!-- Modal de Confirmação de Exclusão -->
+        <div id="modal-confirmacao-exclusao" class="modal-confirmacao">
+            <div class="modal-confirmacao-content">
+                <div class="modal-confirmacao-header">
+                    <h3>
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Confirmar Exclusão de Conta
+                    </h3>
+                </div>
+
+                <div class="modal-confirmacao-body">
+                    <p><strong>Você tem certeza que deseja excluir sua conta?</strong></p>
+                    <p>Esta ação não pode ser desfeita. Todos os seus dados serão permanentemente removidos dos nossos servidores.</p>
+                    
+                    <div class="confirmacao-input-grupo">
+                        <label>Digite <strong>"EXCLUIR"</strong> para confirmar:</label>
+                        <input type="text" id="input-confirmacao" placeholder="Digite EXCLUIR em letras maiúsculas">
+                    </div>
+                </div>
+
+                <div class="modal-confirmacao-footer">
+                    <button class="btn-cancelar-exclusao" id="cancelar-exclusao">Cancelar</button>
+                    <button class="btn-confirmar-exclusao" id="confirmar-exclusao" disabled>
+                        Excluir Permanentemente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
     </main>
 
     <!-- Script -->

@@ -68,7 +68,7 @@ function parseDateToLocal(input) {
   return null;
 }
 
-// 🔥 NOVA FUNÇÃO: Obtém CPF da URL ou localStorage
+//  NOVA FUNÇÃO: Obtém CPF da URL ou localStorage
 function obterCPFDaPagina() {
   // Tenta pegar CPF da URL (?cpf=123456789)
   const urlParams = new URLSearchParams(window.location.search);
@@ -85,7 +85,7 @@ function obterCPFDaPagina() {
   return cpfLocal;
 }
 
-// 🔥 NOVA FUNÇÃO: Verifica se é o perfil do usuário logado
+//  NOVA FUNÇÃO: Verifica se é o perfil do usuário logado
 function ehPerfilProprio() {
   const cpfPagina = obterCPFDaPagina();
   const cpfLogado = localStorage.getItem('cpf');
@@ -100,7 +100,7 @@ async function preencherPerfil() {
   
   if (!cpf) return console.warn("CPF não encontrado");
 
-  console.log("🔍 Carregando perfil do CPF:", cpf);
+  console.log(" Carregando perfil do CPF:", cpf);
 
   try {
     const resposta = await fetch(`${BASE_URL}/usuario/${encodeURIComponent(cpf)}`);
@@ -384,7 +384,32 @@ function criarHeaderPost(post, filtroEsporte) {
 
   return header;
 }
+// ====== SEGUIDORES E SEGUINDO (Yago) =====
+async function carregarSeguidores(){
+  const cpf = localStorage.getItem("cpf");
+ try {
+      
+      const response = await fetch(`/seguidores/${encodeURIComponent(cpf)}`, {
+            method: "GET"
+        });
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar contagem. Status: ${response.status}`);
+        }
 
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Contagem de seguidores:', data.seguidores);
+            console.log('Contagem de seguindo:', data.seguindo);
+
+            // ATUALIZE SEUS ELEMENTOS HTML AQUI
+            document.getElementById('seguidores').innerText ="seguidores\n " +data.seguidores ;
+            document.getElementById('seguindo').innerText = "seguindo\n "+ data.seguindo ;
+        }
+    } catch (error) {
+        console.error('Erro ao buscar contagem:', error);
+    }
+}
 // ======================= ESPORTES =======================
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
@@ -445,6 +470,48 @@ async function carregarEsportes() {
   } catch (erro) {
     console.error("Erro ao carregar esportes:", erro);
     container.innerHTML = `<p>Erro ao carregar esportes: ${escapeHtml(erro.message)}</p>`;
+  }
+}
+
+// ======================= ESPORTES DO LADO DIREITO =======================
+async function carregarEsportesDireita() {
+  const container = document.getElementById("esportes-direita");
+
+  if (!container) {
+    console.warn("Elemento #esportes-direita não encontrado.");
+    return;
+  }
+
+  const cpf = obterCPFDaPagina();
+  if (!cpf) return;
+
+  try {
+    const resp = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpf)}`);
+    if (!resp.ok) throw new Error("Erro ao buscar esportes.");
+
+    const esportes = await resp.json();
+
+    container.innerHTML = ""; // limpar
+
+    if (!Array.isArray(esportes) || esportes.length === 0) {
+      container.innerHTML = `<p style="text-align:center; color:#888;">Sem esportes</p>`;
+      return;
+    }
+
+    esportes.forEach(esporte => {
+      const btn = document.createElement("button");
+      btn.classList.add("btn-esporte-direita");
+      btn.textContent = esporte;
+
+      btn.addEventListener("click", () => {
+        carregarPostsDoUsuario(esporte);
+      });
+
+      container.appendChild(btn);
+    });
+
+  } catch (err) {
+    console.error("Erro ao carregar esportes da direita:", err);
   }
 }
 
@@ -671,35 +738,60 @@ async function criarPost() {
 }
 
 // ======================= NAVEGAÇÃO =======================
-function configurarBotaoEditar() {
-  const btnEditar = document.getElementById('btn-editar-perfil');
-  
-  if (btnEditar) {
-    btnEditar.addEventListener('click', () => {
-      console.log('Botão Editar Perfil clicado. Redirecionando...');
-      window.location.href = 'editPerfil.html'; 
-    });
-  } else {
-    console.warn("Elemento com ID 'btn-editar-perfil' não encontrado.");
+function criarBotaoEditar() {
+  // só mostra se for o perfil do próprio usuário
+  if (!ehPerfilProprio()) return;
+
+  const container = document.querySelector("#container-segue");
+  if (!container) {
+    console.warn("container-segue não encontrado");
+    return;
   }
+
+  // procura área do botão
+  let area = document.querySelector("#area-botao-seguir");
+
+  // se não existir, cria
+  if (!area) {
+    area = document.createElement("div");
+    area.id = "area-botao-seguir";
+    area.style.display = "flex";
+    area.style.alignItems = "center";
+    area.style.marginLeft = "20px";
+
+    container.appendChild(area);
+  }
+
+  // criar botão
+  const botao = document.createElement("button");
+  botao.id = "btn-editar-perfil";
+  botao.className = "botao-editar";
+  botao.textContent = "Editar";
+
+  botao.addEventListener("click", () => {
+    console.log("Redirecionando para editPerfil.html");
+    window.location.href = "editPerfil.html";
+  });
+
+  // inserir na área correta
+  area.appendChild(botao);
+}
+function configurarMenuConfiguracao() {
+  console.log("configurarMenuConfiguracao() não implementada");
 }
 
-function configurarMenuConfiguracao() {
-  const configMenu = document.querySelector(".config-menu");
-  window.configuracoesMenuAlter = function() {
-    if (configMenu) {
-      configMenu.classList.toggle("config-menu-height");
-    }
-  };
-}
 
 // ======================= INICIALIZAÇÃO =======================
 document.addEventListener("DOMContentLoaded", () => {
   preencherPerfil();
   carregarPostsDoUsuario();
   carregarEsportes();
+  carregarEsportesDireita();
+  carregarClubesNoPerfil();
+  criarBotaoEditar(); 
+  configurarMenuConfiguracao();
+  carregarSeguidores();
   carregarClubesNoPerfil();
   configurarBotaoEditar();
-  configurarMenuConfiguracao();
   console.log("perfil inicializado");
 });
