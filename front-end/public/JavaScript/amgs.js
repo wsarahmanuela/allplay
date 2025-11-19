@@ -267,6 +267,387 @@ async function preencherSelectEsportes() {
   console.info("[amigos.js] ℹ preencherSelectEsportes: função chamada (não implementada nesta página)");
 }
 
+function abrirModalCriarEvento() {
+  document.getElementById('modalCriarEvento').classList.add('ativo');
+  carregarEsportesCheckbox();
+  carregarClubesEvento();
+  preencherSelectLocais(); // ← NOVA FUNÇÃO
+
+  const hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('dataEvento').min = hoje;
+}
+
+function fecharModalCriar() {
+  document.getElementById('modalCriarEvento').classList.remove('ativo');
+  document.getElementById('formCriarEvento').reset();
+}
+
+function fecharModalDetalhes() {
+  document.getElementById('modalDetalhesEvento').classList.remove('ativo');
+}
+
+// Fechar ao clicar fora
+document.getElementById('modalCriarEvento')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modalCriarEvento') fecharModalCriar();
+});
+
+document.getElementById('modalDetalhesEvento')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modalDetalhesEvento') fecharModalDetalhes();
+});
+
+// ==================== PREENCHER SELECT DE LOCAIS ====================
+function preencherSelectLocais() {
+  const select = document.getElementById('localEvento');
+  if (!select) return;
+
+  // Limpa e adiciona opção padrão
+  select.innerHTML = '<option value="">Selecione um local</option>';
+
+  // Ordena alfabeticamente
+  const locaisOrdenados = [...locaisDisponiveis].sort((a, b) =>
+    a.nome.localeCompare(b.nome)
+  );
+
+  // Adiciona cada local
+  locaisOrdenados.forEach(local => {
+    const option = document.createElement('option');
+    option.value = local.nome;
+    option.dataset.lat = local.lat;
+    option.dataset.lon = local.lon;
+    option.textContent = local.nome;
+    select.appendChild(option);
+  });
+
+  // Adiciona opção "Outro local"
+  const optionOutro = document.createElement('option');
+  optionOutro.value = 'outro';
+  optionOutro.textContent = 'Outro local (digite abaixo)';
+  select.appendChild(optionOutro);
+
+  // Evento de mudança
+  select.addEventListener('change', function () {
+    const inputCustom = document.getElementById('localEventoCustom');
+    if (this.value === 'outro') {
+      if (!inputCustom) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'localEventoCustom';
+        input.placeholder = 'Digite o nome do local';
+        input.className = 'form-grupo input';
+        input.style.marginTop = '10px';
+        select.parentElement.appendChild(input);
+      }
+    } else {
+      if (inputCustom) inputCustom.remove();
+    }
+  });
+}
+
+// ==================== CARREGAR ESPORTES ====================
+async function carregarEsportesCheckbox() {
+  const container = document.getElementById('esportesCheckbox');
+  if (!container) return;
+
+  const cpf = localStorage.getItem('cpf');
+  if (!cpf) return;
+
+  try {
+    const resposta = await fetch(`http://localhost:3000/esportes/${cpf}`);
+    const esportes = await resposta.json();
+
+    container.innerHTML = '';
+
+    if (esportes.length === 0) {
+      container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#666;">Você ainda não possui esportes cadastrados</p>';
+      return;
+    }
+
+    esportes.forEach((esporte, index) => {
+      const div = document.createElement('div');
+      div.classList.add('checkbox-item');
+      div.innerHTML = `
+                <input type="checkbox" id="esporte${index}" value="${esporte}" name="esportes">
+                <label for="esporte${index}">${esporte}</label>
+            `;
+      container.appendChild(div);
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar esportes:', erro);
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#ff0000;">Erro ao carregar esportes</p>';
+  }
+}
+
+// ==================== CARREGAR CLUBES ====================
+async function carregarClubesEvento() {
+  const select = document.getElementById('clubeEvento');
+  if (!select) return;
+
+  try {
+    const resposta = await fetch('http://localhost:3000/clubes/todos');
+    const clubes = await resposta.json();
+
+    select.innerHTML = '<option value="">Nenhum clube</option>';
+    clubes.forEach(clube => {
+      const option = document.createElement('option');
+      option.value = clube.IDclube;
+      option.textContent = `${clube.nome} - ${clube.esporteClube}`;
+      select.appendChild(option);
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar clubes:', erro);
+  }
+}
+
+// ==================== CRIAR EVENTO (ATUALIZADO) ====================
+async function criarEvento(event) {
+  event.preventDefault();
+
+  const cpf = localStorage.getItem('cpf');
+  if (!cpf) {
+    alert('Você precisa estar logado para criar um evento');
+    return;
+  }
+
+  // Pegar esportes selecionados
+  const checkboxes = document.querySelectorAll('input[name="esportes"]:checked');
+  const esportesSelecionados = Array.from(checkboxes).map(cb => cb.value);
+
+  if (esportesSelecionados.length === 0) {
+    alert('Selecione pelo menos um esporte');
+    return;
+  }
+
+  // Pegar local (do select ou do input custom)
+  const selectLocal = document.getElementById('localEvento');
+  const inputCustom = document.getElementById('localEventoCustom');
+  let local = '';
+
+  if (selectLocal.value === 'outro' && inputCustom) {
+    local = inputCustom.value.trim();
+    if (!local) {
+      alert('Digite o nome do local');
+      return;
+    }
+  } else {
+    local = selectLocal.value;
+    if (!local) {
+      alert('Selecione um local');
+      return;
+    }
+  }
+
+  const dadosEvento = {
+    titulo: document.getElementById('tituloEvento').value,
+    responsavel: document.getElementById('responsavelEvento').value,
+    local: local,
+    data_evento: document.getElementById('dataEvento').value,
+    horario: document.getElementById('horarioEvento').value,
+    descricao: document.getElementById('descricaoEvento').value,
+    esportes: esportesSelecionados.join(', '),
+    clube_id: document.getElementById('clubeEvento').value || null,
+    criador_cpf: cpf
+  };
+
+  console.log(' Enviando dados do evento:', dadosEvento);
+
+  try {
+    const resposta = await fetch('http://localhost:3000/eventos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dadosEvento)
+    });
+
+    const resultado = await resposta.json();
+
+    if (resultado.success) {
+      alert(' Evento criado com sucesso!');
+      fecharModalCriar();
+      carregarEventos();
+    } else {
+      alert('Erro' + (resultado.message || 'Erro ao criar evento'));
+    }
+  } catch (erro) {
+    console.error('Erro ao criar evento:', erro);
+    alert('Erro ao criar evento. Verifique sua conexão e tente novamente.');
+  }
+}
+
+// ==================== CARREGAR EVENTOS (COM BOTÃO EXCLUIR) ====================
+async function carregarEventos() {
+  const container = document.getElementById('container-eventos');
+  if (!container) return;
+
+  const cpfLogado = localStorage.getItem('cpf');
+
+  console.log(' Carregando eventos...');
+
+  try {
+    const resposta = await fetch('http://localhost:3000/eventos');
+
+    console.log('Status da resposta:', resposta.status);
+
+    if (!resposta.ok) {
+      const erro = await resposta.json();
+      console.error(' Erro do servidor:', erro);
+      throw new Error(erro.message || 'Erro ao buscar eventos');
+    }
+
+    const eventos = await resposta.json();
+    console.log('Eventos recebidos:', eventos.length);
+
+    container.innerHTML = '';
+
+    if (eventos.length === 0) {
+      container.innerHTML = '<p class="mensagem-eventos-vazia">Nenhum evento cadastrado no momento</p>';
+      return;
+    }
+
+    eventos.forEach((evento, index) => {
+      console.log(` Processando evento ${index + 1}:`, {
+        id: evento.IDevento,
+        titulo: evento.titulo,
+        data_evento: evento.data_evento
+      });
+
+      const dataEvento = new Date(evento.data_evento);
+      dataEvento.setHours(dataEvento.getHours() + 3);
+
+      if (isNaN(dataEvento.getTime())) {
+        console.error(' Data inválida para evento:', evento);
+        return;
+      }
+
+      const dia = String(dataEvento.getDate()).padStart(2, '0');
+      const mes = dataEvento.toLocaleDateString('pt-BR', { month: 'long' });
+      const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1);
+
+      console.log(` Data processada: ${dia} de ${mesCapitalizado}`);
+
+      const eventoDiv = document.createElement('div');
+      eventoDiv.classList.add('event');
+
+      const ehCriador = evento.criador_cpf === cpfLogado;
+
+      eventoDiv.innerHTML = `
+  <div class="left-event">
+      <h3>${dia}</h3>
+      <span>${mesCapitalizado}</span>
+  </div>
+  <div class="right-event">
+      <div style="display: flex; justify-content: space-between; align-items: start; width: 100%;">
+          <div style="flex: 1; cursor: pointer;" onclick="abrirDetalhesEvento(${evento.IDevento})">
+              <h4>${evento.titulo}</h4>
+              <p>📍 ${evento.local}</p>
+              <a href="#" onclick="event.preventDefault(); event.stopPropagation(); abrirDetalhesEvento(${evento.IDevento});">Mais informações</a>
+          </div>
+          ${ehCriador ? `
+              <button class="btn-excluir-evento" onclick="confirmarExcluirEvento(${evento.IDevento}, '${evento.titulo.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Excluir evento">
+                  ✕
+              </button>
+          ` : ''}
+      </div>
+  </div>
+`;
+
+      container.appendChild(eventoDiv);
+    });
+
+    console.log(' Eventos carregados com sucesso!');
+
+  } catch (erro) {
+    console.error(' Erro ao carregar eventos:', erro);
+    container.innerHTML = '<p class="mensagem-eventos-vazia" style="color:#ff0000;">Erro ao carregar eventos: ' + erro.message + '</p>';
+  }
+}
+
+// ==================== EXCLUIR EVENTO ====================
+async function confirmarExcluirEvento(idEvento, tituloEvento) {
+  console.log(' Tentando excluir evento:', idEvento, tituloEvento);
+
+  const confirmar = confirm(`Deseja realmente excluir o evento "${tituloEvento}"?\n\nEsta ação não pode ser desfeita.`);
+
+  if (!confirmar) {
+    console.log(' Exclusão cancelada pelo usuário');
+    return;
+  }
+
+  console.log('Usuário confirmou exclusão');
+
+  try {
+    console.log(' Enviando DELETE para:', `http://localhost:3000/eventos/${idEvento}`);
+
+    const resposta = await fetch(`http://localhost:3000/eventos/${idEvento}`, {
+      method: 'DELETE'
+    });
+
+    console.log(' Resposta recebida, status:', resposta.status);
+
+    const resultado = await resposta.json();
+    console.log(' Resultado:', resultado);
+
+    if (resultado.success) {
+      alert('Evento excluído com sucesso!');
+      carregarEventos();
+    } else {
+      alert('Erro: ' + (resultado.message || 'Erro ao excluir evento'));
+    }
+  } catch (erro) {
+    console.error(' Erro ao excluir evento:', erro);
+    alert(' Erro ao excluir evento. Tente novamente.');
+  }
+}
+// ==================== ABRIR DETALHES (COM DESTAQUE NO LOCAL) ====================
+async function abrirDetalhesEvento(idEvento) {
+  try {
+    const resposta = await fetch(`http://localhost:3000/eventos/${idEvento}`);
+    const evento = await resposta.json();
+
+    if (!evento.success) {
+      alert('Erro ao carregar detalhes do evento');
+      return;
+    }
+
+    const e = evento.evento;
+    const dataEvento = new Date(e.data_evento + 'T00:00:00');
+    const dataFormatada = dataEvento.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const esportesArray = e.esportes ? e.esportes.split(',').map(s => s.trim()) : [];
+    const esportesTags = esportesArray.map(esp =>
+      `<span class="tag-esporte-modal">${esp}</span>`
+    ).join('');
+
+    // Verifica se o local está na lista de locais do mapa
+    const localEncontrado = locaisDisponiveis.find(local => local.nome === e.local);
+    const badgeLocal = localEncontrado ?
+      `<span style="background: #e8f5e9; color: #0f9800; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 8px;">NO MAPA</span>` :
+      '';
+
+    document.getElementById('tituloDetalhes').textContent = e.titulo;
+    document.getElementById('conteudoDetalhes').innerHTML = `
+              <p>📅 <strong>Data:</strong> ${dataFormatada}</p>
+              <p>⏰ <strong>Horário:</strong> ${e.horario}</p>
+              <p>📍 <strong>Local:</strong> ${e.local}</p>
+              <p>👤 <strong>Responsável:</strong> ${e.responsavel}</p>
+              ${e.descricao ? `<p>📝 <strong>Descrição:</strong><br>${e.descricao}</p>` : ''}
+              ${e.clube_nome ? `<p>🛡️ <strong>Clube:</strong> ${e.clube_nome}</p>` : ''}
+              ${e.criador_nome ? `<p>👥 <strong>Criado por:</strong> ${e.criador_nome}</p>` : ''}
+              <p><strong>Esportes:</strong></p>
+              <div class="esportes-tags">${esportesTags}</div>
+        `;
+
+    document.getElementById('modalDetalhesEvento').classList.add('ativo');
+  } catch (erro) {
+    console.error('Erro ao abrir detalhes:', erro);
+    alert('Erro ao carregar detalhes do evento');
+  }
+}
+
+
+
 // ================== INICIALIZAÇÃO ==================
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[amigos.js]  Inicializando página de amigos...");
@@ -275,4 +656,5 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarAmigos();         
   carregarEsportes();      
   preencherSelectEsportes(); 
+  carregarEventos();
 });

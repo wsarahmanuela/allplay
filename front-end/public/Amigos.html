@@ -100,52 +100,111 @@
             <!-- Usuários aparecem aqui automaticamente -->
         </div>
 
-        <!-- COLUNA DIREITA -->
         <div class="right-sidebar">
             <div class="sidebar-titulo">
                 <h4>Eventos</h4>
-                <h5> Postar Eventos</h5>
-                <a href="#">Ver tudo</a>
+                <a href="#" class="btn-novo-evento" onclick="abrirModalCriarEvento(); return false;">
+                    <i class="fa-solid fa-plus"></i>Postar Eventos
+                </a>
             </div>
 
-            <div class="event">
-                <div class="left-event">
-                    <h3>18</h3>
-                    <span>Setembro</span>
-                </div>
-                <div class="right-event">
-                    <h4>Patota</h4>
-                    <p><i class="fa-solid fa-location-dot"></i> Atlético Tupi - Gaspar</p>
-                    <a href="#">Mais informações</a>
-                </div>
+            <div class="container-eventos-dinamicos" id="container-eventos">
+                <!-- Os eventos serão carregados aqui dinamicamente -->
+                <p class="mensagem-eventos-vazia">Carregando eventos...</p>
             </div>
 
-            <div class="event">
-                <div class="left-event">
-                    <h3>24</h3>
-                    <span>Novembro</span>
-                </div>
-                <div class="right-event">
-                    <h4>Corrida</h4>
-                    <p><i class="fa-solid fa-location-dot"></i> Parque Ramiro - Bnu</p>
-                    <a href="#">Mais informações</a>
-                </div>
-            </div>
-
+            <!-- ÁREA DE ANÚNCIOS (mantém como está) -->
             <div class="sidebar-titulo">
                 <h4>Anúncios</h4>
-                <a href="#">Fechar</a>
             </div>
             <p class="sidebar-text">Matricule seus filhos na escolinha de futebol mais próxima: </p>
             <img src="imagens/criancas.jpg" class="sidebar-ads">
 
             <div class="sidebar-titulo">
-                <a href="#">Ver mais</a>
+
             </div>
         </div>
-    </div>
 
     <script src="JavaScript/amgs.js"></script>
+
+    <!-- MODAL CRIAR EVENTO -->
+        <div class="modal-overlay" id="modalCriarEvento">
+            <div class="modal-evento">
+                <div class="modal-header">
+                    <h3>Criar Novo Evento</h3>
+                    <button class="btn-fechar" onclick="fecharModalCriar()">&times;</button>
+                </div>
+
+                <form id="formCriarEvento" onsubmit="criarEvento(event)">
+                    <div class="form-grupo">
+                        <label for="tituloEvento">Nome do Evento *</label>
+                        <input type="text" id="tituloEvento" required placeholder="Ex: Campeonato de Futebol">
+                    </div>
+
+                    <div class="form-grupo">
+                        <label for="responsavelEvento">Responsável *</label>
+                        <input type="text" id="responsavelEvento" required placeholder="Quem está organizando">
+                    </div>
+
+                    <div class="form-grupo">
+                        <label for="localEvento">Local *</label>
+                        <select id="localEvento" required>
+                            <option value="">Carregando locais...</option>
+                        </select>
+                        <small>Escolha um local do mapa ou "Outro local" para digitar</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-grupo">
+                            <label for="dataEvento">Data *</label>
+                            <input type="date" id="dataEvento" required>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label for="horarioEvento">Horário *</label>
+                            <input type="time" id="horarioEvento" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label for="descricaoEvento">Descrição</label>
+                        <textarea id="descricaoEvento" placeholder="Descreva os detalhes do evento..."></textarea>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label>Esportes *</label>
+                        <small>Selecione um ou mais esportes</small>
+                        <div class="checkbox-grupo" id="esportesCheckbox">
+                            <!-- Será preenchido dinamicamente -->
+                        </div>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label for="clubeEvento">Clube (opcional)</label>
+                        <select id="clubeEvento">
+                            <option value="">Nenhum clube</option>
+                            <!-- Será preenchido dinamicamente -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-criar-evento">Criar Evento</button>
+                </form>
+            </div>
+        </div>
+
+          <!-- MODAL DETALHES DO EVENTO -->
+        <div class="modal-overlay" id="modalDetalhesEvento">
+            <div class="modal-evento">
+                <div class="modal-header">
+                    <h3 id="tituloDetalhes">Detalhes do Evento</h3>
+                    <button class="btn-fechar" onclick="fecharModalDetalhes()">&times;</button>
+                </div>
+
+                <div class="detalhes-evento" id="conteudoDetalhes">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+            </div>
+        </div>
 </body>
 
 </html>

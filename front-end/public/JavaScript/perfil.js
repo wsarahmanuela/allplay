@@ -125,7 +125,7 @@ async function preencherPerfil() {
     if (fotoElem) fotoElem.src = foto;
     if (nomeH3) nomeH3.textContent = nome;
     if (arrobaH5) arrobaH5.textContent = arroba;
-    if (bioElem) bioElem.textContent = bio;
+    if (bioElem) bioElem.innerHTML = bio.replace(/\n/g, "<br>");
     if (fotoNavbar) fotoNavbar.src = foto;
 
     if (bannerElem) {
