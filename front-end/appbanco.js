@@ -749,10 +749,6 @@ app.get("/publicacoes/:id/verificar-curtida", (req, res) => {
 
 app.use(express.static("public"));
 
-app.listen(3000, () => {
-  console.log("Servidor rodando em http://localhost:3000");
-});
-
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
 app.post('/api/usuarios-proximos', (req, res) => {
@@ -1212,7 +1208,6 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
   console.log('   CPF:', cpf);
   console.log('   Confirmação:', confirmacao);
 
-  // Validações
   if (!cpf || !confirmacao) {
     return res.status(400).json({
       success: false,
@@ -1228,63 +1223,33 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
   }
 
   try {
-    // Iniciar transação para garantir que todos os dados sejam excluídos
     await connection.promise().beginTransaction();
 
-    // 1. Excluir curtidas do usuário
-    await connection.promise().query(
-      'DELETE FROM curtida WHERE usuario_cpf = ?',
-      [cpf]
-    );
+    await connection.promise().query('DELETE FROM curtida WHERE usuario_cpf = ?', [cpf]);
     console.log('   ✓ Curtidas excluídas');
 
-    // 2. Excluir curtidas nas publicações do usuário
     await connection.promise().query(
       'DELETE FROM curtida WHERE publicacao_ID IN (SELECT IDpublicacao FROM publicacao WHERE autor_CPF = ?)',
       [cpf]
     );
     console.log('   ✓ Curtidas nas publicações excluídas');
 
-    // 3. Excluir publicações do usuário
-    await connection.promise().query(
-      'DELETE FROM publicacao WHERE autor_CPF = ?',
-      [cpf]
-    );
+    await connection.promise().query('DELETE FROM publicacao WHERE autor_CPF = ?', [cpf]);
     console.log('   ✓ Publicações excluídas');
 
-    // 4. Excluir esportes de interesse do usuário
-    await connection.promise().query(
-      'DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?',
-      [cpf]
-    );
+    await connection.promise().query('DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?', [cpf]);
     console.log('   ✓ Esportes de interesse excluídos');
 
-    // 5. Excluir relação usuário-clube
-    await connection.promise().query(
-      'DELETE FROM usuario_clube WHERE cpf_usuario = ?',
-      [cpf]
-    );
+    await connection.promise().query('DELETE FROM usuario_clube WHERE cpf_usuario = ?', [cpf]);
     console.log('   ✓ Relação com clubes excluída');
 
-    // 6. Excluir seguidores (quem segue o usuário)
-    await connection.promise().query(
-      'DELETE FROM Seguidores WHERE CPF_seguido = ?',
-      [cpf]
-    );
+    await connection.promise().query('DELETE FROM Seguidores WHERE CPF_seguido = ?', [cpf]);
     console.log('   ✓ Seguidores excluídos');
 
-    // 7. Excluir seguindo (quem o usuário segue)
-    await connection.promise().query(
-      'DELETE FROM Seguidores WHERE CPF_seguidor = ?',
-      [cpf]
-    );
+    await connection.promise().query('DELETE FROM Seguidores WHERE CPF_seguidor = ?', [cpf]);
     console.log('   ✓ Seguindo excluído');
 
-    // 8. Por fim, excluir o usuário
-    const [resultadoUsuario] = await connection.promise().query(
-      'DELETE FROM usuario WHERE CPF = ?',
-      [cpf]
-    );
+    const [resultadoUsuario] = await connection.promise().query('DELETE FROM usuario WHERE CPF = ?', [cpf]);
 
     if (resultadoUsuario.affectedRows === 0) {
       await connection.promise().rollback();
@@ -1295,7 +1260,6 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
     }
     console.log('   ✓ Usuário excluído');
 
-    // Confirmar transação
     await connection.promise().commit();
     console.log('✅ Conta excluída com sucesso!\n');
 
@@ -1305,9 +1269,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
     });
 
   } catch (erro) {
-    // Reverter transação em caso de erro
     await connection.promise().rollback();
-    
     console.error('❌ Erro ao excluir conta:', erro);
     res.status(500).json({
       success: false,
@@ -1315,6 +1277,67 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
     });
   }
 });
+
+// ==================== BUSCAR AMIGOS MÚTUOS ====================
+app.get("/mutuos/:cpf", (req, res) => {
+  const cpf = req.params.cpf;
+
+  console.log('\n👥 [API] Rota /mutuos/:cpf CHAMADA!');
+  console.log('   CPF recebido:', cpf);
+
+  const sql = `
+    SELECT DISTINCT
+      u.CPF,
+      u.nome,
+      u.nomeUsuario,
+      u.fotoDePerfil,
+      GROUP_CONCAT(DISTINCT e.nome_esporte) as esportes
+    FROM usuario u
+    INNER JOIN Seguidores s1 
+      ON s1.CPF_seguidor = ? AND s1.CPF_seguido = u.CPF
+    INNER JOIN Seguidores s2 
+      ON s2.CPF_seguido = ? AND s2.CPF_seguidor = u.CPF
+    LEFT JOIN usuario_esportesdeinteresse e 
+      ON e.CPF_usuario = u.CPF
+    GROUP BY u.CPF, u.nome, u.nomeUsuario, u.fotoDePerfil
+    ORDER BY u.nome ASC
+  `;
+
+  connection.query(sql, [cpf, cpf], (erro, resultados) => {
+    if (erro) {
+      console.error("❌ Erro SQL ao buscar amigos mútuos:", erro);
+      return res.status(500).json({ 
+        success: false,
+        message: "Erro no servidor ao buscar amigos.",
+        amigos: [] 
+      });
+    }
+
+    console.log(`✅ Query executada! ${resultados.length} amigos mútuos encontrados`);
+
+    const amigosFormatados = resultados.map(amigo => ({
+      ...amigo,
+      esportes: amigo.esportes ? amigo.esportes.split(',') : []
+    }));
+
+    console.log('📤 Enviando resposta:', amigosFormatados);
+    res.json(amigosFormatados);
+  });
+});
+
+// ==================== TESTE DE ROTAS ====================
+app.get("/teste-rotas", (req, res) => {
+  res.json({
+    message: "Servidor funcionando!",
+    rotas_disponiveis: [
+      "GET /mutuos/:cpf",
+      "GET /usuario/:cpf",
+      "POST /seguir",
+      "DELETE /seguir"
+    ]
+  });
+});
+
 
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;
