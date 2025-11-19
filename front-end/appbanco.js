@@ -778,7 +778,7 @@ app.post('/api/usuarios-proximos', (req, res) => {
     const { latitude, longitude, cpf } = req.body;
     const raio_metros = 20000; // 20 km
 
-    console.log('\n📍 Rota /api/usuarios-proximos chamada');
+    console.log('\n Rota /api/usuarios-proximos chamada');
     console.log('   CPF:', cpf);
     console.log('   Lat:', latitude);
     console.log('   Lon:', longitude);
@@ -790,21 +790,19 @@ app.post('/api/usuarios-proximos', (req, res) => {
         });
     }
 
-    // 1️⃣ Atualiza localização do usuário
     const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
     
     connection.query(updateSql, [latitude, longitude, cpf], (errUpdate) => {
         if (errUpdate) {
-            console.error('❌ Erro ao atualizar localização:', errUpdate);
+            console.error(' Erro ao atualizar localização:', errUpdate);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao atualizar localização' 
             });
         }
 
-        console.log('✅ Localização atualizada');
+        console.log(' Localização atualizada');
 
-        // 2️⃣ Busca usuários próximos usando Haversine
         const haversineQuery = `
             SELECT
                 u.cpf,
@@ -828,7 +826,7 @@ app.post('/api/usuarios-proximos', (req, res) => {
 
         connection.query(haversineQuery, params, (erroBusca, resultados) => {
             if (erroBusca) {
-                console.error('❌ Erro na busca Haversine:', erroBusca);
+                console.error(' Erro na busca Haversine:', erroBusca);
                 return res.status(500).json({ 
                     success: false, 
                     message: 'Erro ao buscar usuários próximos.',
@@ -836,22 +834,17 @@ app.post('/api/usuarios-proximos', (req, res) => {
                 });
             }
 
-            // 3️⃣ Retornar os usuários encontrados
             res.json({
                 success: true,
                 usuarios: resultados
             });
 
-            console.log(`✅ Retornados ${resultados.length} usuários próximos`);
+            console.log(` Retornados ${resultados.length} usuários próximos`);
         });
     });
 });
 
-
-
-// =======================
 // ENDPOINT: LOCAIS POPULARES
-// =======================
 app.get("/api/locais-populares", (req, res) => {
     const sql = `
         SELECT DISTINCT local 
@@ -878,7 +871,7 @@ app.get("/api/locais-populares", (req, res) => {
 });
 
 app.get('/api/todos-usuarios-mapa', (req, res) => {
-  console.log('\n🗺️ Buscando todos os usuários para o mapa...');
+  console.log('\n Buscando todos os usuários para o mapa...');
 
   const sql = `
     SELECT CPF, nome, latitude, longitude
@@ -889,7 +882,7 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
 
   connection.query(sql, (erro, resultados) => {
     if (erro) {
-      console.error('❌ Erro ao buscar usuários do mapa:', erro);
+      console.error(' Erro ao buscar usuários do mapa:', erro);
       return res.status(500).json({
         success: false,
         message: "Erro interno do servidor ao consultar o banco de dados.",
@@ -904,7 +897,7 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
       longitude: parseFloat(u.longitude)
     }));
 
-    console.log(`✅ Retornando ${usuariosParaMapa.length} usuários para o mapa`);
+    console.log(` Retornando ${usuariosParaMapa.length} usuários para o mapa`);
 
     res.json({
       success: true,
@@ -1412,16 +1405,16 @@ app.get("/mutuos/:cpf", (req, res) => {
 // 1. CRIAR EVENTO
 app.post('/eventos', (req, res) => {
   console.log('\n========================================');
-  console.log('📅 ROTA POST /eventos CHAMADA');
+  console.log(' ROTA POST /eventos CHAMADA');
   console.log('========================================');
   
   // Log do body recebido
-  console.log('📦 Body recebido:', JSON.stringify(req.body, null, 2));
+  console.log(' Body recebido:', JSON.stringify(req.body, null, 2));
   
   const { titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id, criador_cpf } = req.body;
 
   // Log de cada campo
-  console.log('\n🔍 Campos extraídos:');
+  console.log('\n Campos extraídos:');
   console.log('   - titulo:', titulo);
   console.log('   - responsavel:', responsavel);
   console.log('   - local:', local);
@@ -1434,7 +1427,7 @@ app.post('/eventos', (req, res) => {
 
   // Validação com logs específicos
   if (!titulo) {
-    console.log('❌ ERRO: Título não informado');
+    console.log(' ERRO: Título não informado');
     return res.status(400).json({
       success: false,
       message: 'Título é obrigatório'
@@ -1442,7 +1435,7 @@ app.post('/eventos', (req, res) => {
   }
 
   if (!responsavel) {
-    console.log('❌ ERRO: Responsável não informado');
+    console.log(' ERRO: Responsável não informado');
     return res.status(400).json({
       success: false,
       message: 'Responsável é obrigatório'
@@ -1450,7 +1443,7 @@ app.post('/eventos', (req, res) => {
   }
 
   if (!local) {
-    console.log('❌ ERRO: Local não informado');
+    console.log(' ERRO: Local não informado');
     return res.status(400).json({
       success: false,
       message: 'Local é obrigatório'
@@ -1458,7 +1451,7 @@ app.post('/eventos', (req, res) => {
   }
 
   if (!data_evento) {
-    console.log('❌ ERRO: Data não informada');
+    console.log(' ERRO: Data não informada');
     return res.status(400).json({
       success: false,
       message: 'Data do evento é obrigatória'
@@ -1466,7 +1459,7 @@ app.post('/eventos', (req, res) => {
   }
 
   if (!horario) {
-    console.log('❌ ERRO: Horário não informado');
+    console.log(' ERRO: Horário não informado');
     return res.status(400).json({
       success: false,
       message: 'Horário é obrigatório'
@@ -1474,22 +1467,22 @@ app.post('/eventos', (req, res) => {
   }
 
   if (!criador_cpf) {
-    console.log('❌ ERRO: CPF do criador não informado');
+    console.log(' ERRO: CPF do criador não informado');
     return res.status(400).json({
       success: false,
       message: 'CPF do criador é obrigatório'
     });
   }
 
-  console.log('\n✅ Validação passou! Preparando SQL...');
+  console.log('\n Validação passou! Preparando SQL...');
 
   const sql = `
     INSERT INTO evento (titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id, criador_cpf)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  console.log('📝 SQL preparado:', sql);
-  console.log('📊 Parâmetros:', [
+  console.log(' SQL preparado:', sql);
+  console.log(' Parâmetros:', [
     titulo,
     responsavel,
     local,
@@ -1514,7 +1507,7 @@ app.post('/eventos', (req, res) => {
   ], (erro, resultado) => {
     if (erro) {
       console.log('\n========================================');
-      console.error('❌ ERRO SQL COMPLETO:', erro);
+      console.error(' ERRO SQL COMPLETO:', erro);
       console.log('========================================');
       console.error('   Código do erro:', erro.code);
       console.error('   SQL State:', erro.sqlState);
@@ -1529,7 +1522,7 @@ app.post('/eventos', (req, res) => {
     }
 
     console.log('\n========================================');
-    console.log('✅ EVENTO CRIADO COM SUCESSO!');
+    console.log(' EVENTO CRIADO COM SUCESSO!');
     console.log('========================================');
     console.log('   ID do evento:', resultado.insertId);
     console.log('   Linhas afetadas:', resultado.affectedRows);
@@ -1544,7 +1537,7 @@ app.post('/eventos', (req, res) => {
 
 // 2. LISTAR TODOS OS EVENTOS (ordenados por data)
 app.get('/eventos', (req, res) => {
-  console.log('\n📋 Buscando todos os eventos...');
+  console.log('\n Buscando todos os eventos...');
 
   // ATENÇÃO: Mudei para 'evento' (singular) baseado nos seus ALTER TABLE
   const sql = `
@@ -1561,7 +1554,7 @@ app.get('/eventos', (req, res) => {
 
   connection.query(sql, (erro, eventos) => {
     if (erro) {
-      console.error('❌ Erro ao listar eventos:', erro);
+      console.error(' Erro ao listar eventos:', erro);
       console.error('   SQL State:', erro.sqlState);
       console.error('   Mensagem:', erro.sqlMessage);
       
@@ -1572,7 +1565,7 @@ app.get('/eventos', (req, res) => {
       });
     }
 
-    console.log(`✅ ${eventos.length} eventos encontrados`);
+    console.log(` ${eventos.length} eventos encontrados`);
     res.json(eventos);
   });
 });
@@ -1580,7 +1573,7 @@ app.get('/eventos', (req, res) => {
 // 3. BUSCAR EVENTO POR ID (com detalhes completos)
 app.get('/eventos/:id', (req, res) => {
   const { id } = req.params;
-  console.log(`\n🔍 Buscando evento ID: ${id}`);
+  console.log(`\n Buscando evento ID: ${id}`);
 
   const sql = `
     SELECT 
@@ -1596,7 +1589,7 @@ app.get('/eventos/:id', (req, res) => {
 
   connection.query(sql, [id], (erro, eventos) => {
     if (erro) {
-      console.error('❌ Erro ao buscar evento:', erro);
+      console.error(' Erro ao buscar evento:', erro);
       return res.status(500).json({
         success: false,
         message: 'Erro ao buscar evento',
@@ -1611,7 +1604,7 @@ app.get('/eventos/:id', (req, res) => {
       });
     }
 
-    console.log('✅ Evento encontrado:', eventos[0].titulo);
+    console.log(' Evento encontrado:', eventos[0].titulo);
     res.json({
       success: true,
       evento: eventos[0]
@@ -1624,7 +1617,7 @@ app.put('/eventos/:id', (req, res) => {
   const { id } = req.params;
   const { titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id } = req.body;
 
-  console.log(`\n✏️ Atualizando evento ID: ${id}`);
+  console.log(`\n Atualizando evento ID: ${id}`);
 
   const sql = `
     UPDATE evento
@@ -1645,7 +1638,7 @@ app.put('/eventos/:id', (req, res) => {
     id
   ], (erro, resultado) => {
     if (erro) {
-      console.error('❌ Erro ao atualizar evento:', erro);
+      console.error(' Erro ao atualizar evento:', erro);
       return res.status(500).json({
         success: false,
         message: 'Erro ao atualizar evento'
@@ -1659,7 +1652,7 @@ app.put('/eventos/:id', (req, res) => {
       });
     }
 
-    console.log('✅ Evento atualizado com sucesso');
+    console.log(' Evento atualizado com sucesso');
     res.json({
       success: true,
       message: 'Evento atualizado com sucesso'
@@ -1671,13 +1664,13 @@ app.put('/eventos/:id', (req, res) => {
 app.delete('/eventos/:id', (req, res) => {
   const { id } = req.params;
 
-  console.log(`\n🗑️ Deletando evento ID: ${id}`);
+  console.log(`\n Deletando evento ID: ${id}`);
 
   const sql = 'DELETE FROM evento WHERE IDevento = ?';
 
   connection.query(sql, [id], (erro, resultado) => {
     if (erro) {
-      console.error('❌ Erro ao deletar evento:', erro);
+      console.error(' Erro ao deletar evento:', erro);
       return res.status(500).json({
         success: false,
         message: 'Erro ao deletar evento'
@@ -1691,7 +1684,7 @@ app.delete('/eventos/:id', (req, res) => {
       });
     }
 
-    console.log('✅ Evento deletado com sucesso');
+    console.log(' Evento deletado com sucesso');
     res.json({
       success: true,
       message: 'Evento deletado com sucesso'
@@ -1703,7 +1696,7 @@ app.delete('/eventos/:id', (req, res) => {
 app.get('/eventos/esporte/:esporte', (req, res) => {
   const { esporte } = req.params;
 
-  console.log(`\n🏅 Buscando eventos do esporte: ${esporte}`);
+  console.log(`\n Buscando eventos do esporte: ${esporte}`);
 
   const sql = `
     SELECT e.*, c.nome as clube_nome
@@ -1715,14 +1708,14 @@ app.get('/eventos/esporte/:esporte', (req, res) => {
 
   connection.query(sql, [`%${esporte}%`], (erro, evento) => {
     if (erro) {
-      console.error('❌ Erro ao buscar eventos por esporte:', erro);
+      console.error(' Erro ao buscar eventos por esporte:', erro);
       return res.status(500).json({
         success: false,
         message: 'Erro ao buscar eventos'
       });
     }
 
-    console.log(`✅ ${evento.length} eventos encontrados`);
+    console.log(` ${evento.length} eventos encontrados`);
     res.json(evento);
   });
 });
@@ -1731,7 +1724,7 @@ app.get('/eventos/esporte/:esporte', (req, res) => {
 app.get('/eventos/usuario/:cpf', (req, res) => {
   const { cpf } = req.params;
 
-  console.log(`\n👤 Buscando eventos criados pelo CPF: ${cpf}`);
+  console.log(`\n Buscando eventos criados pelo CPF: ${cpf}`);
 
   const sql = `
     SELECT e.*, c.nome as clube_nome
@@ -1743,22 +1736,20 @@ app.get('/eventos/usuario/:cpf', (req, res) => {
 
   connection.query(sql, [cpf], (erro, evento) => {
     if (erro) {
-      console.error('❌ Erro ao buscar eventos do usuário:', erro);
+      console.error(' Erro ao buscar eventos do usuário:', erro);
       return res.status(500).json({
         success: false,
         message: 'Erro ao buscar eventos'
       });
     }
 
-    console.log(`✅ ${evento.length} eventos encontrados`);
+    console.log(` ${evento.length} eventos encontrados`);
     res.json({
       success: true,
       eventos: evento
     });
   });
 });
-
-
 // ==================== TESTE DE ROTAS ====================
 app.get("/teste-rotas", (req, res) => {
   res.json({
@@ -1771,9 +1762,6 @@ app.get("/teste-rotas", (req, res) => {
     ]
   });
 });
-
-
-
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;
 app.listen(PORT, () => {
