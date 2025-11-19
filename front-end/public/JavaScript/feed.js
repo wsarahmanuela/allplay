@@ -858,7 +858,7 @@ async function criarEvento(event) {
     criador_cpf: cpf
   };
 
-  console.log('📤 Enviando dados do evento:', dadosEvento);
+  console.log(' Enviando dados do evento:', dadosEvento);
 
   try {
     const resposta = await fetch('http://localhost:3000/eventos', {
@@ -870,11 +870,11 @@ async function criarEvento(event) {
     const resultado = await resposta.json();
 
     if (resultado.success) {
-      alert('✅ Evento criado com sucesso!');
+      alert(' Evento criado com sucesso!');
       fecharModalCriar();
       carregarEventos();
     } else {
-      alert('❌ ' + (resultado.message || 'Erro ao criar evento'));
+      alert('Erro' + (resultado.message || 'Erro ao criar evento'));
     }
   } catch (erro) {
     console.error('Erro ao criar evento:', erro);
@@ -889,21 +889,21 @@ async function carregarEventos() {
 
   const cpfLogado = localStorage.getItem('cpf');
 
-  console.log('📥 Carregando eventos...');
+  console.log(' Carregando eventos...');
 
   try {
     const resposta = await fetch('http://localhost:3000/eventos');
 
-    console.log('📡 Status da resposta:', resposta.status);
+    console.log('Status da resposta:', resposta.status);
 
     if (!resposta.ok) {
       const erro = await resposta.json();
-      console.error('❌ Erro do servidor:', erro);
+      console.error(' Erro do servidor:', erro);
       throw new Error(erro.message || 'Erro ao buscar eventos');
     }
 
     const eventos = await resposta.json();
-    console.log('📦 Eventos recebidos:', eventos.length);
+    console.log('Eventos recebidos:', eventos.length);
 
     container.innerHTML = '';
 
@@ -913,105 +913,99 @@ async function carregarEventos() {
     }
 
     eventos.forEach((evento, index) => {
-      console.log(`📌 Processando evento ${index + 1}:`, {
+      console.log(` Processando evento ${index + 1}:`, {
         id: evento.IDevento,
         titulo: evento.titulo,
         data_evento: evento.data_evento
       });
 
-      // CORREÇÃO: Adicionar timezone para evitar problema de data
       const dataEvento = new Date(evento.data_evento);
+      dataEvento.setHours(dataEvento.getHours() + 3);
 
-        // Ajuste para fuso horário brasileiro (opcional, mas recomendado)
-        dataEvento.setHours(dataEvento.getHours() + 3);
-
-      // Validação da data
       if (isNaN(dataEvento.getTime())) {
-        console.error('❌ Data inválida para evento:', evento);
-        return; // Pula este evento
+        console.error(' Data inválida para evento:', evento);
+        return;
       }
 
       const dia = String(dataEvento.getDate()).padStart(2, '0');
       const mes = dataEvento.toLocaleDateString('pt-BR', { month: 'long' });
       const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1);
 
-      console.log(`   ✅ Data processada: ${dia} de ${mesCapitalizado}`);
+      console.log(` Data processada: ${dia} de ${mesCapitalizado}`);
 
       const eventoDiv = document.createElement('div');
       eventoDiv.classList.add('event');
 
-      // Verifica se é o criador
       const ehCriador = evento.criador_cpf === cpfLogado;
 
       eventoDiv.innerHTML = `
-                <div class="left-event">
-                    <h3>${dia}</h3>
-                    <span>${mesCapitalizado}</span>
-                </div>
-                <div class="right-event">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div style="flex: 1; cursor: pointer;" onclick="abrirDetalhesEvento(${evento.IDevento})">
-                            <h4>${evento.titulo}</h4>
-                            <p><i class="fa-solid fa-location-dot"></i> ${evento.local}</p>
-                            <a href="#" onclick="event.preventDefault(); event.stopPropagation(); abrirDetalhesEvento(${evento.IDevento});">Mais informações</a>
-                        </div>
-                        ${ehCriador ? `
-                            <button class="btn-excluir-evento" onclick="confirmarExcluirEvento(${evento.IDevento}, '${evento.titulo.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Excluir evento">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
+  <div class="left-event">
+      <h3>${dia}</h3>
+      <span>${mesCapitalizado}</span>
+  </div>
+  <div class="right-event">
+      <div style="display: flex; justify-content: space-between; align-items: start; width: 100%;">
+          <div style="flex: 1; cursor: pointer;" onclick="abrirDetalhesEvento(${evento.IDevento})">
+              <h4>${evento.titulo}</h4>
+              <p>📍 ${evento.local}</p>
+              <a href="#" onclick="event.preventDefault(); event.stopPropagation(); abrirDetalhesEvento(${evento.IDevento});">Mais informações</a>
+          </div>
+          ${ehCriador ? `
+              <button class="btn-excluir-evento" onclick="confirmarExcluirEvento(${evento.IDevento}, '${evento.titulo.replace(/'/g, "\\'")}'); event.stopPropagation();" title="Excluir evento">
+                  ✕
+              </button>
+          ` : ''}
+      </div>
+  </div>
+`;
 
       container.appendChild(eventoDiv);
     });
 
-    console.log('✅ Eventos carregados com sucesso!');
+    console.log(' Eventos carregados com sucesso!');
 
   } catch (erro) {
-    console.error('❌ Erro ao carregar eventos:', erro);
+    console.error(' Erro ao carregar eventos:', erro);
     container.innerHTML = '<p class="mensagem-eventos-vazia" style="color:#ff0000;">Erro ao carregar eventos: ' + erro.message + '</p>';
   }
 }
 
 // ==================== EXCLUIR EVENTO ====================
 async function confirmarExcluirEvento(idEvento, tituloEvento) {
-  console.log('🗑️ Tentando excluir evento:', idEvento, tituloEvento);
+  console.log(' Tentando excluir evento:', idEvento, tituloEvento);
 
   const confirmar = confirm(`Deseja realmente excluir o evento "${tituloEvento}"?\n\nEsta ação não pode ser desfeita.`);
 
   if (!confirmar) {
-    console.log('❌ Exclusão cancelada pelo usuário');
+    console.log(' Exclusão cancelada pelo usuário');
     return;
   }
 
-  console.log('✅ Usuário confirmou exclusão');
+  console.log('Usuário confirmou exclusão');
 
   try {
-    console.log('📤 Enviando DELETE para:', `http://localhost:3000/eventos/${idEvento}`);
+    console.log(' Enviando DELETE para:', `http://localhost:3000/eventos/${idEvento}`);
 
     const resposta = await fetch(`http://localhost:3000/eventos/${idEvento}`, {
       method: 'DELETE'
     });
 
-    console.log('📥 Resposta recebida, status:', resposta.status);
+    console.log(' Resposta recebida, status:', resposta.status);
 
     const resultado = await resposta.json();
-    console.log('📦 Resultado:', resultado);
+    console.log(' Resultado:', resultado);
 
     if (resultado.success) {
-      alert('✅ Evento excluído com sucesso!');
+      alert('Evento excluído com sucesso!');
       carregarEventos();
     } else {
-      alert('❌ ' + (resultado.message || 'Erro ao excluir evento'));
+      alert('Erro: ' + (resultado.message || 'Erro ao excluir evento'));
     }
   } catch (erro) {
-    console.error('❌ Erro ao excluir evento:', erro);
-    alert('Erro ao excluir evento. Tente novamente.');
+    console.error(' Erro ao excluir evento:', erro);
+    alert(' Erro ao excluir evento. Tente novamente.');
   }
 }
-
 // ==================== ABRIR DETALHES (COM DESTAQUE NO LOCAL) ====================
 async function abrirDetalhesEvento(idEvento) {
   try {

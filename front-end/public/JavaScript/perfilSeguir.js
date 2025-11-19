@@ -350,7 +350,7 @@ function criarSistemaCurtidas(post, card) {
 }
 
 // CARREGAR POSTS DO PERFIL VISITADO
-async function carregarPostsVisitado() {
+async function carregarPostsVisitado(filtroEsporte = "") {
   const container = document.getElementById("container-baixo");
   if (!container) return console.error("#container-baixo nao encontrado no DOM");
 
@@ -362,6 +362,11 @@ async function carregarPostsVisitado() {
     let posts = [];
     if (Array.isArray(dados)) posts = dados;
     else if (Array.isArray(dados.posts)) posts = dados.posts;
+
+    // ✅ ADICIONAR FILTRO POR ESPORTE
+    if (filtroEsporte) {
+      posts = posts.filter(p => p.esporte && p.esporte.toLowerCase() === filtroEsporte.toLowerCase());
+    }
 
     container.innerHTML = "";
 
@@ -690,33 +695,43 @@ async function carregarEsportesDoVisitado() {
   // IMPORTANTE: Só mostrar se houver CPF na URL (visitando outra pessoa)
   if (!cpfDaUrl || cpfDaUrl === cpfLogado) {
     console.log("Próprio perfil ou sem visitante - não mostra esportes da direita");
-    container.style.display = "none"; // Esconder se for próprio perfil
+    container.style.display = "none";
     return;
   }
 
   console.log("Carregando esportes do CPF visitado:", cpfDaUrl);
 
   try {
-    // Usar cpfDaUrl diretamente, não cpfPerfil
     const resp = await fetch(`${BASE_URL}/esportes/${encodeURIComponent(cpfDaUrl)}`);
     if (!resp.ok) throw new Error("Erro ao buscar esportes.");
 
     const esportes = await resp.json();
 
-    // Limpar esportes estáticos
     container.innerHTML = "";
-    container.style.display = "block"; // Garantir que está visível
+    container.style.display = "block";
 
     if (!Array.isArray(esportes) || esportes.length === 0) {
       container.innerHTML = `<p style="text-align:center; color:#888; padding:20px;">Nenhum esporte escolhido</p>`;
       return;
     }
 
-    // Criar os elementos de esporte
+    // ✅ ADICIONAR EVENTO DE CLIQUE PARA FILTRAR POSTS
     esportes.forEach(esporte => {
       const div = document.createElement("div");
       div.classList.add("esporte");
       div.textContent = esporte;
+      
+      // ✅ EVENTO DE CLIQUE
+      div.style.cursor = "pointer";
+      div.addEventListener("click", () => {
+        // Remover classe ativa de todos
+        container.querySelectorAll(".esporte").forEach(e => e.classList.remove("ativo"));
+        // Adicionar classe ativa no clicado
+        div.classList.add("ativo");
+        // Filtrar posts por esporte
+        carregarPostsVisitado(esporte);
+      });
+      
       container.appendChild(div);
     });
 
