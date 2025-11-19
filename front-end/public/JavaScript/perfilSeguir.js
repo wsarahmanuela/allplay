@@ -687,7 +687,7 @@ async function carregarClubesDoVisitado() {
     
     if (clubes.length === 0) {
       containerClubes.innerHTML += `
-        <p style="color: #999; text-align: center; padding: 20px 0;">
+        <p style="color: #999; text-align: center; padding: 20px;  margin-bottom: 12px;">
           Nenhum clube adicionado ainda.
         </p>
       `;

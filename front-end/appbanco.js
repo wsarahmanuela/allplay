@@ -384,7 +384,7 @@ app.get('/segue/:cpf_seguidor/:cpf_seguido', async (req, res) => {
         
         const segue = resultado.length > 0;
         
-        console.log(`✅ Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
+        console.log(`Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
         
         res.json({ 
             success: true, 
@@ -392,7 +392,7 @@ app.get('/segue/:cpf_seguidor/:cpf_seguido', async (req, res) => {
         });
         
     } catch (erro) {
-        console.error('❌ Erro ao verificar follow:', erro);
+        console.error(' Erro ao verificar follow:', erro);
         res.status(500).json({ 
             success: false, 
             message: 'Erro ao verificar follow',
@@ -522,35 +522,6 @@ app.get('/publicacoes/:cpf', (req, res) => {
     });
   });
 });
-
-// ==================== EXCLUIR PUBLICAÇÃO ====================
-app.delete('/publicacoes/:id', async (req, res) => {
-  const id = req.params.id;
-
-  if (esporte) {
-    query += ' AND p.esporte = ?';
-    params.push(esporte);
-  }
-
-  query += " ORDER BY p.data_publicacao DESC";
-
-  connection.query(query, params, (erro, resultados) => {
-    if (erro) {
-      console.error(" Erro ao buscar publicações do usuário:", erro);
-      return res.status(500).json({
-        success: false,
-        message: "Erro ao carregar publicações do usuário."
-      });
-    }
-
-    console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
-    res.json({
-      success: true,
-      posts: resultados
-    });
-  });
-});
-
 // PUBLICACOES -------------------------------------------------------------
 app.post('/publicacoes', (req, res) => {
   console.log("POST PUBLICACOES");
@@ -656,25 +627,76 @@ app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
 app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
+  console.log(`\n [DELETE] Recebida requisição para excluir publicação ID: ${id}`);
+  console.log(`   Tipo do ID: ${typeof id}`);
+
+  if (!id || isNaN(id)) {
+    console.log('    ID inválido');
+    return res.status(400).json({ 
+      success: false, 
+      message: 'ID da publicação é inválido' 
+    });
+  }
+
   try {
-    await connection
+    console.log('    Verificando se a publicação existe...');
+    const [rows] = await connection
+      .promise()
+      .query('SELECT IDpublicacao FROM publicacao WHERE IDpublicacao = ?', [id]);
+
+    if (!rows || rows.length === 0) {
+      console.log('    Publicação não encontrada no banco');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Publicação não encontrada' 
+      });
+    }
+
+    console.log('   ✓ Publicação encontrada, iniciando exclusão...');
+
+    console.log('    Excluindo curtidas...');
+    const [resultadoCurtidas] = await connection
       .promise()
       .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
+    
+    console.log(`   ✓ ${resultadoCurtidas.affectedRows} curtida(s) excluída(s)`);
 
-    await connection
+    console.log('    Excluindo publicação...');
+    const [resultadoPublicacao] = await connection
       .promise()
       .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
 
-    res.json({ success: true, message: 'Publicação excluída com sucesso!' });
+    if (resultadoPublicacao.affectedRows === 0) {
+      console.log('   Nenhuma linha afetada ao excluir publicação');
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Erro ao excluir publicação' 
+      });
+    }
+
+    console.log('    Publicação excluída com sucesso!\n');
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Publicação excluída com sucesso!' 
+    });
+
   } catch (error) {
-    console.error('Erro ao excluir publicação:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Erro ao excluir publicação.' });
+    console.error('\n[ERRO CRÍTICO] Erro ao excluir publicação:');
+    console.error('   Mensagem:', error.message);
+    console.error('   Stack:', error.stack);
+    console.error('   SQL State:', error.sqlState);
+    console.error('   SQL Message:', error.sqlMessage);
+    console.error('   Código:', error.code);
+
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Erro interno ao excluir publicação',
+      erro: error.message,
+      codigo: error.code || 'UNKNOWN'
+    });
   }
 });
-
-
 // ===================== CURTIDAS =====================
 app.get("/publicacoes/:id/curtidas", (req, res) => {
   const id = req.params.id;
@@ -906,7 +928,6 @@ app.get("/usuario/:cpf", (req, res) => {
 });
 
 //==============EDITAR PERFIL==============
-
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
@@ -1208,7 +1229,7 @@ app.delete("/usuario/clube/remover", (req, res) => {
 app.delete('/usuario/excluir-conta', async (req, res) => {
   const { cpf, confirmacao } = req.body;
 
-  console.log('\n🗑️ Solicitação de exclusão de conta recebida');
+  console.log('\n Solicitação de exclusão de conta recebida');
   console.log('   CPF:', cpf);
   console.log('   Confirmação:', confirmacao);
 
@@ -1297,7 +1318,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
 
     // Confirmar transação
     await connection.promise().commit();
-    console.log('✅ Conta excluída com sucesso!\n');
+    console.log(' Conta excluída com sucesso!\n');
 
     res.json({
       success: true,
@@ -1308,7 +1329,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
     // Reverter transação em caso de erro
     await connection.promise().rollback();
     
-    console.error('❌ Erro ao excluir conta:', erro);
+    console.error(' Erro ao excluir conta:', erro);
     res.status(500).json({
       success: false,
       message: 'Erro ao excluir conta. Tente novamente.'
