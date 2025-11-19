@@ -180,26 +180,10 @@
                 <a href="#">Ver mais</a>
             </div>
         </div>
-
-        <div class="modal-overlay" id="modalDetalhesEvento">
-            <div class="modal-evento">
-                <div class="modal-header">
-                    <h3 id="tituloDetalhes">Detalhes do Evento</h3>
-                    <button class="btn-fechar" onclick="fecharModalDetalhes()">&times;</button>
-                </div>
-
-                <div class="detalhes-evento" id="conteudoDetalhes">
-                    <!-- Será preenchido dinamicamente -->
-                </div>
-            </div>
-        </div>
-
     
-    </div>
-    </div>
+        <script src="JavaScript/feed.js"></script>
 
-    <script src="JavaScript/feed.js"></script>
-     <!-- MODAL CRIAR EVENTO -->
+         <!-- MODAL CRIAR EVENTO -->
         <div class="modal-overlay" id="modalCriarEvento">
             <div class="modal-evento">
                 <div class="modal-header">
@@ -220,7 +204,10 @@
 
                     <div class="form-grupo">
                         <label for="localEvento">Local *</label>
-                        <input type="text" id="localEvento" required placeholder="Onde será realizado">
+                        <select id="localEvento" required>
+                            <option value="">Carregando locais...</option>
+                        </select>
+                        <small>Escolha um local do mapa ou "Outro local" para digitar</small>
                     </div>
 
                     <div class="form-row">
@@ -258,6 +245,20 @@
 
                     <button type="submit" class="btn-criar-evento">Criar Evento</button>
                 </form>
+            </div>
+        </div>
+
+          <!-- MODAL DETALHES DO EVENTO -->
+        <div class="modal-overlay" id="modalDetalhesEvento">
+            <div class="modal-evento">
+                <div class="modal-header">
+                    <h3 id="tituloDetalhes">Detalhes do Evento</h3>
+                    <button class="btn-fechar" onclick="fecharModalDetalhes()">&times;</button>
+                </div>
+
+                <div class="detalhes-evento" id="conteudoDetalhes">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
             </div>
         </div>
 

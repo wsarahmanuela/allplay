@@ -1,51 +1,194 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-#map {
-  height: 980px;     /* mapa ocupa a tela toda */
-  width: 100%;
-  position: relative; /* referência para os filhos com position absolute */
+body {
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
-/* Botão de voltar */
+/* MAPA */
+#map {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+}
+
+/* BOTÃO VOLTAR */
 .button {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  z-index: 1000;
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 1200;
 }
 
 .button a {
-  background: #0f9800;
-  color: white;
-  padding: 10px 12px;
-  border-radius: 50%; /* deixa redondo */
-  text-decoration: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  font-size: 18px;
+    background: #0f9800;
+    color: white;
+    padding: 12px 14px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.35);
+    transition: 0.2s;
 }
 
-/* Container de informações */
-.container {
-  position: absolute;     /* fica por cima do mapa */
-  top: 20px;                 /* começa no topo */
-  right: 20px;               /* encostado no lado direito */
-  height: 100px;           /* ocupa toda a altura da tela */
-  width: 300px;           /* largura do painel */
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
-  box-shadow: -2px 0 58px rgba(0,0,0,0.3);
-  z-index: 1000;          /* garante que fique sobre o mapa */
-  overflow-y: auto;       /* ativa rolagem se o conteúdo for maior que a tela */
-  border-radius: 12px 12px 12px 12px; /
+.button a:hover {
+    background: #0c7a02;
 }
 
-.container h1 {
-  font-size: 18px;
-  margin: 0 0 5px 0;
-  display: inline-block;
+/* PAINEL LATERAL - (AGORA FUNCIONA) */
+.painel-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    max-height: 80vh;
+    background: rgba(255, 255, 255, 0.75);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    overflow-y: auto;
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-.container i {
-  margin-left: 8px;
-  color: #333;
+/* GRUPO EXPANDÍVEL */
+.painel-grupo {
+    margin-bottom: 18px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* HEADER DO GRUPO */
+.painel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    background: #ffffffd2;
+    transition: 0.2s;
+}
+
+.painel-header:hover {
+    background: #f0f0f0;
+}
+
+.painel-header h2 {
+    font-size: 17px;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ANIMAÇÃO DA SETA */
+.seta {
+    transition: 0.3s;
+}
+
+/* CONTEÚDO EXPANDÍVEL */
+.painel-conteudo {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    padding-left: 5px;
+}
+
+/* Quando expandido */
+.painel-grupo.ativo .painel-conteudo {
+    max-height: 500px; /* altura máxima liberada */
+    padding: 10px;
+}
+
+.painel-grupo.ativo .seta {
+    transform: rotate(180deg);
+}
+
+/* ITENS DE LISTA */
+.usuario-item,
+.local-popular-item {
+    background: #f7f7f7;
+    padding: 10px 14px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: 0.25s;
+}
+
+.local-popular-item:hover {
+    background: #eaeaea;
+    transform: translateX(-2px);
+}
+
+/* ÍCONES AO LADO DO TÍTULO */
+.titulo-icone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Ícones */
+.titulo-icone i {
+    font-size: 18px;
+    color: #0f9800;
+}
+
+/* Ajuste do h2 */
+.painel-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+.usuario-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffffcc;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+    transition: .2s;
+}
+
+.usuario-item:hover {
+    background: #f0f0f0;
+    transform: translateX(-3px);
+}
+
+.usuario-foto {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+}
+
+.usuario-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.usuario-nome {
+    font-weight: 600;
+}
+
+.usuario-distancia {
+    font-size: 12px;
+    color: #555;
+}
+
+.usuario-item {
+    position: relative;
+}
+
+.usuario-item .distancia {
+    margin-left: auto;
+    color: #555;
 }

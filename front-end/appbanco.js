@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+
 const uploadDir = path.join(__dirname, "uploads");
 // =================== CONFIGURAÇÃO DO MULTER ===================
 const fs = require("fs");
@@ -774,68 +775,125 @@ app.use(express.static("public"));
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
 app.post('/api/usuarios-proximos', (req, res) => {
-  const { latitude, longitude, cpf } = req.body;
-  const raio_metros = 20000; // Raio de busca
+    const { latitude, longitude, cpf } = req.body;
+    const raio_metros = 20000; // 20 km
 
-  if (!cpf || !latitude || !longitude) {
-    return res.status(400).json({ success: false, message: 'Dados incompletos.' });
-  }
+    console.log('\n📍 Rota /api/usuarios-proximos chamada');
+    console.log('   CPF:', cpf);
+    console.log('   Lat:', latitude);
+    console.log('   Lon:', longitude);
 
-  const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
-  connection.query(updateSql, [latitude, longitude, cpf], (err) => {
-    if (err) console.error('Erro ao atualizar localização:', err);
-    const haversineQuery = `
-              SELECT
-                  u.nome,
-                  u.fotoDePerfil,
-                  ( 6371000 * acos(
-                      cos( radians(?) ) * cos( radians( latitude ) )
-                      * cos( radians( longitude ) - radians(?) )
-                      + sin( radians(?) ) * sin( radians( latitude ) )
-                  ) ) AS distancia_m
-              FROM
-                  usuario u
-              WHERE
-                  u.cpf != ?
-              HAVING
-                  distancia_m < ?
-              ORDER BY
-                  distancia_m
-              LIMIT 10
-          `;
+    if (!cpf || !latitude || !longitude) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'CPF, latitude e longitude são obrigatórios.' 
+        });
+    }
 
-    const params = [latitude, longitude, latitude, cpf, raio_metros];
+    // 1️⃣ Atualiza localização do usuário
+    const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
+    
+    connection.query(updateSql, [latitude, longitude, cpf], (errUpdate) => {
+        if (errUpdate) {
+            console.error('❌ Erro ao atualizar localização:', errUpdate);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao atualizar localização' 
+            });
+        }
 
-    connection.query(haversineQuery, params, (erroBusca, resultados) => {
-      if (erroBusca) {
-        console.error('Erro na busca Haversine:', erroBusca);
-        return res.status(500).json({ success: false, message: 'Erro ao buscar usuários próximos.' });
-      }
+        console.log('✅ Localização atualizada');
 
-      const usuariosProximos = resultados.map(usuario => ({
-        nome: usuario.nome,
-        distancia: Math.round(usuario.distancia_m)
-      }));
+        // 2️⃣ Busca usuários próximos usando Haversine
+        const haversineQuery = `
+            SELECT
+                u.cpf,
+                u.nome,
+                u.fotoDePerfil,
+                ( 6371000 * acos(
+                    cos(radians(?)) * cos(radians(u.latitude))
+                    * cos(radians(u.longitude) - radians(?))
+                    + sin(radians(?)) * sin(radians(u.latitude))
+                )) AS distancia_m
+            FROM usuario u
+            WHERE u.cpf != ?
+              AND u.latitude IS NOT NULL 
+              AND u.longitude IS NOT NULL
+            HAVING distancia_m < ?
+            ORDER BY distancia_m
+            LIMIT 10
+        `;
 
-      res.json({ success: true, usuarios: usuariosProximos });
+        const params = [latitude, longitude, latitude, cpf, raio_metros];
+
+        connection.query(haversineQuery, params, (erroBusca, resultados) => {
+            if (erroBusca) {
+                console.error('❌ Erro na busca Haversine:', erroBusca);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao buscar usuários próximos.',
+                    erro: erroBusca.sqlMessage 
+                });
+            }
+
+            // 3️⃣ Retornar os usuários encontrados
+            res.json({
+                success: true,
+                usuarios: resultados
+            });
+
+            console.log(`✅ Retornados ${resultados.length} usuários próximos`);
+        });
     });
-  });
+});
+
+
+
+// =======================
+// ENDPOINT: LOCAIS POPULARES
+// =======================
+app.get("/api/locais-populares", (req, res) => {
+    const sql = `
+        SELECT DISTINCT local 
+        FROM evento
+        WHERE local IS NOT NULL AND local != ''
+    `;
+
+    connection.query(sql, (erro, resultados) => {
+        if (erro) {
+            console.error("Erro ao buscar locais populares:", erro);
+            return res.status(500).json({
+                success: false,
+                message: "Erro ao buscar locais populares."
+            });
+        }
+
+        const locais = resultados.map(r => r.local);
+
+        res.json({
+            success: true,
+            locais
+        });
+    });
 });
 
 app.get('/api/todos-usuarios-mapa', (req, res) => {
+  console.log('\n🗺️ Buscando todos os usuários para o mapa...');
 
   const sql = `
-          SELECT CPF, nome, latitude, longitude
-          FROM usuario
-          WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-      `;
+    SELECT CPF, nome, latitude, longitude
+    FROM usuario
+    WHERE latitude IS NOT NULL 
+      AND longitude IS NOT NULL
+  `;
 
   connection.query(sql, (erro, resultados) => {
     if (erro) {
-      console.error('Erro ao buscar todos os usuários do MySQL:', erro);
+      console.error('❌ Erro ao buscar usuários do mapa:', erro);
       return res.status(500).json({
         success: false,
-        message: "Erro interno do servidor ao consultar o banco de dados."
+        message: "Erro interno do servidor ao consultar o banco de dados.",
+        erro: erro.sqlMessage
       });
     }
 
@@ -846,7 +904,7 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
       longitude: parseFloat(u.longitude)
     }));
 
-    console.log(`[API] Retornando ${usuariosParaMapa.length} usuários para o mapa.`);
+    console.log(`✅ Retornando ${usuariosParaMapa.length} usuários para o mapa`);
 
     res.json({
       success: true,
@@ -1291,12 +1349,8 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
 
   } catch (erro) {
     await connection.promise().rollback();
-<<<<<<< HEAD
+
     console.error('❌ Erro ao excluir conta:', erro);
-=======
-    
-    console.error(' Erro ao excluir conta:', erro);
->>>>>>> 4a413f743fd99f8773c34e7534bba79a00a4e9c4
     res.status(500).json({
       success: false,
       message: 'Erro ao excluir conta. Tente novamente.'
@@ -1304,7 +1358,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
+
 // ==================== BUSCAR AMIGOS MÚTUOS ====================
 app.get("/mutuos/:cpf", (req, res) => {
   const cpf = req.params.cpf;
@@ -1352,17 +1406,7 @@ app.get("/mutuos/:cpf", (req, res) => {
   });
 });
 
-// ==================== TESTE DE ROTAS ====================
-app.get("/teste-rotas", (req, res) => {
-  res.json({
-    message: "Servidor funcionando!",
-    rotas_disponiveis: [
-      "GET /mutuos/:cpf",
-      "GET /usuario/:cpf",
-      "POST /seguir",
-      "DELETE /seguir"
-    ]
-=======
+
 // ==================== ROTAS DE EVENTOS ====================
 
 // 1. CRIAR EVENTO
@@ -1439,9 +1483,6 @@ app.post('/eventos', (req, res) => {
 
   console.log('\n✅ Validação passou! Preparando SQL...');
 
-  // ATENÇÃO: Use o nome correto da sua tabela
-  // Se sua tabela se chama 'evento' (singular), use 'evento'
-  // Se sua tabela se chama 'eventos' (plural), use 'eventos'
   const sql = `
     INSERT INTO evento (titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id, criador_cpf)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -1586,7 +1627,7 @@ app.put('/eventos/:id', (req, res) => {
   console.log(`\n✏️ Atualizando evento ID: ${id}`);
 
   const sql = `
-    UPDATE eventos
+    UPDATE evento
     SET titulo = ?, responsavel = ?, local = ?, data_evento = ?, 
         horario = ?, descricao = ?, esportes = ?, clube_id = ?
     WHERE IDevento = ?
@@ -1632,7 +1673,7 @@ app.delete('/eventos/:id', (req, res) => {
 
   console.log(`\n🗑️ Deletando evento ID: ${id}`);
 
-  const sql = 'DELETE FROM eventos WHERE IDevento = ?';
+  const sql = 'DELETE FROM evento WHERE IDevento = ?';
 
   connection.query(sql, [id], (erro, resultado) => {
     if (erro) {
@@ -1666,13 +1707,13 @@ app.get('/eventos/esporte/:esporte', (req, res) => {
 
   const sql = `
     SELECT e.*, c.nome as clube_nome
-    FROM eventos e
+    FROM evento e
     LEFT JOIN clube c ON e.clube_id = c.IDclube
     WHERE e.esportes LIKE ? AND e.data_evento >= CURDATE()
     ORDER BY e.data_evento ASC
   `;
 
-  connection.query(sql, [`%${esporte}%`], (erro, eventos) => {
+  connection.query(sql, [`%${esporte}%`], (erro, evento) => {
     if (erro) {
       console.error('❌ Erro ao buscar eventos por esporte:', erro);
       return res.status(500).json({
@@ -1681,8 +1722,8 @@ app.get('/eventos/esporte/:esporte', (req, res) => {
       });
     }
 
-    console.log(`✅ ${eventos.length} eventos encontrados`);
-    res.json(eventos);
+    console.log(`✅ ${evento.length} eventos encontrados`);
+    res.json(evento);
   });
 });
 
@@ -1694,13 +1735,13 @@ app.get('/eventos/usuario/:cpf', (req, res) => {
 
   const sql = `
     SELECT e.*, c.nome as clube_nome
-    FROM eventos e
+    FROM evento e
     LEFT JOIN clube c ON e.clube_id = c.IDclube
     WHERE e.criador_cpf = ?
     ORDER BY e.data_evento DESC
   `;
 
-  connection.query(sql, [cpf], (erro, eventos) => {
+  connection.query(sql, [cpf], (erro, evento) => {
     if (erro) {
       console.error('❌ Erro ao buscar eventos do usuário:', erro);
       return res.status(500).json({
@@ -1709,14 +1750,28 @@ app.get('/eventos/usuario/:cpf', (req, res) => {
       });
     }
 
-    console.log(`✅ ${eventos.length} eventos encontrados`);
+    console.log(`✅ ${evento.length} eventos encontrados`);
     res.json({
       success: true,
-      eventos: eventos
+      eventos: evento
     });
->>>>>>> 4a413f743fd99f8773c34e7534bba79a00a4e9c4
   });
 });
+
+
+// ==================== TESTE DE ROTAS ====================
+app.get("/teste-rotas", (req, res) => {
+  res.json({
+    message: "Servidor funcionando!",
+    rotas_disponiveis: [
+      "GET /mutuos/:cpf",
+      "GET /usuario/:cpf",
+      "POST /seguir",
+      "DELETE /seguir"
+    ]
+  });
+});
+
 
 
 // A LINHA app.listen DEVE SER A ÚLTIMA!

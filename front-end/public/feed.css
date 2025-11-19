@@ -188,13 +188,13 @@ i {
 }
 .sidebar-titulo h4{
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     font-family: 'Inter', sans-serif;;
 }
 .sidebar-titulo a{
     text-decoration: none;
     color: #0f9800;
-    font-size: 12px;
+    font-size: 18px;
 }
 .event{
     display: flex;
@@ -206,7 +206,7 @@ i {
     height: 65px;
     width: 75px;
     margin-right: 15px;
-    padding-top: 10px;
+    padding-top: 0px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -835,7 +835,7 @@ i {
 }
 
 .btn-novo-evento i {
-    font-size: 12px;
+    font-size: 18px;
     margin-right: 4px;
 }
 
@@ -857,7 +857,7 @@ i {
     height: 65px;
     width: 65px;
     margin-right: 15px;
-    padding-top: 10px;
+    padding-top: 1px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -973,4 +973,162 @@ i {
     color: #666;
     padding: 30px 20px;
     font-size: 14px;
+}
+
+.left-event {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.left-event img.icon-esporte {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+/* Botão de excluir evento */
+.btn-excluir-evento {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: 0.3s;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: 10px;
+}
+
+.btn-excluir-evento:hover {
+    background: #ffe5e5;
+    transform: scale(1.1);
+}
+
+.btn-excluir-evento:active {
+    transform: scale(0.95);
+}
+
+/* Ajuste no select de local para ficar mais alto */
+.form-grupo select#localEvento {
+    min-height: 45px;
+}
+
+/* Input customizado de local */
+#localEventoCustom {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.3s;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 10px;
+}
+
+#localEventoCustom:focus {
+    outline: none;
+    border-color: #0f9800;
+    box-shadow: 0 0 0 3px rgba(15, 152, 0, 0.1);
+}
+
+/* Ícone de mapa no modal de detalhes */
+.fa-map-pin {
+    animation: pulsePin 2s infinite;
+}
+
+@keyframes pulsePin {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Ajuste no right-event para melhor layout */
+.right-event {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Botão de excluir evento */
+.btn-excluir-evento {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: 0.3s;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: 10px;
+}
+
+.btn-excluir-evento:hover {
+    background: #ffe5e5;
+    transform: scale(1.1);
+}
+
+.btn-excluir-evento:active {
+    transform: scale(0.95);
+}
+
+/* Ajuste no select de local para ficar mais alto */
+.form-grupo select#localEvento {
+    min-height: 45px;
+}
+
+/* Input customizado de local */
+#localEventoCustom {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.3s;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 10px;
+}
+
+#localEventoCustom:focus {
+    outline: none;
+    border-color: #0f9800;
+    box-shadow: 0 0 0 3px rgba(15, 152, 0, 0.1);
+}
+
+/* Ajuste no right-event para melhor layout */
+.right-event {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hover nos cards de evento */
+.event:hover .btn-excluir-evento {
+    opacity: 1;
+}
+
+.btn-excluir-evento {
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+/* Opção "Outro local" destacada */
+select#localEvento option[value="outro"] {
+    background: #f0f0f0;
+    font-weight: 600;
 }

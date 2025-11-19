@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/83a13259ee.js" crossorigin="anonymous"></script>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
@@ -18,30 +19,47 @@
 
 <body>
 
-    <div id="map"> <!--DIV do Mapa-->
-        <div class="button"> <!-- DIV do botão de voltar (natan)-->
+    <div id="map">
+
+        <!-- Botão voltar -->
+        <div class="button">
             <a href="feed.html" class="Voltar"><i class="fa-solid fa-arrow-left"></i></a>
         </div>
 
-        <div class="container"> <!--DIV de onde estarão os usuarios proximos e locais populares (natan)-->
-        <div>
-            <h1>Usuários Proximos</h1>
-            <i class="fa-solid fa-users"></i>
+        <!-- PAINEL LATERAL -->
+        <div class="painel-info">
 
-            <div id="usuarios-proximos-lista">
-                <p>Buscando...</p>
+            <!-- BLOCO EXPANDÍVEL -->
+            <!-- Usuários Próximos -->
+            <div class="painel-grupo">
+                <div class="painel-header" onclick="togglePainel(this)">
+                    <div class="titulo-icone">
+                        <i class="fa-solid fa-users"></i>
+                        <h2>Usuários Próximos</h2>
+                    </div>
+                    <i class="fa-solid fa-chevron-down seta"></i>
+                </div>
+
+                <div class="painel-conteudo" id="usuarios-proximos-lista">
+                    <p>Buscando...</p>
+                </div>
             </div>
 
-        </div>
+            <!-- Locais Populares -->
+            <div class="painel-grupo">
+                <div class="painel-header" onclick="togglePainel(this)">
+                    <div class="titulo-icone">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <h2>Locais Populares</h2>
+                    </div>
+                    <i class="fa-solid fa-chevron-down seta"></i>
+                </div>
 
-        <div>
-            <h1>Locais Populares</h1>
-            <i class="fa-solid fa-map-location-dot"></i>
-        </div>
-    </div>
-    </div>
-    <script src="JavaScript/map.js"></script>
+                <div class="painel-conteudo lista-locais-populares" id="locais-populares"></div>
+            </div>
+
+
+            <script src="JavaScript/map.js"></script>
 </body>
-
 
 </html>
