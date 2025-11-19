@@ -22,7 +22,8 @@
         <div class="nav-right">
             <div class="search-box">
                 <img src="imagens/search.image.png" alt="Search">
-                <input type="text" placeholder="Search">
+                <input type="text" placeholder="Search" id="searchInput">
+                <div id="resultsDiv"></div>
             </div>
             <div class="nav-user-icon online" onclick="configuracoesMenuAlter()">
                 <img src="imagens/profile.picture.jpg" alt="Usuário">
@@ -78,11 +79,15 @@
                 </div>
             </div>
 
-            <div id="container-direita"> 
-                <div class="seguindo-seguidores">
-                    <div class="seguindo"><h4 id="seguindo-count">0 seguindo</h4></div>
-                    <div class="seguidores"><h4 id="seguidores-count">0 seguidores</h4></div>
-                </div>
+           <div id="container-direita">
+    <div class="seguindo-seguidores">
+        <div class="seguindo">
+            <h4><span id="seguindo-count">0</span> seguindo</h4>
+        </div>
+        <div class="seguidores">
+            <h4><span id="seguidores-count">0</span> seguidores</h4>
+        </div>
+    </div>
 
                 <div class="esportes">
                     <div class="esporte">Basquete</div>

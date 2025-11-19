@@ -384,7 +384,7 @@ app.get('/segue/:cpf_seguidor/:cpf_seguido', async (req, res) => {
         
         const segue = resultado.length > 0;
         
-        console.log(`✅ Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
+        console.log(`Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
         
         res.json({ 
             success: true, 
@@ -392,7 +392,7 @@ app.get('/segue/:cpf_seguidor/:cpf_seguido', async (req, res) => {
         });
         
     } catch (erro) {
-        console.error('❌ Erro ao verificar follow:', erro);
+        console.error(' Erro ao verificar follow:', erro);
         res.status(500).json({ 
             success: false, 
             message: 'Erro ao verificar follow',
@@ -522,35 +522,6 @@ app.get('/publicacoes/:cpf', (req, res) => {
     });
   });
 });
-
-// ==================== EXCLUIR PUBLICAÇÃO ====================
-app.delete('/publicacoes/:id', async (req, res) => {
-  const id = req.params.id;
-
-  if (esporte) {
-    query += ' AND p.esporte = ?';
-    params.push(esporte);
-  }
-
-  query += " ORDER BY p.data_publicacao DESC";
-
-  connection.query(query, params, (erro, resultados) => {
-    if (erro) {
-      console.error(" Erro ao buscar publicações do usuário:", erro);
-      return res.status(500).json({
-        success: false,
-        message: "Erro ao carregar publicações do usuário."
-      });
-    }
-
-    console.log(` ${resultados.length} publicações encontradas para CPF ${cpf}`);
-    res.json({
-      success: true,
-      posts: resultados
-    });
-  });
-});
-
 // PUBLICACOES -------------------------------------------------------------
 app.post('/publicacoes', (req, res) => {
   console.log("POST PUBLICACOES");
@@ -656,25 +627,76 @@ app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
 app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
+  console.log(`\n [DELETE] Recebida requisição para excluir publicação ID: ${id}`);
+  console.log(`   Tipo do ID: ${typeof id}`);
+
+  if (!id || isNaN(id)) {
+    console.log('    ID inválido');
+    return res.status(400).json({ 
+      success: false, 
+      message: 'ID da publicação é inválido' 
+    });
+  }
+
   try {
-    await connection
+    console.log('    Verificando se a publicação existe...');
+    const [rows] = await connection
+      .promise()
+      .query('SELECT IDpublicacao FROM publicacao WHERE IDpublicacao = ?', [id]);
+
+    if (!rows || rows.length === 0) {
+      console.log('    Publicação não encontrada no banco');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Publicação não encontrada' 
+      });
+    }
+
+    console.log('   ✓ Publicação encontrada, iniciando exclusão...');
+
+    console.log('    Excluindo curtidas...');
+    const [resultadoCurtidas] = await connection
       .promise()
       .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
+    
+    console.log(`   ✓ ${resultadoCurtidas.affectedRows} curtida(s) excluída(s)`);
 
-    await connection
+    console.log('    Excluindo publicação...');
+    const [resultadoPublicacao] = await connection
       .promise()
       .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
 
-    res.json({ success: true, message: 'Publicação excluída com sucesso!' });
+    if (resultadoPublicacao.affectedRows === 0) {
+      console.log('   Nenhuma linha afetada ao excluir publicação');
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Erro ao excluir publicação' 
+      });
+    }
+
+    console.log('    Publicação excluída com sucesso!\n');
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Publicação excluída com sucesso!' 
+    });
+
   } catch (error) {
-    console.error('Erro ao excluir publicação:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Erro ao excluir publicação.' });
+    console.error('\n[ERRO CRÍTICO] Erro ao excluir publicação:');
+    console.error('   Mensagem:', error.message);
+    console.error('   Stack:', error.stack);
+    console.error('   SQL State:', error.sqlState);
+    console.error('   SQL Message:', error.sqlMessage);
+    console.error('   Código:', error.code);
+
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Erro interno ao excluir publicação',
+      erro: error.message,
+      codigo: error.code || 'UNKNOWN'
+    });
   }
 });
-
-
 // ===================== CURTIDAS =====================
 app.get("/publicacoes/:id/curtidas", (req, res) => {
   const id = req.params.id;
@@ -902,7 +924,6 @@ app.get("/usuario/:cpf", (req, res) => {
 });
 
 //==============EDITAR PERFIL==============
-
 app.get("/esportes/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
@@ -1204,7 +1225,7 @@ app.delete("/usuario/clube/remover", (req, res) => {
 app.delete('/usuario/excluir-conta', async (req, res) => {
   const { cpf, confirmacao } = req.body;
 
-  console.log('\n🗑️ Solicitação de exclusão de conta recebida');
+  console.log('\n Solicitação de exclusão de conta recebida');
   console.log('   CPF:', cpf);
   console.log('   Confirmação:', confirmacao);
 
@@ -1261,7 +1282,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
     console.log('   ✓ Usuário excluído');
 
     await connection.promise().commit();
-    console.log('✅ Conta excluída com sucesso!\n');
+    console.log(' Conta excluída com sucesso!\n');
 
     res.json({
       success: true,
@@ -1270,7 +1291,12 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
 
   } catch (erro) {
     await connection.promise().rollback();
+<<<<<<< HEAD
     console.error('❌ Erro ao excluir conta:', erro);
+=======
+    
+    console.error(' Erro ao excluir conta:', erro);
+>>>>>>> 4a413f743fd99f8773c34e7534bba79a00a4e9c4
     res.status(500).json({
       success: false,
       message: 'Erro ao excluir conta. Tente novamente.'
@@ -1278,6 +1304,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // ==================== BUSCAR AMIGOS MÚTUOS ====================
 app.get("/mutuos/:cpf", (req, res) => {
   const cpf = req.params.cpf;
@@ -1335,6 +1362,359 @@ app.get("/teste-rotas", (req, res) => {
       "POST /seguir",
       "DELETE /seguir"
     ]
+=======
+// ==================== ROTAS DE EVENTOS ====================
+
+// 1. CRIAR EVENTO
+app.post('/eventos', (req, res) => {
+  console.log('\n========================================');
+  console.log('📅 ROTA POST /eventos CHAMADA');
+  console.log('========================================');
+  
+  // Log do body recebido
+  console.log('📦 Body recebido:', JSON.stringify(req.body, null, 2));
+  
+  const { titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id, criador_cpf } = req.body;
+
+  // Log de cada campo
+  console.log('\n🔍 Campos extraídos:');
+  console.log('   - titulo:', titulo);
+  console.log('   - responsavel:', responsavel);
+  console.log('   - local:', local);
+  console.log('   - data_evento:', data_evento);
+  console.log('   - horario:', horario);
+  console.log('   - descricao:', descricao);
+  console.log('   - esportes:', esportes);
+  console.log('   - clube_id:', clube_id);
+  console.log('   - criador_cpf:', criador_cpf);
+
+  // Validação com logs específicos
+  if (!titulo) {
+    console.log('❌ ERRO: Título não informado');
+    return res.status(400).json({
+      success: false,
+      message: 'Título é obrigatório'
+    });
+  }
+
+  if (!responsavel) {
+    console.log('❌ ERRO: Responsável não informado');
+    return res.status(400).json({
+      success: false,
+      message: 'Responsável é obrigatório'
+    });
+  }
+
+  if (!local) {
+    console.log('❌ ERRO: Local não informado');
+    return res.status(400).json({
+      success: false,
+      message: 'Local é obrigatório'
+    });
+  }
+
+  if (!data_evento) {
+    console.log('❌ ERRO: Data não informada');
+    return res.status(400).json({
+      success: false,
+      message: 'Data do evento é obrigatória'
+    });
+  }
+
+  if (!horario) {
+    console.log('❌ ERRO: Horário não informado');
+    return res.status(400).json({
+      success: false,
+      message: 'Horário é obrigatório'
+    });
+  }
+
+  if (!criador_cpf) {
+    console.log('❌ ERRO: CPF do criador não informado');
+    return res.status(400).json({
+      success: false,
+      message: 'CPF do criador é obrigatório'
+    });
+  }
+
+  console.log('\n✅ Validação passou! Preparando SQL...');
+
+  // ATENÇÃO: Use o nome correto da sua tabela
+  // Se sua tabela se chama 'evento' (singular), use 'evento'
+  // Se sua tabela se chama 'eventos' (plural), use 'eventos'
+  const sql = `
+    INSERT INTO evento (titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id, criador_cpf)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  console.log('📝 SQL preparado:', sql);
+  console.log('📊 Parâmetros:', [
+    titulo,
+    responsavel,
+    local,
+    data_evento,
+    horario,
+    descricao || null,
+    esportes || null,
+    clube_id || null,
+    criador_cpf
+  ]);
+
+  connection.query(sql, [
+    titulo,
+    responsavel,
+    local,
+    data_evento,
+    horario,
+    descricao || null,
+    esportes || null,
+    clube_id || null,
+    criador_cpf
+  ], (erro, resultado) => {
+    if (erro) {
+      console.log('\n========================================');
+      console.error('❌ ERRO SQL COMPLETO:', erro);
+      console.log('========================================');
+      console.error('   Código do erro:', erro.code);
+      console.error('   SQL State:', erro.sqlState);
+      console.error('   Mensagem:', erro.sqlMessage);
+      console.error('   SQL:', erro.sql);
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Erro no servidor ao criar evento',
+        erro: erro.sqlMessage // Adiciona mensagem de erro para debug
+      });
+    }
+
+    console.log('\n========================================');
+    console.log('✅ EVENTO CRIADO COM SUCESSO!');
+    console.log('========================================');
+    console.log('   ID do evento:', resultado.insertId);
+    console.log('   Linhas afetadas:', resultado.affectedRows);
+    
+    res.json({
+      success: true,
+      message: 'Evento criado com sucesso',
+      eventoId: resultado.insertId
+    });
+  });
+});
+
+// 2. LISTAR TODOS OS EVENTOS (ordenados por data)
+app.get('/eventos', (req, res) => {
+  console.log('\n📋 Buscando todos os eventos...');
+
+  // ATENÇÃO: Mudei para 'evento' (singular) baseado nos seus ALTER TABLE
+  const sql = `
+    SELECT 
+      e.*,
+      c.nome as clube_nome,
+      u.nome as criador_nome
+    FROM evento e
+    LEFT JOIN clube c ON e.clube_id = c.IDclube
+    LEFT JOIN usuario u ON e.criador_cpf = u.CPF
+    WHERE e.data_evento >= CURDATE()
+    ORDER BY e.data_evento ASC, e.horario ASC
+  `;
+
+  connection.query(sql, (erro, eventos) => {
+    if (erro) {
+      console.error('❌ Erro ao listar eventos:', erro);
+      console.error('   SQL State:', erro.sqlState);
+      console.error('   Mensagem:', erro.sqlMessage);
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao buscar eventos',
+        erro: erro.sqlMessage
+      });
+    }
+
+    console.log(`✅ ${eventos.length} eventos encontrados`);
+    res.json(eventos);
+  });
+});
+
+// 3. BUSCAR EVENTO POR ID (com detalhes completos)
+app.get('/eventos/:id', (req, res) => {
+  const { id } = req.params;
+  console.log(`\n🔍 Buscando evento ID: ${id}`);
+
+  const sql = `
+    SELECT 
+      e.*,
+      c.nome as clube_nome,
+      u.nome as criador_nome,
+      u.nomeUsuario as criador_usuario
+    FROM evento e
+    LEFT JOIN clube c ON e.clube_id = c.IDclube
+    LEFT JOIN usuario u ON e.criador_cpf = u.CPF
+    WHERE e.IDevento = ?
+  `;
+
+  connection.query(sql, [id], (erro, eventos) => {
+    if (erro) {
+      console.error('❌ Erro ao buscar evento:', erro);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao buscar evento',
+        erro: erro.sqlMessage
+      });
+    }
+
+    if (eventos.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Evento não encontrado'
+      });
+    }
+
+    console.log('✅ Evento encontrado:', eventos[0].titulo);
+    res.json({
+      success: true,
+      evento: eventos[0]
+    });
+  });
+});
+
+// 4. ATUALIZAR EVENTO
+app.put('/eventos/:id', (req, res) => {
+  const { id } = req.params;
+  const { titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id } = req.body;
+
+  console.log(`\n✏️ Atualizando evento ID: ${id}`);
+
+  const sql = `
+    UPDATE eventos
+    SET titulo = ?, responsavel = ?, local = ?, data_evento = ?, 
+        horario = ?, descricao = ?, esportes = ?, clube_id = ?
+    WHERE IDevento = ?
+  `;
+
+  connection.query(sql, [
+    titulo,
+    responsavel,
+    local,
+    data_evento,
+    horario,
+    descricao || null,
+    esportes || null,
+    clube_id || null,
+    id
+  ], (erro, resultado) => {
+    if (erro) {
+      console.error('❌ Erro ao atualizar evento:', erro);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao atualizar evento'
+      });
+    }
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Evento não encontrado'
+      });
+    }
+
+    console.log('✅ Evento atualizado com sucesso');
+    res.json({
+      success: true,
+      message: 'Evento atualizado com sucesso'
+    });
+  });
+});
+
+// 5. DELETAR EVENTO
+app.delete('/eventos/:id', (req, res) => {
+  const { id } = req.params;
+
+  console.log(`\n🗑️ Deletando evento ID: ${id}`);
+
+  const sql = 'DELETE FROM eventos WHERE IDevento = ?';
+
+  connection.query(sql, [id], (erro, resultado) => {
+    if (erro) {
+      console.error('❌ Erro ao deletar evento:', erro);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao deletar evento'
+      });
+    }
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Evento não encontrado'
+      });
+    }
+
+    console.log('✅ Evento deletado com sucesso');
+    res.json({
+      success: true,
+      message: 'Evento deletado com sucesso'
+    });
+  });
+});
+
+// 6. BUSCAR EVENTOS POR ESPORTE
+app.get('/eventos/esporte/:esporte', (req, res) => {
+  const { esporte } = req.params;
+
+  console.log(`\n🏅 Buscando eventos do esporte: ${esporte}`);
+
+  const sql = `
+    SELECT e.*, c.nome as clube_nome
+    FROM eventos e
+    LEFT JOIN clube c ON e.clube_id = c.IDclube
+    WHERE e.esportes LIKE ? AND e.data_evento >= CURDATE()
+    ORDER BY e.data_evento ASC
+  `;
+
+  connection.query(sql, [`%${esporte}%`], (erro, eventos) => {
+    if (erro) {
+      console.error('❌ Erro ao buscar eventos por esporte:', erro);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao buscar eventos'
+      });
+    }
+
+    console.log(`✅ ${eventos.length} eventos encontrados`);
+    res.json(eventos);
+  });
+});
+
+// 7. BUSCAR EVENTOS DE UM USUÁRIO
+app.get('/eventos/usuario/:cpf', (req, res) => {
+  const { cpf } = req.params;
+
+  console.log(`\n👤 Buscando eventos criados pelo CPF: ${cpf}`);
+
+  const sql = `
+    SELECT e.*, c.nome as clube_nome
+    FROM eventos e
+    LEFT JOIN clube c ON e.clube_id = c.IDclube
+    WHERE e.criador_cpf = ?
+    ORDER BY e.data_evento DESC
+  `;
+
+  connection.query(sql, [cpf], (erro, eventos) => {
+    if (erro) {
+      console.error('❌ Erro ao buscar eventos do usuário:', erro);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao buscar eventos'
+      });
+    }
+
+    console.log(`✅ ${eventos.length} eventos encontrados`);
+    res.json({
+      success: true,
+      eventos: eventos
+    });
+>>>>>>> 4a413f743fd99f8773c34e7534bba79a00a4e9c4
   });
 });
 

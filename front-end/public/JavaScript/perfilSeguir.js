@@ -180,6 +180,76 @@ async function carregarFotoNavbar() {
     console.error("Erro ao carregar foto do navbar:", err);
   }
 }
+// BARRA DE PESQUISA
+const searchInput = document.getElementById("searchInput");
+const resultsDiv = document.getElementById("resultsDiv");
+
+if (searchInput && resultsDiv) {
+  async function fazerBusca() {
+    const termo = searchInput.value.trim();
+    if (!termo) {
+      resultsDiv.style.display = "none";
+      return;
+    }
+
+    try {
+      const resposta = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(termo)}`);
+      if (!resposta.ok) throw new Error("Erro ao buscar dados");
+
+      const resultados = await resposta.json();
+      resultsDiv.innerHTML = "";
+
+      if (resultados.usuarios.length === 0 && resultados.posts.length === 0) {
+        resultsDiv.textContent = "Nenhum resultado encontrado.";
+      } else {
+        resultados.usuarios.forEach(usuario => {
+          const div = document.createElement("div");
+          div.classList.add("result-item");
+          div.innerHTML = `
+            <img src="${usuario.fotoDePerfil ? `http://localhost:3000/uploads/${usuario.fotoDePerfil}` : 'imagens/profile.picture.jpg'}" alt="${usuario.nome}">
+            <span>${usuario.nome} (@${usuario.nomeUsuario})</span>
+          `;
+
+          div.dataset.cpf = usuario.CPF;
+
+          div.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const cpfDoUsuario = div.dataset.cpf;
+            console.log(" Indo para perfil do CPF:", cpfDoUsuario);
+            window.location.href = `/perfilSeguir.html?cpf=${encodeURIComponent(cpfDoUsuario)}`;
+          });
+
+          resultsDiv.appendChild(div);
+        });
+
+        resultados.posts.forEach(post => {
+          const div = document.createElement("div");
+          div.classList.add("result-item");
+          div.innerHTML = `
+            <strong>${post.nome}</strong>: ${post.conteudo}
+          `;
+          resultsDiv.appendChild(div);
+        });
+      }
+
+      resultsDiv.style.display = "block";
+
+    } catch (erro) {
+      console.error("Erro ao fazer busca:", erro);
+      resultsDiv.textContent = "Erro ao buscar. Tente novamente.";
+      resultsDiv.style.display = "block";
+    }
+  }
+
+  searchInput.addEventListener("input", fazerBusca);
+
+  document.addEventListener("click", (e) => {
+    if (!resultsDiv.contains(e.target) && e.target !== searchInput) {
+      resultsDiv.style.display = "none";
+    }
+  });
+}
 
 // SISTEMA DE CURTIDAS
 function criarSistemaCurtidas(post, card) {
@@ -687,7 +757,7 @@ async function carregarClubesDoVisitado() {
     
     if (clubes.length === 0) {
       containerClubes.innerHTML += `
-        <p style="color: #999; text-align: center; padding: 20px 0;">
+        <p style="color: #999; text-align: center; padding: 20px;  margin-bottom: 12px;">
           Nenhum clube adicionado ainda.
         </p>
       `;
