@@ -624,3 +624,353 @@ i {
   color: #666;
   margin-top: 40px;
 }
+
+/* =================== EVENTOS =================== */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.ativo {
+    display: flex;
+}
+
+.modal-evento {
+    background: white;
+    border-radius: 12px;
+    padding: 30px 40px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #0f9800;
+}
+
+.modal-header h3 {
+    color: #0f9800;
+    font-size: 22px;
+    margin: 0;
+}
+
+.btn-fechar {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.btn-fechar:hover {
+    color: #ff0000;
+    transform: rotate(90deg);
+}
+
+.form-grupo {
+    margin-bottom: 20px;
+}
+
+.form-grupo label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-grupo input,
+.form-grupo select,
+.form-grupo textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-grupo input:focus,
+.form-grupo select:focus,
+.form-grupo textarea:focus {
+    outline: none;
+    border-color: #0f9800;
+    box-shadow: 0 0 0 3px rgba(15, 152, 0, 0.1);
+}
+
+.form-grupo textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-grupo small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+}
+
+/* Grid para data e horário lado a lado */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-row .form-grupo {
+    margin-bottom: 20px;
+}
+
+.checkbox-grupo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox-item label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 13px;
+}
+
+.btn-criar-evento {
+    width: 100%;
+    padding: 14px;
+    background: #0f9800;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn-criar-evento:hover {
+    background: #41db51;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 152, 0, 0.3);
+}
+
+.btn-criar-evento:active {
+    transform: translateY(0);
+}
+
+/* Botão + Novo Evento - Estilo minimalista */
+.btn-novo-evento {
+    display: inline-block;
+    background: none;
+    color: #0f9800;
+    border: none;
+    padding: 0;
+    font-size: px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.btn-novo-evento:hover {
+    color: #41db51;
+    text-decoration: underline;
+}
+
+.btn-novo-evento i {
+    font-size: 12px;
+    margin-right: 4px;
+}
+
+/* Estilo do card de evento - Match com a referência */
+.event {
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid transparent;
+    margin-bottom: 18px;
+}
+
+.event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.left-event {
+    border-radius: 10px;
+    height: 65px;
+    width: 65px;
+    margin-right: 15px;
+    padding-top: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.left-event h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    line-height: 1;
+}
+
+.left-event span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #41db51;
+    color: #fff;
+    font-size: 9px;
+    padding: 3px 0;
+    text-transform: capitalize;
+}
+
+.right-event h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+    margin: 0 0 5px 0;
+}
+
+.right-event p {
+    font-size: 12px;
+    color: #666;
+    margin: 0 0 5px 0;
+}
+
+.right-event p i {
+    color: #0f9800;
+    margin-right: 5px;
+}
+
+.right-event a {
+    font-size: 12px;
+    text-decoration: none;
+    color: #41db51;
+    font-weight: 500;
+}
+
+/* Modal de detalhes do evento */
+.detalhes-evento {
+    line-height: 1.8;
+}
+
+.detalhes-evento p {
+    margin-bottom: 12px;
+    color: #333;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.detalhes-evento strong {
+    color: #0f9800;
+    min-width: 100px;
+}
+
+.detalhes-evento i {
+    color: #0f9800;
+    width: 20px;
+    margin-top: 3px;
+}
+
+.esportes-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tag-esporte-modal {
+    background: #e8f5e9;
+    color: #0f9800;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.container-eventos-dinamicos {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.container-eventos-dinamicos::-webkit-scrollbar {
+    width: 8px;
+}
+
+.container-eventos-dinamicos::-webkit-scrollbar-thumb {
+    background: #0f9800;
+    border-radius: 4px;
+}
+
+.container-eventos-dinamicos::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.mensagem-eventos-vazia {
+    text-align: center;
+    color: #666;
+    padding: 30px 20px;
+    font-size: 14px;
+}
