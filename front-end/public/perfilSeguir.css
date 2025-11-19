@@ -402,16 +402,6 @@ nav {
     max-width: 1000px;
 }
 
-/* Define largura fixa para a lateral direita e espaçamento */
-#container-direita {
-    flex: none;
-    width: 280px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 2px 8px rgba(0, 0, 0, 0.08);
-    height: fit-content;
-    margin-top: 5px;
-}
 
 /* Publicação */
 .publicacao-card {
@@ -476,7 +466,7 @@ nav {
     padding: 1rem;
     width: 18vw;
     min-width: 200px;
-    height: 80vh;
+    min-height: 80vh;  
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -509,20 +499,21 @@ nav {
 }
 
 /* Esportes */
-.esportes {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+
 
 .esporte {
-    padding: 8px 10px;
-    border-radius: 8px;
-    text-align: center;
-    border: 2px solid #2BA848;
-    color: #2BA848;
+width: 100%;
+    background: #fff;
+    color: #22aa22;
+    border: 2px solid #22aa22;
+    padding: 10px;
+    border-radius: 10px;
     font-weight: bold;
-    background: transparent;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .2s;
+    text-align: center;
+    margin-bottom: 12px;
 }
 
 /* ======================= INFOS GERAIS ======================= */
