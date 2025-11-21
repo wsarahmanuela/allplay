@@ -907,6 +907,68 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
   });
 });
 
+/// ENDPOINT: BUSCAR EVENTOS POR LOCAL (VERSÃO FINAL - TESTADA)
+app.get("/api/eventos-por-local", (req, res) => {
+    const { local } = req.query;
+
+    console.log('\n🔍 [API] /api/eventos-por-local CHAMADA');
+    console.log('   Local solicitado:', local);
+
+    if (!local) {
+        console.log('   ❌ Local não fornecido');
+        return res.status(400).json({
+            success: false,
+            message: "Nome do local é obrigatório."
+        });
+    }
+
+    // Query simplificada usando SELECT * para pegar todas as colunas
+    const sql = `SELECT * FROM evento WHERE local = ? ORDER BY data_evento DESC LIMIT 10`;
+
+    console.log('   📝 Executando SQL...');
+
+    connection.query(sql, [local], (erro, resultados) => {
+        if (erro) {
+            console.error('   ❌ ERRO SQL:');
+            console.error('      Código:', erro.code);
+            console.error('      Mensagem:', erro.sqlMessage);
+            console.error('      SQL State:', erro.sqlState);
+            
+            return res.status(500).json({
+                success: false,
+                message: "Erro ao buscar eventos.",
+                erro: erro.sqlMessage
+            });
+        }
+
+        console.log(`   ✅ Query OK! ${resultados.length} evento(s) encontrado(s)`);
+        
+        if (resultados.length > 0) {
+            console.log('   📋 Primeiro evento:', {
+                id: resultados[0].IDevento,
+                titulo: resultados[0].titulo,
+                local: resultados[0].local,
+                data: resultados[0].data_evento
+            });
+        }
+
+        // Formatar resposta com dados consistentes
+        const eventosFormatados = resultados.map(ev => ({
+            idEvento: ev.IDevento,
+            titulo: ev.titulo,
+            descricao: ev.descricao || '',
+            dataEvento: ev.data_evento,
+            horaEvento: ev.horario,
+            local: ev.local,
+            tipo: ev.esportes || ev.tipo || 'Evento'
+        }));
+
+        res.json({
+            success: true,
+            eventos: eventosFormatados
+        });
+    });
+});
 
 // barra de pesquisa
 app.get("/search", (req, res) => {
