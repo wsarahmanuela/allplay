@@ -1055,13 +1055,399 @@ async function abrirDetalhesEvento(idEvento) {
     alert('Erro ao carregar detalhes do evento');
   }
 }
+// ==================== ANÚNCIOS ====================
+let imagensAnuncioSelecionadas = [];
 
+// Abrir Modal
+function abrirModalCriarAnuncio() {
+    document.getElementById('modalCriarAnuncio').classList.add('ativo');
+    imagensAnuncioSelecionadas = [];
+    document.getElementById('previewImagens').innerHTML = '';
+    document.getElementById('infoImagens').textContent = 'Nenhuma imagem selecionada';
+    document.getElementById('formCriarAnuncio').reset();
+}
 
-// ================== INICIALIZAÇÃO ==================
+// Fechar Modal
+function fecharModalAnuncio() {
+    document.getElementById('modalCriarAnuncio').classList.remove('ativo');
+    document.getElementById('formCriarAnuncio').reset();
+    imagensAnuncioSelecionadas = [];
+    document.getElementById('previewImagens').innerHTML = '';
+    document.getElementById('infoImagens').textContent = 'Nenhuma imagem selecionada';
+}
+
+// ==================== CAPTURA DE IMAGENS ====================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const inputImagens = document.getElementById('imagensAnuncio');
+    
+    if (inputImagens) {
+        inputImagens.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            
+            console.log('📸 Imagens selecionadas:', files.length);
+            
+            // Verificar limite de 3 imagens
+            if (files.length > 3) {
+                alert('⚠️ Você pode selecionar no máximo 3 imagens!');
+                this.value = '';
+                return;
+            }
+            
+            // Se não houver arquivos
+            if (files.length === 0) {
+                imagensAnuncioSelecionadas = [];
+                document.getElementById('previewImagens').innerHTML = '';
+                document.getElementById('infoImagens').textContent = 'Nenhuma imagem selecionada';
+                return;
+            }
+            
+            // Atualizar array de imagens
+            imagensAnuncioSelecionadas = files;
+            mostrarPreviewImagens(files);
+            
+            // Atualizar texto informativo
+            const infoTexto = files.length === 1 
+                ? '✅ 1 imagem selecionada' 
+                : `✅ ${files.length} imagens selecionadas`;
+            document.getElementById('infoImagens').textContent = infoTexto;
+            
+            console.log('✅ Imagens armazenadas:', imagensAnuncioSelecionadas.length);
+        });
+    }
+});
+
+// ==================== PREVIEW DAS IMAGENS ====================
+
+function mostrarPreviewImagens(files) {
+    const container = document.getElementById('previewImagens');
+    container.innerHTML = '';
+    
+    files.forEach((file, index) => {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.classList.add('preview-item');
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Preview ${index + 1}">
+                <button type="button" class="btn-remover-preview" onclick="removerImagemAnuncio(${index})">
+                    ×
+                </button>
+            `;
+            container.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+    });
+}
+
+// ==================== REMOVER IMAGEM ====================
+
+function removerImagemAnuncio(index) {
+    console.log('🗑️ Removendo imagem:', index);
+    
+    // Criar novo array sem a imagem removida
+    const novosArquivos = Array.from(imagensAnuncioSelecionadas);
+    novosArquivos.splice(index, 1);
+    
+    // Atualizar o array
+    imagensAnuncioSelecionadas = novosArquivos;
+    
+    // Atualizar o input file usando DataTransfer
+    const dataTransfer = new DataTransfer();
+    novosArquivos.forEach(file => dataTransfer.items.add(file));
+    document.getElementById('imagensAnuncio').files = dataTransfer.files;
+    
+    // Atualizar preview
+    if (novosArquivos.length > 0) {
+        mostrarPreviewImagens(novosArquivos);
+        const infoTexto = novosArquivos.length === 1 
+            ? '✅ 1 imagem selecionada' 
+            : `✅ ${novosArquivos.length} imagens selecionadas`;
+        document.getElementById('infoImagens').textContent = infoTexto;
+    } else {
+        document.getElementById('previewImagens').innerHTML = '';
+        document.getElementById('infoImagens').textContent = 'Nenhuma imagem selecionada';
+    }
+    
+    console.log('✅ Imagens restantes:', imagensAnuncioSelecionadas.length);
+}
+
+// ==================== CRIAR ANÚNCIO ====================
+
+async function criarAnuncio(event) {
+    event.preventDefault();
+    
+    console.log('📢 Iniciando criação de anúncio...');
+    
+    const titulo = document.getElementById('tituloAnuncio').value.trim();
+    const descricao = document.getElementById('descricaoAnuncio').value.trim();
+    const cpf = localStorage.getItem('cpf');
+    
+    console.log('Título:', titulo);
+    console.log('Descrição:', descricao);
+    console.log('CPF:', cpf);
+    console.log('Imagens no array:', imagensAnuncioSelecionadas.length);
+    
+    // ==================== VALIDAÇÕES ====================
+    
+    if (!titulo) {
+        alert('⚠️ Por favor, insira um título para o anúncio');
+        return;
+    }
+    
+    if (!descricao) {
+        alert('⚠️ Por favor, insira uma descrição para o anúncio');
+        return;
+    }
+    
+    if (!cpf) {
+        alert('⚠️ Erro: Você precisa estar logado para criar um anúncio');
+        return;
+    }
+    
+    if (imagensAnuncioSelecionadas.length === 0) {
+        alert('⚠️ Por favor, selecione pelo menos 1 imagem');
+        return;
+    }
+    
+    // ==================== CRIAR FORMDATA ====================
+    
+    const formData = new FormData();
+    formData.append('titulo', titulo);
+    formData.append('descricao', descricao);
+    formData.append('criador_cpf', cpf);
+    
+    // Adicionar todas as imagens com o nome "imagens" (plural)
+    imagensAnuncioSelecionadas.forEach((file) => {
+        formData.append('imagens', file);
+        console.log('📎 Adicionando imagem:', file.name, '| Tamanho:', (file.size / 1024).toFixed(2), 'KB');
+    });
+    
+    // Log do FormData
+    console.log('📦 FormData criado com:');
+    for (let pair of formData.entries()) {
+        console.log(`  ${pair[0]}:`, pair[1]);
+    }
+    
+    try {
+        console.log('📤 Enviando para o servidor...');
+        
+        const response = await fetch('http://localhost:3000/anuncios', {
+            method: 'POST',
+            body: formData
+        });
+        
+        console.log('📊 Status da resposta:', response.status);
+        
+        const result = await response.json();
+        
+        console.log('📥 Resposta do servidor:', result);
+        
+        if (result.success) {
+            alert('✅ Anúncio criado com sucesso!');
+            fecharModalAnuncio();
+            carregarAnuncios();
+        } else {
+            alert('❌ Erro ao criar anúncio: ' + (result.message || 'Erro desconhecido'));
+        }
+    } catch (erro) {
+        console.error('❌ Erro ao criar anúncio:', erro);
+        alert('❌ Erro ao criar anúncio. Verifique sua conexão e tente novamente.');
+    }
+}
+
+// ==================== CARREGAR ANÚNCIOS ====================
+
+async function carregarAnuncios() {
+    console.log('📋 Carregando anúncios...');
+    
+    const container = document.getElementById('container-anuncios');
+    if (!container) {
+        console.error('❌ Container de anúncios não encontrado');
+        return;
+    }
+    
+    try {
+        const response = await fetch('http://localhost:3000/anuncios');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const anuncios = await response.json();
+        
+        console.log('📥 Anúncios recebidos:', anuncios.length);
+        
+        if (!Array.isArray(anuncios)) {
+            container.innerHTML = '<p class="mensagem-anuncios-vazia">❌ Erro ao carregar anúncios</p>';
+            return;
+        }
+        
+        if (anuncios.length === 0) {
+            container.innerHTML = '<p class="mensagem-anuncios-vazia">📢 Nenhum anúncio cadastrado ainda</p>';
+            return;
+        }
+        
+        renderizarAnuncios(anuncios);
+        
+    } catch (erro) {
+        console.error('❌ Erro ao carregar anúncios:', erro);
+        container.innerHTML = '<p class="mensagem-anuncios-vazia">❌ Erro ao carregar anúncios</p>';
+    }
+}
+
+// ==================== RENDERIZAR ANÚNCIOS ====================
+
+function renderizarAnuncios(anuncios) {
+    const container = document.getElementById('container-anuncios');
+    container.innerHTML = '';
+    
+    const cpfLogado = localStorage.getItem('cpf');
+    
+    anuncios.forEach(anuncio => {
+        // Filtrar apenas imagens que existem
+        const imagens = [anuncio.imagem1, anuncio.imagem2, anuncio.imagem3].filter(img => img);
+        
+        const anuncioCard = document.createElement('div');
+        anuncioCard.classList.add('anuncio-card');
+        
+        anuncioCard.innerHTML = `
+            ${anuncio.criador_cpf === cpfLogado ? `
+                <button class="btn-excluir-anuncio" onclick="excluirAnuncio(${anuncio.id}, '${anuncio.titulo.replace(/'/g, "\\'")}')">
+                    ×
+                </button>
+            ` : ''}
+            
+            <div class="anuncio-header">
+                <h4>${anuncio.titulo}</h4>
+                <p>${anuncio.descricao}</p>
+            </div>
+            
+            <div class="anuncio-carrossel" id="carrossel-${anuncio.id}">
+                ${imagens.map((img, idx) => `
+                    <img src="http://localhost:3000/uploads/${img}" 
+                         alt="${anuncio.titulo}" 
+                         class="${idx === 0 ? 'ativo' : ''}">
+                `).join('')}
+                
+                ${imagens.length > 1 ? `
+                    <button class="carrossel-btn prev" onclick="navegarCarrosselAnuncio(${anuncio.id}, -1)">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="carrossel-btn next" onclick="navegarCarrosselAnuncio(${anuncio.id}, 1)">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    
+                    <div class="carrossel-indicadores">
+                        ${imagens.map((_, idx) => `
+                            <div class="indicador ${idx === 0 ? 'ativo' : ''}" 
+                                 onclick="irParaSlideAnuncio(${anuncio.id}, ${idx})"></div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        container.appendChild(anuncioCard);
+    });
+    
+    console.log(`✅ ${anuncios.length} anúncios renderizados`);
+}
+
+// ==================== CARROSSEL COM VELOCIDADE AJUSTADA ====================
+
+const carrosselIndices = {};
+
+function navegarCarrosselAnuncio(id, direcao) {
+    const carrossel = document.getElementById(`carrossel-${id}`);
+    const imagens = carrossel.querySelectorAll('img');
+    const indicadores = carrossel.querySelectorAll('.indicador');
+    
+    if (!carrosselIndices[id]) carrosselIndices[id] = 0;
+    
+    // Remover classe ativo da imagem atual
+    imagens[carrosselIndices[id]].classList.remove('ativo');
+    if (indicadores.length > 0) {
+        indicadores[carrosselIndices[id]].classList.remove('ativo');
+    }
+    
+    // Calcular novo índice
+    carrosselIndices[id] += direcao;
+    
+    // Loop circular
+    if (carrosselIndices[id] < 0) {
+        carrosselIndices[id] = imagens.length - 1;
+    } else if (carrosselIndices[id] >= imagens.length) {
+        carrosselIndices[id] = 0;
+    }
+    
+    // Adicionar classe ativo na nova imagem
+    imagens[carrosselIndices[id]].classList.add('ativo');
+    if (indicadores.length > 0) {
+        indicadores[carrosselIndices[id]].classList.add('ativo');
+    }
+}
+
+function irParaSlideAnuncio(id, index) {
+    const carrossel = document.getElementById(`carrossel-${id}`);
+    const imagens = carrossel.querySelectorAll('img');
+    const indicadores = carrossel.querySelectorAll('.indicador');
+    
+    // Remover todas as classes ativo
+    imagens.forEach(img => img.classList.remove('ativo'));
+    indicadores.forEach(ind => ind.classList.remove('ativo'));
+    
+    // Adicionar classe ativo no índice selecionado
+    imagens[index].classList.add('ativo');
+    indicadores[index].classList.add('ativo');
+    
+    carrosselIndices[id] = index;
+}
+
+// ==================== EXCLUIR ANÚNCIO ====================
+
+async function excluirAnuncio(id, titulo) {
+    if (!confirm(`🗑️ Deseja realmente excluir o anúncio "${titulo}"?`)) {
+        return;
+    }
+    
+    try {
+        console.log('🗑️ Excluindo anúncio ID:', id);
+        
+        const response = await fetch(`http://localhost:3000/anuncios/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        console.log('📥 Resposta:', result);
+        
+        if (result.success) {
+            alert('✅ Anúncio excluído com sucesso!');
+            carregarAnuncios();
+        } else {
+            alert('❌ Erro ao excluir anúncio: ' + (result.message || 'Erro desconhecido'));
+        }
+    } catch (erro) {
+        console.error('❌ Erro ao excluir anúncio:', erro);
+        alert('❌ Erro ao excluir anúncio');
+    }
+}
+
+// =================== ATUALIZAR INICIALIZAÇÃO ===================
+// Certifique-se de que esta linha está no DOMContentLoaded:
+
 document.addEventListener("DOMContentLoaded", () => {
-  preencherPerfil();
-  carregarFeed();
-  carregarEsportes();
-  preencherSelectEsportes();
-  carregarEventos();
+    console.log("🚀 Iniciando aplicação...");
+    
+    preencherPerfil();
+    carregarFeed();
+    carregarEsportes();
+    preencherSelectEsportes();
+    carregarEventos();
+    carregarAnuncios(); // ← ESTA LINHA DEVE ESTAR AQUI
+    
+    console.log("✅ Todas as funções inicializadas");
 });
