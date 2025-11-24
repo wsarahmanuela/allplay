@@ -568,7 +568,6 @@ i {
     margin: 2px 0 10px;
 }
 
-/* === TAGS === */
 .tags {
     display: flex;
     gap: 8px;
@@ -584,13 +583,12 @@ i {
     transition: background 0.25s ease, transform 0.2s ease;
 }
 
-/* Hover nas tags */
 .tag:hover {
     background: #d5ffd0;
     transform: scale(1.08);
 }
 
-/* === AÇÕES === */
+
 .actions {
     display: flex;
     gap: 10px;

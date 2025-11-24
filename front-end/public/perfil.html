@@ -23,16 +23,15 @@
 
         <div class="nav-right">
             <div class="search-box">
-                  <img src="imagens/search.image.png">
-            <input type="text" placeholder="Pesquisar" id="searchInput">
-            <div id="resultsDiv"></div>
-        </div>
-            <!-- ÍCONE DO USUÁRIO -->
+                <img src="imagens/search.image.png">
+                <input type="text" placeholder="Pesquisar" id="searchInput">
+                <div id="resultsDiv"></div>
+            </div>
+
             <div class="nav-user-icon online" onclick="configuracoesMenuAlter()">
                 <img src="imagens/profile.picture.jpg" alt="Usuário">
             </div>
 
-            <!-- ===================== MENU DE CONFIGURAÇÕES ===================== -->
             <div class="config-menu">
                 <div class="config-menu-inner">
                     <div class="config-menu-user-info">
@@ -41,12 +40,13 @@
                     </div>
                 </div>
             </div>
-            <!-- ===================== FIM DO MENU DE CONFIGURAÇÕES ===================== -->
-
         </div>
     </nav>
 
-    <div class="container">
+    <!-- ===================== CONTAINER PRINCIPAL (AJUSTADO) ===================== -->
+    <div class="container layout-principal">
+
+        <!-- ===================== ESQUERDA ===================== -->
         <div class="left-sidebar">
             <div class="imp-links">
                 <a href="Amigos.html"><img src="imagens/friends.png" alt="">Amigos</a>
@@ -59,13 +59,14 @@
                     <span>Feed</span>
                 </a>
             </div>
+
             <div class="shortcut-links" id="atalhos-esportes">
                 <p>Seus esportes</p>
-                <!-- Esportes aparecem aqui -->
+                <!-- Esportes aparecem via JS -->
             </div>
         </div>
 
-        <!-- CENTRO -->
+        <!-- ===================== CENTRO ===================== -->
         <div class="perfil-container">
             <div class="main-content">
                 <div id="perfil-wrapper">
@@ -83,9 +84,7 @@
                             <h3>Nome Completo</h3>
                             <h5>@nome_usuário</h5>
                         </div>
-                        <div class="seguir" id="btn-editar-perfil">
-                       
-                        </div>
+                        <div class="seguir" id="btn-editar-perfil"></div>
                     </div>
                 </div>
 
@@ -94,8 +93,9 @@
                 </div>
             </div>
 
+            <!-- ===================== DIREITA ===================== -->
             <div id="container-direita">
-                 <div class="seguindo-seguidores">
+                <div class="seguindo-seguidores">
                     <div class="seguindo">
                         <h4 id="seguindo">seguindo</h4>
                     </div>
@@ -104,8 +104,7 @@
                     </div>
                 </div>
 
-                <div id="esportes-direita">
-                </div>
+                <div id="esportes-direita"></div>
 
                 <div class="infos-geral">
                     <div class="biografia">
@@ -120,6 +119,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <script src="JavaScript/perfil.js"></script>
