@@ -627,6 +627,326 @@ i {
 
 /* =================== EVENTOS =================== */
 
+.event {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #0f9800;
+}
+
+.left-event {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f8;
+    border-radius: 10px;
+    min-width: 70px;
+    height: 70px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.left-event h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    line-height: 1;
+}
+
+.left-event span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #41db51;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 0;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.right-event {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.right-event h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+}
+
+.right-event p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.right-event a {
+    font-size: 12px;
+    text-decoration: none;
+    color: #0f9800;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.right-event a:hover {
+    color: #41db51;
+    text-decoration: underline;
+}
+
+.btn-excluir-evento {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+    opacity: 0;
+}
+
+.event:hover .btn-excluir-evento {
+    opacity: 1;
+}
+
+.btn-excluir-evento:hover {
+    background: #ff4444;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* =================== ANÚNCIOS =================== */
+
+.anuncio-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.anuncio-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.anuncio-header {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.anuncio-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+    margin: 0 0 8px 0;
+}
+
+.anuncio-header p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.anuncio-carrossel {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.anuncio-carrossel img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.anuncio-carrossel img.ativo {
+    opacity: 1;
+}
+
+.carrossel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #333;
+    transition: all 0.3s;
+    z-index: 5;
+}
+
+.carrossel-btn:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.carrossel-btn.prev {
+    left: 10px;
+}
+
+.carrossel-btn.next {
+    right: 10px;
+}
+
+.carrossel-indicadores {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 5;
+}
+
+.indicador {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.indicador.ativo {
+    background: white;
+    width: 24px;
+    border-radius: 4px;
+}
+
+.btn-excluir-anuncio {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 68, 68, 0.95);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.3s;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-excluir-anuncio:hover {
+    background: #ff1744;
+    transform: scale(1.1);
+}
+
+/* Botão criar anúncio */
+.btn-novo-anuncio {
+    display: inline-block;
+    background: none;
+    color: #0f9800;
+    border: none;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.btn-novo-anuncio:hover {
+    color: #41db51;
+    text-decoration: underline;
+}
+
+.btn-novo-anuncio i {
+    font-size: 18px;
+    margin-right: 4px;
+}
+
+/* Ajuste no container de anúncios */
+.container-anuncios-dinamicos {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.container-anuncios-dinamicos::-webkit-scrollbar {
+    width: 8px;
+}
+
+.container-anuncios-dinamicos::-webkit-scrollbar-thumb {
+    background: #0f9800;
+    border-radius: 4px;
+}
+
+.container-anuncios-dinamicos::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.mensagem-anuncios-vazia {
+    text-align: center;
+    color: #666;
+    padding: 30px 20px;
+    font-size: 14px;
+}
+
+/* =================== MODAL CRIAR ANÚNCIO =================== */
+
 .modal-overlay {
     display: none;
     position: fixed;
@@ -635,13 +955,20 @@ i {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    animation: fadeIn 0.3s ease;
 }
 
 .modal-overlay.ativo {
     display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-evento {
@@ -725,6 +1052,7 @@ i {
     font-size: 14px;
     transition: 0.3s;
     font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
 }
 
 .form-grupo input:focus,
@@ -737,7 +1065,7 @@ i {
 
 .form-grupo textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 100px;
 }
 
 .form-grupo small {
@@ -747,7 +1075,138 @@ i {
     font-size: 12px;
 }
 
-/* Grid para data e horário lado a lado */
+/* Input de arquivo customizado */
+.input-file-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-file-custom input[type="file"] {
+    display: none;
+}
+
+.btn-selecionar-imagens {
+    background: #0f9800;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(15, 152, 0, 0.3);
+}
+
+.btn-selecionar-imagens:hover {
+    background: #41db51;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 152, 0, 0.4);
+}
+
+.btn-selecionar-imagens i {
+    font-size: 16px;
+}
+
+.info-imagens {
+    text-align: center;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* =================== PREVIEW DAS IMAGENS =================== */
+
+.preview-imagens {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.preview-item {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.preview-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-remover-preview {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(255, 68, 68, 0.95);
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-remover-preview:hover {
+    background: #ff1744;
+    transform: scale(1.15);
+}
+
+/* =================== BOTÃO CRIAR ANÚNCIO =================== */
+
+.btn-criar-evento {
+    width: 100%;
+    padding: 14px;
+    background: #0f9800;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(15, 152, 0, 0.3);
+}
+
+.btn-criar-evento:hover {
+    background: #41db51;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 152, 0, 0.4);
+}
+
+.btn-criar-evento:active {
+    transform: translateY(0);
+}
+
+/* =================== GRID PARA DATA E HORÁRIO =================== */
+
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -757,6 +1216,8 @@ i {
 .form-row .form-grupo {
     margin-bottom: 20px;
 }
+
+/* =================== CHECKBOX GRUPOS (PARA ESPORTES) =================== */
 
 .checkbox-grupo {
     display: grid;
@@ -790,38 +1251,15 @@ i {
     font-size: 13px;
 }
 
-.btn-criar-evento {
-    width: 100%;
-    padding: 14px;
-    background: #0f9800;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 10px;
-}
+/* =================== BOTÃO NOVO EVENTO =================== */
 
-.btn-criar-evento:hover {
-    background: #41db51;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(15, 152, 0, 0.3);
-}
-
-.btn-criar-evento:active {
-    transform: translateY(0);
-}
-
-/* Botão + Novo Evento - Estilo minimalista */
 .btn-novo-evento {
     display: inline-block;
     background: none;
     color: #0f9800;
     border: none;
     padding: 0;
-    font-size: px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 15px;
@@ -839,77 +1277,8 @@ i {
     margin-right: 4px;
 }
 
-/* Estilo do card de evento - Match com a referência */
-.event {
-    cursor: pointer;
-    transition: 0.3s;
-    border: 1px solid transparent;
-    margin-bottom: 18px;
-}
+/* =================== DETALHES DO EVENTO (MODAL) =================== */
 
-.event:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.left-event {
-    border-radius: 10px;
-    height: 65px;
-    width: 65px;
-    margin-right: 15px;
-    padding-top: 1px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.left-event h3 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin: 0;
-    line-height: 1;
-}
-
-.left-event span {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #41db51;
-    color: #fff;
-    font-size: 9px;
-    padding: 3px 0;
-    text-transform: capitalize;
-}
-
-.right-event h4 {
-    font-size: 15px;
-    font-weight: 600;
-    color: #000;
-    margin: 0 0 5px 0;
-}
-
-.right-event p {
-    font-size: 12px;
-    color: #666;
-    margin: 0 0 5px 0;
-}
-
-.right-event p i {
-    color: #0f9800;
-    margin-right: 5px;
-}
-
-.right-event a {
-    font-size: 12px;
-    text-decoration: none;
-    color: #41db51;
-    font-weight: 500;
-}
-
-/* Modal de detalhes do evento */
 .detalhes-evento {
     line-height: 1.8;
 }
@@ -949,6 +1318,8 @@ i {
     font-weight: 500;
 }
 
+/* =================== CONTAINER EVENTOS =================== */
+
 .container-eventos-dinamicos {
     max-height: 450px;
     overflow-y: auto;
@@ -975,53 +1346,12 @@ i {
     font-size: 14px;
 }
 
-.left-event {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
+/* =================== AJUSTES ESPECÍFICOS =================== */
 
-.left-event img.icon-esporte {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    margin-bottom: 8px;
-}
-
-/* Botão de excluir evento */
-.btn-excluir-evento {
-    background: none;
-    border: none;
-    color: #ff4444;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: 0.3s;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    margin-left: 10px;
-}
-
-.btn-excluir-evento:hover {
-    background: #ffe5e5;
-    transform: scale(1.1);
-}
-
-.btn-excluir-evento:active {
-    transform: scale(0.95);
-}
-
-/* Ajuste no select de local para ficar mais alto */
 .form-grupo select#localEvento {
     min-height: 45px;
 }
 
-/* Input customizado de local */
 #localEventoCustom {
     width: 100%;
     padding: 12px;
@@ -1039,96 +1369,57 @@ i {
     box-shadow: 0 0 0 3px rgba(15, 152, 0, 0.1);
 }
 
-/* Ícone de mapa no modal de detalhes */
-.fa-map-pin {
-    animation: pulsePin 2s infinite;
-}
-
-@keyframes pulsePin {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-}
-
-/* Ajuste no right-event para melhor layout */
-.right-event {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Botão de excluir evento */
-.btn-excluir-evento {
-    background: none;
-    border: none;
-    color: #ff4444;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: 0.3s;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    margin-left: 10px;
-}
-
-.btn-excluir-evento:hover {
-    background: #ffe5e5;
-    transform: scale(1.1);
-}
-
-.btn-excluir-evento:active {
-    transform: scale(0.95);
-}
-
-/* Ajuste no select de local para ficar mais alto */
-.form-grupo select#localEvento {
-    min-height: 45px;
-}
-
-/* Input customizado de local */
-#localEventoCustom {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: 0.3s;
-    font-family: 'Poppins', sans-serif;
-    margin-top: 10px;
-}
-
-#localEventoCustom:focus {
-    outline: none;
-    border-color: #0f9800;
-    box-shadow: 0 0 0 3px rgba(15, 152, 0, 0.1);
-}
-
-/* Ajuste no right-event para melhor layout */
-.right-event {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Hover nos cards de evento */
-.event:hover .btn-excluir-evento {
-    opacity: 1;
-}
-
-.btn-excluir-evento {
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
-
-/* Opção "Outro local" destacada */
 select#localEvento option[value="outro"] {
     background: #f0f0f0;
     font-weight: 600;
+}
+
+/* =================== RESPONSIVO =================== */
+
+@media (max-width: 768px) {
+    .modal-evento {
+        width: 95%;
+        padding: 25px 20px;
+        max-height: 90vh;
+    }
+    
+    .modal-header h3 {
+        font-size: 20px;
+    }
+    
+    .preview-imagens {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .anuncio-carrossel {
+        height: 200px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .checkbox-grupo {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =================== SCROLLBAR MODAL =================== */
+
+.modal-evento::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-evento::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.modal-evento::-webkit-scrollbar-thumb {
+    background: #0f9800;
+    border-radius: 4px;
+}
+
+.modal-evento::-webkit-scrollbar-thumb:hover {
+    background: #41db51;
 }

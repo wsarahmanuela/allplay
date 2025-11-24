@@ -29,6 +29,22 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const uploadAnuncios = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const tiposPermitidos = /jpeg|jpg|png|gif|webp/;
+    const extname = tiposPermitidos.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = tiposPermitidos.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Apenas imagens são permitidas!'));
+    }
+  }
+});
+
 
 const connection = mysql2.createConnection({
   host: 'localhost',
@@ -175,10 +191,10 @@ app.get('/teste-banco', (req, res) => {
 //CADASTRO02 -----------------------------------------------------------------
 
 app.post("/cadastro/foto", upload.single("foto"), (req, res) => {
-  const { cpf, bio, nomeUsuario } = req.body; 
+  const { cpf, bio, nomeUsuario } = req.body;
   const foto = req.file ? req.file.filename : null;
 
-  if (!cpf || !bio || !foto || !nomeUsuario) { 
+  if (!cpf || !bio || !foto || !nomeUsuario) {
     return res.status(400).json({ success: false, message: "Dados incompletos." });
   }
 
@@ -248,205 +264,205 @@ app.get("/esportes/mestra", (req, res) => {
   });
 });
 const queryPromise = (sql, params) => {
-    return new Promise((resolve, reject) => {
-        connection.query(sql, params, (error, results) => {
-            if (error) {
-                return reject(error);
-            }
-            resolve(results);
-        });
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results);
     });
+  });
 };
 
 app.get('/seguidores/:cpf', async (req, res) => {
-    const cpf = req.params.cpf;
-    
-    console.log(`\n Rota /seguidores/:cpf chamada com:`);
-    console.log(`   CPF: ${cpf}`);
+  const cpf = req.params.cpf;
 
-    if (!cpf) {
-        return res.status(400).json({ success: false, message: 'CPF é obrigatório.' });
-    }
-    const seguidoresQuery = `
+  console.log(`\n Rota /seguidores/:cpf chamada com:`);
+  console.log(`   CPF: ${cpf}`);
+
+  if (!cpf) {
+    return res.status(400).json({ success: false, message: 'CPF é obrigatório.' });
+  }
+  const seguidoresQuery = `
         SELECT COUNT(*) AS total_seguidores 
         FROM Seguidores 
         WHERE CPF_seguido = ?
     `;
-    const seguindoQuery = `
+  const seguindoQuery = `
         SELECT COUNT(*) AS total_seguindo 
         FROM Seguidores 
         WHERE CPF_seguidor = ?
     `;
 
-    try {
+  try {
 
-        const [resultadosSeguidores, resultadosSeguindo] = await Promise.all([
-            queryPromise(seguidoresQuery, [cpf]),
-            queryPromise(seguindoQuery, [cpf])
-        ]);
+    const [resultadosSeguidores, resultadosSeguindo] = await Promise.all([
+      queryPromise(seguidoresQuery, [cpf]),
+      queryPromise(seguindoQuery, [cpf])
+    ]);
 
-        const totalSeguidores = resultadosSeguidores[0]?.total_seguidores || 0;
-        const totalSeguindo = resultadosSeguindo[0]?.total_seguindo || 0;
-        
-        console.log(` Contagem encontrada: Seguidores: ${totalSeguidores}, Seguindo: ${totalSeguindo}`);
+    const totalSeguidores = resultadosSeguidores[0]?.total_seguidores || 0;
+    const totalSeguindo = resultadosSeguindo[0]?.total_seguindo || 0;
 
-        res.json({
-            success: true,
-            seguidores: totalSeguidores,
-            seguindo: totalSeguindo
-        });
+    console.log(` Contagem encontrada: Seguidores: ${totalSeguidores}, Seguindo: ${totalSeguindo}`);
 
-    } catch (erro) {
-        console.error('Erro ao buscar contagens de seguidores:', erro);
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Erro no servidor ao buscar a contagem.',
-            // Opcional, mas útil para debug
-            error: erro.message 
-        });
-    }
+    res.json({
+      success: true,
+      seguidores: totalSeguidores,
+      seguindo: totalSeguindo
+    });
+
+  } catch (erro) {
+    console.error('Erro ao buscar contagens de seguidores:', erro);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro no servidor ao buscar a contagem.',
+      // Opcional, mas útil para debug
+      error: erro.message
+    });
+  }
 });
 // Rota para seguir um usuário
 app.post('/seguir', async (req, res) => {
-    const { cpf_seguidor, cpf_seguido } = req.body;
-    
-    console.log(`\n Rota /seguir chamada com:`);
-    console.log(`   CPF Seguidor: ${cpf_seguidor}`);
-    console.log(`   CPF Seguido: ${cpf_seguido}`);
+  const { cpf_seguidor, cpf_seguido } = req.body;
 
-    // Validações
-    if (!cpf_seguidor || !cpf_seguido) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'CPF do seguidor e CPF do seguido são obrigatórios.' 
-        });
-    }
+  console.log(`\n Rota /seguir chamada com:`);
+  console.log(`   CPF Seguidor: ${cpf_seguidor}`);
+  console.log(`   CPF Seguido: ${cpf_seguido}`);
 
-    if (cpf_seguidor === cpf_seguido) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Você não pode seguir a si mesmo.' 
-        });
-    }
+  // Validações
+  if (!cpf_seguidor || !cpf_seguido) {
+    return res.status(400).json({
+      success: false,
+      message: 'CPF do seguidor e CPF do seguido são obrigatórios.'
+    });
+  }
 
-    try {
-        // Verificar se já está seguindo
-        const verificarQuery = `
+  if (cpf_seguidor === cpf_seguido) {
+    return res.status(400).json({
+      success: false,
+      message: 'Você não pode seguir a si mesmo.'
+    });
+  }
+
+  try {
+    // Verificar se já está seguindo
+    const verificarQuery = `
             SELECT * FROM Seguidores 
             WHERE CPF_seguidor = ? AND CPF_seguido = ?
         `;
-        
-        const jaSegue = await queryPromise(verificarQuery, [cpf_seguidor, cpf_seguido]);
 
-        if (jaSegue.length > 0) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Você já está seguindo este usuário.' 
-            });
-        }
+    const jaSegue = await queryPromise(verificarQuery, [cpf_seguidor, cpf_seguido]);
 
-        // Inserir o novo seguidor
-        const inserirQuery = `
+    if (jaSegue.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Você já está seguindo este usuário.'
+      });
+    }
+
+    // Inserir o novo seguidor
+    const inserirQuery = `
             INSERT INTO Seguidores (CPF_seguidor, CPF_seguido) 
             VALUES (?, ?)
         `;
-        
-        await queryPromise(inserirQuery, [cpf_seguidor, cpf_seguido]);
 
-        console.log(` Usuário ${cpf_seguidor} agora segue ${cpf_seguido}`);
+    await queryPromise(inserirQuery, [cpf_seguidor, cpf_seguido]);
 
-        res.json({
-            success: true,
-            message: 'Você está seguindo este usuário!'
-        });
+    console.log(` Usuário ${cpf_seguidor} agora segue ${cpf_seguido}`);
 
-    } catch (erro) {
-        console.error(' Erro ao seguir usuário:', erro);
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Erro no servidor ao seguir o usuário.',
-            error: erro.message 
-        });
-    }
+    res.json({
+      success: true,
+      message: 'Você está seguindo este usuário!'
+    });
+
+  } catch (erro) {
+    console.error(' Erro ao seguir usuário:', erro);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro no servidor ao seguir o usuário.',
+      error: erro.message
+    });
+  }
 });
 // Rota para verificar se um usuário segue outro
 app.get('/segue/:cpf_seguidor/:cpf_seguido', async (req, res) => {
-    const { cpf_seguidor, cpf_seguido } = req.params;
-    
-    console.log(`\n🔍 Verificando se ${cpf_seguidor} segue ${cpf_seguido}`);
-    
-    try {
-        const query = `
+  const { cpf_seguidor, cpf_seguido } = req.params;
+
+  console.log(`\n🔍 Verificando se ${cpf_seguidor} segue ${cpf_seguido}`);
+
+  try {
+    const query = `
             SELECT * FROM Seguidores 
             WHERE CPF_seguidor = ? AND CPF_seguido = ?
         `;
-        
-        const resultado = await queryPromise(query, [cpf_seguidor, cpf_seguido]);
-        
-        const segue = resultado.length > 0;
-        
-        console.log(`Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
-        
-        res.json({ 
-            success: true, 
-            segue: segue 
-        });
-        
-    } catch (erro) {
-        console.error(' Erro ao verificar follow:', erro);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Erro ao verificar follow',
-            error: erro.message 
-        });
-    }
+
+    const resultado = await queryPromise(query, [cpf_seguidor, cpf_seguido]);
+
+    const segue = resultado.length > 0;
+
+    console.log(`Resultado: ${segue ? 'Já segue' : 'Não segue'}`);
+
+    res.json({
+      success: true,
+      segue: segue
+    });
+
+  } catch (erro) {
+    console.error(' Erro ao verificar follow:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao verificar follow',
+      error: erro.message
+    });
+  }
 });
 
 // Rota para deixar de seguir um usuário
 app.delete('/seguir', async (req, res) => {
-    const { cpf_seguidor, cpf_seguido } = req.body;
-    
-    console.log(`\n Rota DELETE /seguir chamada com:`);
-    console.log(`   CPF Seguidor: ${cpf_seguidor}`);
-    console.log(`   CPF Seguido: ${cpf_seguido}`);
+  const { cpf_seguidor, cpf_seguido } = req.body;
 
-    if (!cpf_seguidor || !cpf_seguido) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'CPF do seguidor e CPF do seguido são obrigatórios.' 
-        });
-    }
+  console.log(`\n Rota DELETE /seguir chamada com:`);
+  console.log(`   CPF Seguidor: ${cpf_seguidor}`);
+  console.log(`   CPF Seguido: ${cpf_seguido}`);
 
-    try {
-        const deletarQuery = `
+  if (!cpf_seguidor || !cpf_seguido) {
+    return res.status(400).json({
+      success: false,
+      message: 'CPF do seguidor e CPF do seguido são obrigatórios.'
+    });
+  }
+
+  try {
+    const deletarQuery = `
             DELETE FROM Seguidores 
             WHERE CPF_seguidor = ? AND CPF_seguido = ?
         `;
-        
-        const resultado = await queryPromise(deletarQuery, [cpf_seguidor, cpf_seguido]);
 
-        if (resultado.affectedRows === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Você não estava seguindo este usuário.' 
-            });
-        }
+    const resultado = await queryPromise(deletarQuery, [cpf_seguidor, cpf_seguido]);
 
-        console.log(` Usuário ${cpf_seguidor} deixou de seguir ${cpf_seguido}`);
-
-        res.json({
-            success: true,
-            message: 'Você deixou de seguir este usuário!'
-        });
-
-    } catch (erro) {
-        console.error(' Erro ao deixar de seguir:', erro);
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Erro no servidor ao deixar de seguir.',
-            error: erro.message 
-        });
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Você não estava seguindo este usuário.'
+      });
     }
+
+    console.log(` Usuário ${cpf_seguidor} deixou de seguir ${cpf_seguido}`);
+
+    res.json({
+      success: true,
+      message: 'Você deixou de seguir este usuário!'
+    });
+
+  } catch (erro) {
+    console.error(' Erro ao deixar de seguir:', erro);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro no servidor ao deixar de seguir.',
+      error: erro.message
+    });
+  }
 });
 // CARREGAR FEED  
 async function carregarFeed() {
@@ -633,9 +649,9 @@ app.delete('/publicacoes/:id', async (req, res) => {
 
   if (!id || isNaN(id)) {
     console.log('    ID inválido');
-    return res.status(400).json({ 
-      success: false, 
-      message: 'ID da publicação é inválido' 
+    return res.status(400).json({
+      success: false,
+      message: 'ID da publicação é inválido'
     });
   }
 
@@ -647,9 +663,9 @@ app.delete('/publicacoes/:id', async (req, res) => {
 
     if (!rows || rows.length === 0) {
       console.log('    Publicação não encontrada no banco');
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Publicação não encontrada' 
+      return res.status(404).json({
+        success: false,
+        message: 'Publicação não encontrada'
       });
     }
 
@@ -659,7 +675,7 @@ app.delete('/publicacoes/:id', async (req, res) => {
     const [resultadoCurtidas] = await connection
       .promise()
       .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
-    
+
     console.log(`   ✓ ${resultadoCurtidas.affectedRows} curtida(s) excluída(s)`);
 
     console.log('    Excluindo publicação...');
@@ -669,17 +685,17 @@ app.delete('/publicacoes/:id', async (req, res) => {
 
     if (resultadoPublicacao.affectedRows === 0) {
       console.log('   Nenhuma linha afetada ao excluir publicação');
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Erro ao excluir publicação' 
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao excluir publicação'
       });
     }
 
     console.log('    Publicação excluída com sucesso!\n');
 
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Publicação excluída com sucesso!' 
+    return res.status(200).json({
+      success: true,
+      message: 'Publicação excluída com sucesso!'
     });
 
   } catch (error) {
@@ -690,8 +706,8 @@ app.delete('/publicacoes/:id', async (req, res) => {
     console.error('   SQL Message:', error.sqlMessage);
     console.error('   Código:', error.code);
 
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: 'Erro interno ao excluir publicação',
       erro: error.message,
       codigo: error.code || 'UNKNOWN'
@@ -775,35 +791,35 @@ app.use(express.static("public"));
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
 app.post('/api/usuarios-proximos', (req, res) => {
-    const { latitude, longitude, cpf } = req.body;
-    const raio_metros = 20000; // 20 km
+  const { latitude, longitude, cpf } = req.body;
+  const raio_metros = 20000; // 20 km
 
-    console.log('\n Rota /api/usuarios-proximos chamada');
-    console.log('   CPF:', cpf);
-    console.log('   Lat:', latitude);
-    console.log('   Lon:', longitude);
+  console.log('\n Rota /api/usuarios-proximos chamada');
+  console.log('   CPF:', cpf);
+  console.log('   Lat:', latitude);
+  console.log('   Lon:', longitude);
 
-    if (!cpf || !latitude || !longitude) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'CPF, latitude e longitude são obrigatórios.' 
-        });
+  if (!cpf || !latitude || !longitude) {
+    return res.status(400).json({
+      success: false,
+      message: 'CPF, latitude e longitude são obrigatórios.'
+    });
+  }
+
+  const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
+
+  connection.query(updateSql, [latitude, longitude, cpf], (errUpdate) => {
+    if (errUpdate) {
+      console.error(' Erro ao atualizar localização:', errUpdate);
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao atualizar localização'
+      });
     }
 
-    const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
-    
-    connection.query(updateSql, [latitude, longitude, cpf], (errUpdate) => {
-        if (errUpdate) {
-            console.error(' Erro ao atualizar localização:', errUpdate);
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Erro ao atualizar localização' 
-            });
-        }
+    console.log(' Localização atualizada');
 
-        console.log(' Localização atualizada');
-
-        const haversineQuery = `
+    const haversineQuery = `
             SELECT
                 u.cpf,
                 u.nome,
@@ -822,52 +838,52 @@ app.post('/api/usuarios-proximos', (req, res) => {
             LIMIT 10
         `;
 
-        const params = [latitude, longitude, latitude, cpf, raio_metros];
+    const params = [latitude, longitude, latitude, cpf, raio_metros];
 
-        connection.query(haversineQuery, params, (erroBusca, resultados) => {
-            if (erroBusca) {
-                console.error(' Erro na busca Haversine:', erroBusca);
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'Erro ao buscar usuários próximos.',
-                    erro: erroBusca.sqlMessage 
-                });
-            }
-
-            res.json({
-                success: true,
-                usuarios: resultados
-            });
-
-            console.log(` Retornados ${resultados.length} usuários próximos`);
+    connection.query(haversineQuery, params, (erroBusca, resultados) => {
+      if (erroBusca) {
+        console.error(' Erro na busca Haversine:', erroBusca);
+        return res.status(500).json({
+          success: false,
+          message: 'Erro ao buscar usuários próximos.',
+          erro: erroBusca.sqlMessage
         });
+      }
+
+      res.json({
+        success: true,
+        usuarios: resultados
+      });
+
+      console.log(` Retornados ${resultados.length} usuários próximos`);
     });
+  });
 });
 
 // ENDPOINT: LOCAIS POPULARES
 app.get("/api/locais-populares", (req, res) => {
-    const sql = `
+  const sql = `
         SELECT DISTINCT local 
         FROM evento
         WHERE local IS NOT NULL AND local != ''
     `;
 
-    connection.query(sql, (erro, resultados) => {
-        if (erro) {
-            console.error("Erro ao buscar locais populares:", erro);
-            return res.status(500).json({
-                success: false,
-                message: "Erro ao buscar locais populares."
-            });
-        }
+  connection.query(sql, (erro, resultados) => {
+    if (erro) {
+      console.error("Erro ao buscar locais populares:", erro);
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao buscar locais populares."
+      });
+    }
 
-        const locais = resultados.map(r => r.local);
+    const locais = resultados.map(r => r.local);
 
-        res.json({
-            success: true,
-            locais
-        });
+    res.json({
+      success: true,
+      locais
     });
+  });
 });
 
 app.get('/api/todos-usuarios-mapa', (req, res) => {
@@ -907,6 +923,68 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
   });
 });
 
+/// ENDPOINT: BUSCAR EVENTOS POR LOCAL (VERSÃO FINAL - TESTADA)
+app.get("/api/eventos-por-local", (req, res) => {
+  const { local } = req.query;
+
+  console.log('\n🔍 [API] /api/eventos-por-local CHAMADA');
+  console.log('   Local solicitado:', local);
+
+  if (!local) {
+    console.log('   ❌ Local não fornecido');
+    return res.status(400).json({
+      success: false,
+      message: "Nome do local é obrigatório."
+    });
+  }
+
+  // Query simplificada usando SELECT * para pegar todas as colunas
+  const sql = `SELECT * FROM evento WHERE local = ? ORDER BY data_evento DESC LIMIT 10`;
+
+  console.log('   📝 Executando SQL...');
+
+  connection.query(sql, [local], (erro, resultados) => {
+    if (erro) {
+      console.error('   ❌ ERRO SQL:');
+      console.error('      Código:', erro.code);
+      console.error('      Mensagem:', erro.sqlMessage);
+      console.error('      SQL State:', erro.sqlState);
+
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao buscar eventos.",
+        erro: erro.sqlMessage
+      });
+    }
+
+    console.log(`   ✅ Query OK! ${resultados.length} evento(s) encontrado(s)`);
+
+    if (resultados.length > 0) {
+      console.log('   📋 Primeiro evento:', {
+        id: resultados[0].IDevento,
+        titulo: resultados[0].titulo,
+        local: resultados[0].local,
+        data: resultados[0].data_evento
+      });
+    }
+
+    // Formatar resposta com dados consistentes
+    const eventosFormatados = resultados.map(ev => ({
+      idEvento: ev.IDevento,
+      titulo: ev.titulo,
+      descricao: ev.descricao || '',
+      dataEvento: ev.data_evento,
+      horaEvento: ev.horario,
+      local: ev.local,
+      tipo: ev.esportes || ev.tipo || 'Evento'
+    }));
+
+    res.json({
+      success: true,
+      eventos: eventosFormatados
+    });
+  });
+});
 
 // barra de pesquisa
 app.get("/search", (req, res) => {
@@ -1075,13 +1153,13 @@ app.put("/usuario/atualizar", (req, res) => {
 // 1. BUSCAR TODOS OS CLUBES CADASTRADOS
 app.get("/clubes/todos", (req, res) => {
   const sql = "SELECT IDclube, nome, esporteClube FROM clube ORDER BY nome ASC";
-  
+
   connection.query(sql, (erro, resultados) => {
     if (erro) {
       console.error("Erro ao buscar clubes:", erro);
       return res.status(500).json({ success: false, message: "Erro ao buscar clubes." });
     }
-    
+
     res.json(resultados);
   });
 });
@@ -1089,7 +1167,7 @@ app.get("/clubes/todos", (req, res) => {
 // 2. BUSCAR CLUBES DE UM USUÁRIO ESPECÍFICO
 app.get("/usuario/:cpf/clubes", (req, res) => {
   const cpf = req.params.cpf;
-  
+
   const sql = `
     SELECT c.IDclube, c.nome, c.esporteClube
     FROM clube c
@@ -1097,16 +1175,16 @@ app.get("/usuario/:cpf/clubes", (req, res) => {
     WHERE uc.cpf_usuario = ?
     ORDER BY c.nome ASC
   `;
-  
+
   connection.query(sql, [cpf], (erro, resultados) => {
     if (erro) {
       console.error("Erro ao buscar clubes do usuário:", erro);
-      return res.status(500).json({ 
-        success: false, 
-        message: "Erro ao buscar clubes do usuário." 
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao buscar clubes do usuário."
       });
     }
-    
+
     res.json({ success: true, clubes: resultados });
   });
 });
@@ -1114,45 +1192,45 @@ app.get("/usuario/:cpf/clubes", (req, res) => {
 // 3. ADICIONAR CLUBE EXISTENTE AO USUÁRIO
 app.post("/usuario/clube/adicionar", (req, res) => {
   const { cpf, idClube } = req.body;
-  
+
   if (!cpf || !idClube) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "CPF e ID do clube são obrigatórios." 
+    return res.status(400).json({
+      success: false,
+      message: "CPF e ID do clube são obrigatórios."
     });
   }
-  
+
   // Verifica se o usuário já tem esse clube
   const checkSql = "SELECT * FROM usuario_clube WHERE cpf_usuario = ? AND IDclube = ?";
-  
+
   connection.query(checkSql, [cpf, idClube], (erro, resultados) => {
     if (erro) {
       console.error("Erro ao verificar clube:", erro);
-      return res.status(500).json({ 
-        success: false, 
-        message: "Erro ao verificar clube." 
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao verificar clube."
       });
     }
-    
+
     if (resultados.length > 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Você já adicionou este clube." 
+      return res.status(400).json({
+        success: false,
+        message: "Você já adicionou este clube."
       });
     }
-    
+
     // Adiciona o clube ao usuário
     const insertSql = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
-    
+
     connection.query(insertSql, [cpf, idClube], (erro2) => {
       if (erro2) {
         console.error("Erro ao adicionar clube ao usuário:", erro2);
-        return res.status(500).json({ 
-          success: false, 
-          message: "Erro ao adicionar clube." 
+        return res.status(500).json({
+          success: false,
+          message: "Erro ao adicionar clube."
         });
       }
-      
+
       res.json({ success: true, message: "Clube adicionado com sucesso!" });
     });
   });
@@ -1161,76 +1239,76 @@ app.post("/usuario/clube/adicionar", (req, res) => {
 // 4. CRIAR NOVO CLUBE E ADICIONAR AO USUÁRIO
 app.post("/usuario/clube/criar", (req, res) => {
   const { cpf, nomeClube, esporte } = req.body;
-  
+
   if (!cpf || !nomeClube || !esporte) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "CPF, nome do clube e esporte são obrigatórios." 
+    return res.status(400).json({
+      success: false,
+      message: "CPF, nome do clube e esporte são obrigatórios."
     });
   }
-  
+
   // Verifica se o clube já existe
   const checkSql = "SELECT IDclube FROM clube WHERE nome = ? AND esporteClube = ?";
-  
+
   connection.query(checkSql, [nomeClube, esporte], (erro, resultados) => {
     if (erro) {
       console.error("Erro ao verificar clube existente:", erro);
-      return res.status(500).json({ 
-        success: false, 
-        message: "Erro ao verificar clube." 
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao verificar clube."
       });
     }
-    
+
     if (resultados.length > 0) {
       // Clube já existe, apenas adiciona ao usuário
       const idClubeExistente = resultados[0].IDclube;
-      
+
       const insertRelacao = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
       connection.query(insertRelacao, [cpf, idClubeExistente], (erro2) => {
         if (erro2) {
           console.error("Erro ao adicionar clube existente:", erro2);
-          return res.status(500).json({ 
-            success: false, 
-            message: "Erro ao adicionar clube." 
+          return res.status(500).json({
+            success: false,
+            message: "Erro ao adicionar clube."
           });
         }
-        
-        res.json({ 
-          success: true, 
-          message: "Clube adicionado com sucesso!" 
+
+        res.json({
+          success: true,
+          message: "Clube adicionado com sucesso!"
         });
       });
-      
+
     } else {
       // Cria novo clube
       const insertClube = "INSERT INTO clube (nome, esporteClube) VALUES (?, ?)";
-      
+
       connection.query(insertClube, [nomeClube, esporte], (erro3, resultado) => {
         if (erro3) {
           console.error("Erro ao criar novo clube:", erro3);
-          return res.status(500).json({ 
-            success: false, 
-            message: "Erro ao criar clube." 
+          return res.status(500).json({
+            success: false,
+            message: "Erro ao criar clube."
           });
         }
-        
+
         const novoIdClube = resultado.insertId;
-        
+
         // Adiciona o novo clube ao usuário
         const insertRelacao = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
-        
+
         connection.query(insertRelacao, [cpf, novoIdClube], (erro4) => {
           if (erro4) {
             console.error("Erro ao adicionar novo clube ao usuário:", erro4);
-            return res.status(500).json({ 
-              success: false, 
-              message: "Erro ao adicionar clube." 
+            return res.status(500).json({
+              success: false,
+              message: "Erro ao adicionar clube."
             });
           }
-          
-          res.json({ 
-            success: true, 
-            message: "Clube criado e adicionado com sucesso!" 
+
+          res.json({
+            success: true,
+            message: "Clube criado e adicionado com sucesso!"
           });
         });
       });
@@ -1241,32 +1319,32 @@ app.post("/usuario/clube/criar", (req, res) => {
 // 5. REMOVER CLUBE DO USUÁRIO
 app.delete("/usuario/clube/remover", (req, res) => {
   const { cpf, idClube } = req.body;
-  
+
   if (!cpf || !idClube) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "CPF e ID do clube são obrigatórios." 
+    return res.status(400).json({
+      success: false,
+      message: "CPF e ID do clube são obrigatórios."
     });
   }
-  
+
   const sql = "DELETE FROM usuario_clube WHERE cpf_usuario = ? AND IDclube = ?";
-  
+
   connection.query(sql, [cpf, idClube], (erro, resultado) => {
     if (erro) {
       console.error("Erro ao remover clube:", erro);
-      return res.status(500).json({ 
-        success: false, 
-        message: "Erro ao remover clube." 
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao remover clube."
       });
     }
-    
+
     if (resultado.affectedRows === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Clube não encontrado para este usuário." 
+      return res.status(404).json({
+        success: false,
+        message: "Clube não encontrado para este usuário."
       });
     }
-    
+
     res.json({ success: true, message: "Clube removido com sucesso!" });
   });
 });
@@ -1380,10 +1458,10 @@ app.get("/mutuos/:cpf", (req, res) => {
   connection.query(sql, [cpf, cpf], (erro, resultados) => {
     if (erro) {
       console.error("❌ Erro SQL ao buscar amigos mútuos:", erro);
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
         message: "Erro no servidor ao buscar amigos.",
-        amigos: [] 
+        amigos: []
       });
     }
 
@@ -1407,10 +1485,10 @@ app.post('/eventos', (req, res) => {
   console.log('\n========================================');
   console.log(' ROTA POST /eventos CHAMADA');
   console.log('========================================');
-  
+
   // Log do body recebido
   console.log(' Body recebido:', JSON.stringify(req.body, null, 2));
-  
+
   const { titulo, responsavel, local, data_evento, horario, descricao, esportes, clube_id, criador_cpf } = req.body;
 
   // Log de cada campo
@@ -1513,7 +1591,7 @@ app.post('/eventos', (req, res) => {
       console.error('   SQL State:', erro.sqlState);
       console.error('   Mensagem:', erro.sqlMessage);
       console.error('   SQL:', erro.sql);
-      
+
       return res.status(500).json({
         success: false,
         message: 'Erro no servidor ao criar evento',
@@ -1526,7 +1604,7 @@ app.post('/eventos', (req, res) => {
     console.log('========================================');
     console.log('   ID do evento:', resultado.insertId);
     console.log('   Linhas afetadas:', resultado.affectedRows);
-    
+
     res.json({
       success: true,
       message: 'Evento criado com sucesso',
@@ -1557,7 +1635,7 @@ app.get('/eventos', (req, res) => {
       console.error(' Erro ao listar eventos:', erro);
       console.error('   SQL State:', erro.sqlState);
       console.error('   Mensagem:', erro.sqlMessage);
-      
+
       return res.status(500).json({
         success: false,
         message: 'Erro ao buscar eventos',
@@ -1762,6 +1840,223 @@ app.get("/teste-rotas", (req, res) => {
     ]
   });
 });
+
+// ==================== ROTAS DE ANÚNCIOS (VERSÃO CORRIGIDA) ====================
+// 1️⃣ CRIAR ANÚNCIO (POST deve vir antes dos GET com parâmetros)
+app.post('/anuncios', uploadAnuncios.array("imagens", 3), async (req, res) => {
+  try {
+    const { titulo, descricao, criador_cpf } = req.body;
+
+    console.log("📥 Body:", req.body);
+    console.log("📎 Files:", req.files);
+
+    if (!titulo || !descricao || !criador_cpf) {
+      return res.status(400).json({
+        success: false,
+        message: 'Título, descrição e CPF do criador são obrigatórios'
+      });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pelo menos uma imagem é obrigatória'
+      });
+    }
+
+    const imagens = req.files.map(f => f.filename);
+
+    const imagem1 = imagens[0] || null;
+    const imagem2 = imagens[1] || null;
+    const imagem3 = imagens[2] || null;
+
+    const query = `
+      INSERT INTO anuncio (titulo, descricao, imagem1, imagem2, imagem3, criador_cpf)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const [resultado] = await connection.promise().query(query, [
+      titulo,
+      descricao,
+      imagem1,
+      imagem2,
+      imagem3,
+      criador_cpf
+    ]);
+
+    res.json({
+      success: true,
+      message: "Anúncio criado com sucesso",
+      anuncioId: resultado.insertId
+    });
+
+  } catch (erro) {
+    console.error("❌ Erro:", erro);
+    res.status(500).json({
+      success: false,
+      message: "Erro ao criar anúncio: " + erro.message
+    });
+  }
+});
+
+
+
+// 2️⃣ LISTAR TODOS OS ANÚNCIOS (sem parâmetros - DEVE VIR ANTES de /anuncios/:id)
+app.get('/anuncios', async (req, res) => {
+  console.log('\n========================================');
+  console.log('📥 [GET /anuncios] CHAMADA RECEBIDA');
+  console.log('========================================');
+
+  try {
+    const query = `
+            SELECT 
+                a.id,
+                a.titulo,
+                a.descricao,
+                a.imagem1,
+                a.imagem2,
+                a.imagem3,
+                a.criador_cpf,
+                a.data_criacao,
+                a.ativo,
+                u.nome as criador_nome,
+                u.nomeUsuario as criador_usuario
+            FROM anuncio a
+            LEFT JOIN usuario u ON a.criador_cpf = u.CPF
+            WHERE a.ativo = 1
+            ORDER BY a.data_criacao DESC
+        `;
+
+    console.log('🔍 Executando query...');
+
+    const [anuncios] = await connection.promise().query(query);
+
+    console.log(`✅ ${anuncios.length} anúncios encontrados`);
+    console.log('========================================\n');
+
+    res.json(anuncios);
+
+  } catch (erro) {
+    console.error('\n❌ ERRO AO BUSCAR ANÚNCIOS:', erro.message);
+    console.error('========================================\n');
+
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao buscar anúncios',
+      error: erro.message
+    });
+  }
+});
+
+// 3️⃣ BUSCAR ANÚNCIOS POR USUÁRIO (rota específica - ANTES de /anuncios/:id)
+app.get('/anuncios/usuario/:cpf', async (req, res) => {
+  try {
+    const { cpf } = req.params;
+
+    console.log('📥 Buscando anúncios do CPF:', cpf);
+
+    const query = `
+            SELECT * FROM anuncio
+            WHERE criador_cpf = ? AND ativo = 1
+            ORDER BY data_criacao DESC
+        `;
+
+    const [anuncios] = await connection.promise().query(query, [cpf]);
+
+    console.log(`✅ ${anuncios.length} anúncios encontrados para ${cpf}`);
+
+    res.json(anuncios);
+
+  } catch (erro) {
+    console.error('❌ Erro ao buscar anúncios do usuário:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao buscar anúncios: ' + erro.message
+    });
+  }
+});
+
+// 4️⃣ BUSCAR ANÚNCIO POR ID (com parâmetro genérico - DEVE VIR POR ÚLTIMO)
+app.get('/anuncios/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('📥 Buscando anúncio ID:', id);
+
+    const query = `
+            SELECT 
+                a.*,
+                u.nome as criador_nome,
+                u.nomeUsuario as criador_usuario,
+                u.fotoDePerfil as criador_foto
+            FROM anuncio a
+            LEFT JOIN usuario u ON a.criador_cpf = u.CPF
+            WHERE a.id = ? AND a.ativo = 1
+        `;
+
+    const [resultado] = await connection.promise().query(query, [id]);
+
+    if (resultado.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Anúncio não encontrado'
+      });
+    }
+
+    console.log('✅ Anúncio encontrado:', resultado[0].titulo);
+
+    res.json({
+      success: true,
+      anuncio: resultado[0]
+    });
+
+  } catch (erro) {
+    console.error('❌ Erro ao buscar anúncio:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao buscar anúncio: ' + erro.message
+    });
+  }
+});
+
+// 5️⃣ EXCLUIR ANÚNCIO (DELETE com parâmetro)
+app.delete('/anuncios/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('🗑️ Tentando excluir anúncio:', id);
+
+    const [anuncio] = await connection.promise().query(
+      'SELECT * FROM anuncio WHERE id = ?',
+      [id]
+    );
+
+    if (anuncio.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Anúncio não encontrado'
+      });
+    }
+
+    const query = 'UPDATE anuncio SET ativo = 0 WHERE id = ?';
+    await connection.promise().query(query, [id]);
+
+    console.log('✅ Anúncio excluído com sucesso');
+
+    res.json({
+      success: true,
+      message: 'Anúncio excluído com sucesso'
+    });
+
+  } catch (erro) {
+    console.error('❌ Erro ao excluir anúncio:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao excluir anúncio: ' + erro.message
+    });
+  }
+});
+
 // A LINHA app.listen DEVE SER A ÚLTIMA!
 const PORT = 3000;
 app.listen(PORT, () => {

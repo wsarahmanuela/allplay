@@ -37,7 +37,7 @@ body {
     background: #0c7a02;
 }
 
-/* PAINEL LATERAL - (AGORA FUNCIONA) */
+/* PAINEL LATERAL */
 .painel-info {
     position: absolute;
     top: 20px;
@@ -50,7 +50,6 @@ body {
     box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
     z-index: 1000;
     overflow-y: auto;
-
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 }
@@ -80,9 +79,9 @@ body {
 }
 
 .painel-header h2 {
-    font-size: 17px;
-    margin: 0;
+    font-size: 18px;
     font-weight: 600;
+    margin: 0;
 }
 
 /* ANIMAÇÃO DA SETA */
@@ -95,35 +94,17 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.35s ease;
-    padding-left: 5px;
+    padding: 0;
 }
 
 /* Quando expandido */
 .painel-grupo.ativo .painel-conteudo {
-    max-height: 500px; /* altura máxima liberada */
+    max-height: 500px;
     padding: 10px;
 }
 
 .painel-grupo.ativo .seta {
     transform: rotate(180deg);
-}
-
-/* ITENS DE LISTA */
-.usuario-item,
-.local-popular-item {
-    background: #f7f7f7;
-    padding: 10px 14px;
-    border-radius: 12px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-    font-size: 14px;
-    cursor: pointer;
-    margin-bottom: 8px;
-    transition: 0.25s;
-}
-
-.local-popular-item:hover {
-    background: #eaeaea;
-    transform: translateX(-2px);
 }
 
 /* ÍCONES AO LADO DO TÍTULO */
@@ -133,62 +114,176 @@ body {
     gap: 8px;
 }
 
-/* Ícones */
 .titulo-icone i {
     font-size: 18px;
     color: #0f9800;
 }
 
-/* Ajuste do h2 */
-.painel-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-}
+/* ===============================================
+   ITENS DE USUÁRIO (ATUALIZADO)
+   =============================================== */
 .usuario-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background: #ffffffcc;
-    padding: 10px;
+    padding: 12px;
     border-radius: 12px;
     cursor: pointer;
     box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-    transition: .2s;
+    transition: all .2s ease;
+    margin-bottom: 8px;
 }
 
 .usuario-item:hover {
     background: #f0f0f0;
     transform: translateX(-3px);
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
 }
 
+/* Foto do usuário */
 .usuario-foto {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #fff;
+    border: 2px solid #0f9800;
+    background-color: #e0e0e0;
+    flex-shrink: 0;
 }
 
+/* Container de informações do usuário */
 .usuario-info {
     display: flex;
     flex-direction: column;
+    gap: 4px;
+    flex: 1;
 }
 
+/* Nome do usuário */
 .usuario-nome {
     font-weight: 600;
+    font-size: 15px;
+    color: #222;
 }
 
+/* Distância */
 .usuario-distancia {
     font-size: 12px;
-    color: #555;
+    color: #666;
+    font-weight: 500;
 }
 
-.usuario-item {
+/* ===============================================
+   LOCAIS POPULARES (ATUALIZADO)
+   =============================================== */
+.local-popular-item {
+    background: #f7f7f7;
+    padding: 12px 14px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.25s ease;
     position: relative;
 }
 
-.usuario-item .distancia {
-    margin-left: auto;
-    color: #555;
+.local-popular-item:hover {
+    background: #0f9800;
+    color: white;
+    transform: translateX(-3px);
+    box-shadow: 0px 4px 10px rgba(15, 152, 0, 0.3);
+}
+
+.local-popular-item:active {
+    transform: translateX(-3px) scale(0.98);
+}
+
+/* Indicador visual de clique */
+.local-popular-item::after {
+    content: '📍';
+    position: absolute;
+    right: 12px;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.local-popular-item:hover::after {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* Mensagens de estado vazio */
+.painel-conteudo p {
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    padding: 10px;
+    margin: 0;
+}
+
+/* Scrollbar customizada */
+.painel-info::-webkit-scrollbar {
+    width: 6px;
+}
+
+.painel-info::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
+
+.painel-info::-webkit-scrollbar-thumb {
+    background: rgba(15, 152, 0, 0.5);
+    border-radius: 10px;
+}
+
+.painel-info::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 152, 0, 0.7);
+}
+
+/* ===============================================
+   ESTILOS PARA POPUPS DE EVENTOS
+   =============================================== */
+.popup-local h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: #222;
+    border-bottom: 2px solid #0f9800;
+    padding-bottom: 8px;
+}
+
+.eventos-lista {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.evento-item-popup {
+    background: #f8f8f8;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 3px solid #0f9800;
+}
+
+.evento-item-popup strong {
+    color: #222;
+    font-size: 14px;
+}
+
+.evento-item-popup:last-child {
+    margin-bottom: 0;
+}
+
+/* Customizar o popup do Leaflet */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    padding: 8px;
+}
+
+.leaflet-popup-content {
+    margin: 8px 12px;
+    max-width: 280px !important;
 }
