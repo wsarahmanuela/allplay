@@ -355,7 +355,6 @@ nav {
 
 /* ======================= ÁREA DE PUBLICAÇÕES ======================= */
 #container-baixo {
-    background-color: #ffffff3c;
     border-radius: 20px;
     padding: 30px;
     margin-top: 20px;
@@ -366,7 +365,6 @@ nav {
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: auto;
     justify-content: flex-start;
 }

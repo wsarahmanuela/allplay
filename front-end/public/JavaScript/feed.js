@@ -218,13 +218,7 @@ async function carregarFeed(filtroEsporte = "") {
 
       div.appendChild(dataDiv);
 
-      if (post.esporte) {
-        const tag = document.createElement("span");
-        tag.classList.add("tag-esporte");
-        tag.textContent = post.esporte;
-        div.appendChild(tag);
-      }
-
+      
       const curtidaDiv = document.createElement("div");
       curtidaDiv.classList.add("curtidas");
 
@@ -1085,11 +1079,11 @@ document.addEventListener('DOMContentLoaded', () => {
         inputImagens.addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
             
-            console.log('📸 Imagens selecionadas:', files.length);
+            console.log(' Imagens selecionadas:', files.length);
             
             // Verificar limite de 3 imagens
             if (files.length > 3) {
-                alert('⚠️ Você pode selecionar no máximo 3 imagens!');
+                alert(' Você pode selecionar no máximo 3 imagens!');
                 this.value = '';
                 return;
             }
@@ -1108,11 +1102,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Atualizar texto informativo
             const infoTexto = files.length === 1 
-                ? '✅ 1 imagem selecionada' 
-                : `✅ ${files.length} imagens selecionadas`;
+                ? ' 1 imagem selecionada' 
+                : ` ${files.length} imagens selecionadas`;
             document.getElementById('infoImagens').textContent = infoTexto;
             
-            console.log('✅ Imagens armazenadas:', imagensAnuncioSelecionadas.length);
+            console.log(' Imagens armazenadas:', imagensAnuncioSelecionadas.length);
         });
     }
 });
@@ -1145,7 +1139,7 @@ function mostrarPreviewImagens(files) {
 // ==================== REMOVER IMAGEM ====================
 
 function removerImagemAnuncio(index) {
-    console.log('🗑️ Removendo imagem:', index);
+    console.log(' Removendo imagem:', index);
     
     // Criar novo array sem a imagem removida
     const novosArquivos = Array.from(imagensAnuncioSelecionadas);
@@ -1163,15 +1157,15 @@ function removerImagemAnuncio(index) {
     if (novosArquivos.length > 0) {
         mostrarPreviewImagens(novosArquivos);
         const infoTexto = novosArquivos.length === 1 
-            ? '✅ 1 imagem selecionada' 
-            : `✅ ${novosArquivos.length} imagens selecionadas`;
+            ? ' 1 imagem selecionada' 
+            : ` ${novosArquivos.length} imagens selecionadas`;
         document.getElementById('infoImagens').textContent = infoTexto;
     } else {
         document.getElementById('previewImagens').innerHTML = '';
         document.getElementById('infoImagens').textContent = 'Nenhuma imagem selecionada';
     }
     
-    console.log('✅ Imagens restantes:', imagensAnuncioSelecionadas.length);
+    console.log(' Imagens restantes:', imagensAnuncioSelecionadas.length);
 }
 
 // ==================== CRIAR ANÚNCIO ====================
@@ -1179,7 +1173,7 @@ function removerImagemAnuncio(index) {
 async function criarAnuncio(event) {
     event.preventDefault();
     
-    console.log('📢 Iniciando criação de anúncio...');
+    console.log(' Iniciando criação de anúncio...');
     
     const titulo = document.getElementById('tituloAnuncio').value.trim();
     const descricao = document.getElementById('descricaoAnuncio').value.trim();
@@ -1193,22 +1187,22 @@ async function criarAnuncio(event) {
     // ==================== VALIDAÇÕES ====================
     
     if (!titulo) {
-        alert('⚠️ Por favor, insira um título para o anúncio');
+        alert(' Por favor, insira um título para o anúncio');
         return;
     }
     
     if (!descricao) {
-        alert('⚠️ Por favor, insira uma descrição para o anúncio');
+        alert(' Por favor, insira uma descrição para o anúncio');
         return;
     }
     
     if (!cpf) {
-        alert('⚠️ Erro: Você precisa estar logado para criar um anúncio');
+        alert(' Erro: Você precisa estar logado para criar um anúncio');
         return;
     }
     
     if (imagensAnuncioSelecionadas.length === 0) {
-        alert('⚠️ Por favor, selecione pelo menos 1 imagem');
+        alert(' Por favor, selecione pelo menos 1 imagem');
         return;
     }
     
@@ -1222,50 +1216,50 @@ async function criarAnuncio(event) {
     // Adicionar todas as imagens com o nome "imagens" (plural)
     imagensAnuncioSelecionadas.forEach((file) => {
         formData.append('imagens', file);
-        console.log('📎 Adicionando imagem:', file.name, '| Tamanho:', (file.size / 1024).toFixed(2), 'KB');
+        console.log(' Adicionando imagem:', file.name, '| Tamanho:', (file.size / 1024).toFixed(2), 'KB');
     });
     
     // Log do FormData
-    console.log('📦 FormData criado com:');
+    console.log(' FormData criado com:');
     for (let pair of formData.entries()) {
         console.log(`  ${pair[0]}:`, pair[1]);
     }
     
     try {
-        console.log('📤 Enviando para o servidor...');
+        console.log(' Enviando para o servidor...');
         
         const response = await fetch('http://localhost:3000/anuncios', {
             method: 'POST',
             body: formData
         });
         
-        console.log('📊 Status da resposta:', response.status);
+        console.log(' Status da resposta:', response.status);
         
         const result = await response.json();
         
-        console.log('📥 Resposta do servidor:', result);
+        console.log(' Resposta do servidor:', result);
         
         if (result.success) {
-            alert('✅ Anúncio criado com sucesso!');
+            alert(' Anúncio criado com sucesso!');
             fecharModalAnuncio();
             carregarAnuncios();
         } else {
-            alert('❌ Erro ao criar anúncio: ' + (result.message || 'Erro desconhecido'));
+            alert(' Erro ao criar anúncio: ' + (result.message || 'Erro desconhecido'));
         }
     } catch (erro) {
-        console.error('❌ Erro ao criar anúncio:', erro);
-        alert('❌ Erro ao criar anúncio. Verifique sua conexão e tente novamente.');
+        console.error(' Erro ao criar anúncio:', erro);
+        alert(' Erro ao criar anúncio. Verifique sua conexão e tente novamente.');
     }
 }
 
 // ==================== CARREGAR ANÚNCIOS ====================
 
 async function carregarAnuncios() {
-    console.log('📋 Carregando anúncios...');
+    console.log(' Carregando anúncios...');
     
     const container = document.getElementById('container-anuncios');
     if (!container) {
-        console.error('❌ Container de anúncios não encontrado');
+        console.error(' Container de anúncios não encontrado');
         return;
     }
     
@@ -1278,7 +1272,7 @@ async function carregarAnuncios() {
         
         const anuncios = await response.json();
         
-        console.log('📥 Anúncios recebidos:', anuncios.length);
+        console.log(' Anúncios recebidos:', anuncios.length);
         
         if (!Array.isArray(anuncios)) {
             container.innerHTML = '<p class="mensagem-anuncios-vazia">❌ Erro ao carregar anúncios</p>';
@@ -1293,7 +1287,7 @@ async function carregarAnuncios() {
         renderizarAnuncios(anuncios);
         
     } catch (erro) {
-        console.error('❌ Erro ao carregar anúncios:', erro);
+        console.error(' Erro ao carregar anúncios:', erro);
         container.innerHTML = '<p class="mensagem-anuncios-vazia">❌ Erro ao carregar anúncios</p>';
     }
 }
@@ -1353,7 +1347,7 @@ function renderizarAnuncios(anuncios) {
         container.appendChild(anuncioCard);
     });
     
-    console.log(`✅ ${anuncios.length} anúncios renderizados`);
+    console.log(` ${anuncios.length} anúncios renderizados`);
 }
 
 // ==================== CARROSSEL COM VELOCIDADE AJUSTADA ====================
@@ -1409,12 +1403,12 @@ function irParaSlideAnuncio(id, index) {
 // ==================== EXCLUIR ANÚNCIO ====================
 
 async function excluirAnuncio(id, titulo) {
-    if (!confirm(`🗑️ Deseja realmente excluir o anúncio "${titulo}"?`)) {
+    if (!confirm(` Deseja realmente excluir o anúncio "${titulo}"?`)) {
         return;
     }
     
     try {
-        console.log('🗑️ Excluindo anúncio ID:', id);
+        console.log(' Excluindo anúncio ID:', id);
         
         const response = await fetch(`http://localhost:3000/anuncios/${id}`, {
             method: 'DELETE'
@@ -1422,17 +1416,17 @@ async function excluirAnuncio(id, titulo) {
         
         const result = await response.json();
         
-        console.log('📥 Resposta:', result);
+        console.log(' Resposta:', result);
         
         if (result.success) {
-            alert('✅ Anúncio excluído com sucesso!');
+            alert(' Anúncio excluído com sucesso!');
             carregarAnuncios();
         } else {
-            alert('❌ Erro ao excluir anúncio: ' + (result.message || 'Erro desconhecido'));
+            alert(' Erro ao excluir anúncio: ' + (result.message || 'Erro desconhecido'));
         }
     } catch (erro) {
-        console.error('❌ Erro ao excluir anúncio:', erro);
-        alert('❌ Erro ao excluir anúncio');
+        console.error(' Erro ao excluir anúncio:', erro);
+        alert(' Erro ao excluir anúncio');
     }
 }
 
@@ -1440,7 +1434,7 @@ async function excluirAnuncio(id, titulo) {
 // Certifique-se de que esta linha está no DOMContentLoaded:
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 Iniciando aplicação...");
+    console.log(" Iniciando aplicação...");
     
     preencherPerfil();
     carregarFeed();
@@ -1449,5 +1443,5 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarEventos();
     carregarAnuncios(); // ← ESTA LINHA DEVE ESTAR AQUI
     
-    console.log("✅ Todas as funções inicializadas");
+    console.log(" Todas as funções inicializadas");
 });

@@ -645,7 +645,7 @@ app.delete('/publicacoes/:id', async (req, res) => {
   const id = req.params.id;
 
   console.log(`\n [DELETE] Recebida requisição para excluir publicação ID: ${id}`);
-  console.log(`   Tipo do ID: ${typeof id}`);
+  console.log(`Tipo do ID: ${typeof id}`);
 
   if (!id || isNaN(id)) {
     console.log('    ID inválido');
@@ -656,29 +656,29 @@ app.delete('/publicacoes/:id', async (req, res) => {
   }
 
   try {
-    console.log('    Verificando se a publicação existe...');
+    console.log('Verificando se a publicação existe...');
     const [rows] = await connection
       .promise()
       .query('SELECT IDpublicacao FROM publicacao WHERE IDpublicacao = ?', [id]);
 
     if (!rows || rows.length === 0) {
-      console.log('    Publicação não encontrada no banco');
+      console.log('Publicação não encontrada no banco');
       return res.status(404).json({
         success: false,
         message: 'Publicação não encontrada'
       });
     }
 
-    console.log('   ✓ Publicação encontrada, iniciando exclusão...');
+    console.log('Publicação encontrada, iniciando exclusão...');
 
-    console.log('    Excluindo curtidas...');
+    console.log('Excluindo curtidas...');
     const [resultadoCurtidas] = await connection
       .promise()
       .query('DELETE FROM curtida WHERE publicacao_ID = ?', [id]);
 
-    console.log(`   ✓ ${resultadoCurtidas.affectedRows} curtida(s) excluída(s)`);
+    console.log(`${resultadoCurtidas.affectedRows} curtida(s) excluída(s)`);
 
-    console.log('    Excluindo publicação...');
+    console.log('Excluindo publicação...');
     const [resultadoPublicacao] = await connection
       .promise()
       .query('DELETE FROM publicacao WHERE IDpublicacao = ?', [id]);
@@ -691,7 +691,7 @@ app.delete('/publicacoes/:id', async (req, res) => {
       });
     }
 
-    console.log('    Publicação excluída com sucesso!\n');
+    console.log('Publicação excluída com sucesso!\n');
 
     return res.status(200).json({
       success: true,
@@ -923,15 +923,14 @@ app.get('/api/todos-usuarios-mapa', (req, res) => {
   });
 });
 
-/// ENDPOINT: BUSCAR EVENTOS POR LOCAL (VERSÃO FINAL - TESTADA)
 app.get("/api/eventos-por-local", (req, res) => {
   const { local } = req.query;
 
-  console.log('\n🔍 [API] /api/eventos-por-local CHAMADA');
+  console.log('\n[API] /api/eventos-por-local CHAMADA');
   console.log('   Local solicitado:', local);
 
   if (!local) {
-    console.log('   ❌ Local não fornecido');
+    console.log('Local não fornecido');
     return res.status(400).json({
       success: false,
       message: "Nome do local é obrigatório."
@@ -941,14 +940,14 @@ app.get("/api/eventos-por-local", (req, res) => {
   // Query simplificada usando SELECT * para pegar todas as colunas
   const sql = `SELECT * FROM evento WHERE local = ? ORDER BY data_evento DESC LIMIT 10`;
 
-  console.log('   📝 Executando SQL...');
+  console.log('Executando SQL...');
 
   connection.query(sql, [local], (erro, resultados) => {
     if (erro) {
-      console.error('   ❌ ERRO SQL:');
-      console.error('      Código:', erro.code);
-      console.error('      Mensagem:', erro.sqlMessage);
-      console.error('      SQL State:', erro.sqlState);
+      console.error('ERRO SQL:');
+      console.error('Código:', erro.code);
+      console.error('Mensagem:', erro.sqlMessage);
+      console.error('SQL State:', erro.sqlState);
 
       return res.status(500).json({
         success: false,
@@ -957,10 +956,10 @@ app.get("/api/eventos-por-local", (req, res) => {
       });
     }
 
-    console.log(`   ✅ Query OK! ${resultados.length} evento(s) encontrado(s)`);
+    console.log(`Query OK! ${resultados.length} evento(s) encontrado(s)`);
 
     if (resultados.length > 0) {
-      console.log('   📋 Primeiro evento:', {
+      console.log('Primeiro evento:', {
         id: resultados[0].IDevento,
         titulo: resultados[0].titulo,
         local: resultados[0].local,
@@ -1087,13 +1086,10 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
   const updates = [];
   const params = [];
 
-  // 1. Verifica e adiciona o banner
   if (bannerFile) {
     updates.push("banner = ?");
     params.push(bannerFile.filename);
   }
-
-  // 2. Verifica e adiciona a foto de perfil
   if (fotoDePerfilFile) {
     updates.push("fotoDePerfil = ?");
     params.push(fotoDePerfilFile.filename);
@@ -1115,7 +1111,6 @@ app.post("/usuario/upload-perfil/:cpf", upload.fields([
   });
 });
 
-
 // ATUALIZAR DADOS DO PERFIL (NOVA ROTA)
 app.put("/usuario/atualizar", (req, res) => {
   const { cpf, nomeCompleto, nomeUsuario, bio, localizacao } = req.body;
@@ -1129,8 +1124,6 @@ app.put("/usuario/atualizar", (req, res) => {
         SET nome = ?, nomeUsuario = ?, bio = ?, cidade = ?
         WHERE cpf = ?
     `;
-
-
   connection.query(sql, [nomeCompleto, nomeUsuario, bio, localizacao, cpf], (erro, resultados) => {
 
     if (erro) {
@@ -1148,9 +1141,6 @@ app.put("/usuario/atualizar", (req, res) => {
 
 
 // ==================== ROTAS DE CLUBES ====================
-// Adicione estas rotas no seu arquivo appbanco.js (Node.js)
-
-// 1. BUSCAR TODOS OS CLUBES CADASTRADOS
 app.get("/clubes/todos", (req, res) => {
   const sql = "SELECT IDclube, nome, esporteClube FROM clube ORDER BY nome ASC";
 
@@ -1293,8 +1283,6 @@ app.post("/usuario/clube/criar", (req, res) => {
         }
 
         const novoIdClube = resultado.insertId;
-
-        // Adiciona o novo clube ao usuário
         const insertRelacao = "INSERT INTO usuario_clube (cpf_usuario, IDclube) VALUES (?, ?)";
 
         connection.query(insertRelacao, [cpf, novoIdClube], (erro4) => {
@@ -1350,7 +1338,6 @@ app.delete("/usuario/clube/remover", (req, res) => {
 });
 
 // ==================== ROTA DE EXCLUSÃO DE CONTA ====================
-
 app.delete('/usuario/excluir-conta', async (req, res) => {
   const { cpf, confirmacao } = req.body;
 
@@ -1376,28 +1363,28 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
     await connection.promise().beginTransaction();
 
     await connection.promise().query('DELETE FROM curtida WHERE usuario_cpf = ?', [cpf]);
-    console.log('   ✓ Curtidas excluídas');
+    console.log('Curtidas excluídas');
 
     await connection.promise().query(
       'DELETE FROM curtida WHERE publicacao_ID IN (SELECT IDpublicacao FROM publicacao WHERE autor_CPF = ?)',
       [cpf]
     );
-    console.log('   ✓ Curtidas nas publicações excluídas');
+    console.log('Curtidas nas publicações excluídas');
 
     await connection.promise().query('DELETE FROM publicacao WHERE autor_CPF = ?', [cpf]);
-    console.log('   ✓ Publicações excluídas');
+    console.log('Publicações excluídas');
 
     await connection.promise().query('DELETE FROM usuario_esportesdeinteresse WHERE CPF_usuario = ?', [cpf]);
-    console.log('   ✓ Esportes de interesse excluídos');
+    console.log('Esportes de interesse excluídos');
 
     await connection.promise().query('DELETE FROM usuario_clube WHERE cpf_usuario = ?', [cpf]);
-    console.log('   ✓ Relação com clubes excluída');
+    console.log('Relação com clubes excluída');
 
     await connection.promise().query('DELETE FROM Seguidores WHERE CPF_seguido = ?', [cpf]);
-    console.log('   ✓ Seguidores excluídos');
+    console.log('Seguidores excluídos');
 
     await connection.promise().query('DELETE FROM Seguidores WHERE CPF_seguidor = ?', [cpf]);
-    console.log('   ✓ Seguindo excluído');
+    console.log('Seguindo excluído');
 
     const [resultadoUsuario] = await connection.promise().query('DELETE FROM usuario WHERE CPF = ?', [cpf]);
 
@@ -1408,7 +1395,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
         message: 'Usuário não encontrado.'
       });
     }
-    console.log('   ✓ Usuário excluído');
+    console.log('Usuário excluído');
 
     await connection.promise().commit();
     console.log(' Conta excluída com sucesso!\n');
@@ -1421,7 +1408,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
   } catch (erro) {
     await connection.promise().rollback();
 
-    console.error('❌ Erro ao excluir conta:', erro);
+    console.error('Erro ao excluir conta:', erro);
     res.status(500).json({
       success: false,
       message: 'Erro ao excluir conta. Tente novamente.'
@@ -1434,7 +1421,7 @@ app.delete('/usuario/excluir-conta', async (req, res) => {
 app.get("/mutuos/:cpf", (req, res) => {
   const cpf = req.params.cpf;
 
-  console.log('\n👥 [API] Rota /mutuos/:cpf CHAMADA!');
+  console.log('\n [API] Rota /mutuos/:cpf CHAMADA!');
   console.log('   CPF recebido:', cpf);
 
   const sql = `
@@ -1457,7 +1444,7 @@ app.get("/mutuos/:cpf", (req, res) => {
 
   connection.query(sql, [cpf, cpf], (erro, resultados) => {
     if (erro) {
-      console.error("❌ Erro SQL ao buscar amigos mútuos:", erro);
+      console.error("Erro SQL ao buscar amigos mútuos:", erro);
       return res.status(500).json({
         success: false,
         message: "Erro no servidor ao buscar amigos.",
@@ -1465,22 +1452,20 @@ app.get("/mutuos/:cpf", (req, res) => {
       });
     }
 
-    console.log(`✅ Query executada! ${resultados.length} amigos mútuos encontrados`);
+    console.log(`Query executada! ${resultados.length} amigos mútuos encontrados`);
 
     const amigosFormatados = resultados.map(amigo => ({
       ...amigo,
       esportes: amigo.esportes ? amigo.esportes.split(',') : []
     }));
 
-    console.log('📤 Enviando resposta:', amigosFormatados);
+    console.log('Enviando resposta:', amigosFormatados);
     res.json(amigosFormatados);
   });
 });
 
 
 // ==================== ROTAS DE EVENTOS ====================
-
-// 1. CRIAR EVENTO
 app.post('/eventos', (req, res) => {
   console.log('\n========================================');
   console.log(' ROTA POST /eventos CHAMADA');
@@ -1595,7 +1580,7 @@ app.post('/eventos', (req, res) => {
       return res.status(500).json({
         success: false,
         message: 'Erro no servidor ao criar evento',
-        erro: erro.sqlMessage // Adiciona mensagem de erro para debug
+        erro: erro.sqlMessage 
       });
     }
 
@@ -1617,7 +1602,6 @@ app.post('/eventos', (req, res) => {
 app.get('/eventos', (req, res) => {
   console.log('\n Buscando todos os eventos...');
 
-  // ATENÇÃO: Mudei para 'evento' (singular) baseado nos seus ALTER TABLE
   const sql = `
     SELECT 
       e.*,
@@ -1842,13 +1826,12 @@ app.get("/teste-rotas", (req, res) => {
 });
 
 // ==================== ROTAS DE ANÚNCIOS (VERSÃO CORRIGIDA) ====================
-// 1️⃣ CRIAR ANÚNCIO (POST deve vir antes dos GET com parâmetros)
 app.post('/anuncios', uploadAnuncios.array("imagens", 3), async (req, res) => {
   try {
     const { titulo, descricao, criador_cpf } = req.body;
 
-    console.log("📥 Body:", req.body);
-    console.log("📎 Files:", req.files);
+    console.log(" Body:", req.body);
+    console.log(" Files:", req.files);
 
     if (!titulo || !descricao || !criador_cpf) {
       return res.status(400).json({
@@ -1891,7 +1874,7 @@ app.post('/anuncios', uploadAnuncios.array("imagens", 3), async (req, res) => {
     });
 
   } catch (erro) {
-    console.error("❌ Erro:", erro);
+    console.error(" Erro:", erro);
     res.status(500).json({
       success: false,
       message: "Erro ao criar anúncio: " + erro.message
@@ -1899,12 +1882,9 @@ app.post('/anuncios', uploadAnuncios.array("imagens", 3), async (req, res) => {
   }
 });
 
-
-
-// 2️⃣ LISTAR TODOS OS ANÚNCIOS (sem parâmetros - DEVE VIR ANTES de /anuncios/:id)
 app.get('/anuncios', async (req, res) => {
   console.log('\n========================================');
-  console.log('📥 [GET /anuncios] CHAMADA RECEBIDA');
+  console.log(' [GET /anuncios] CHAMADA RECEBIDA');
   console.log('========================================');
 
   try {
@@ -1927,17 +1907,17 @@ app.get('/anuncios', async (req, res) => {
             ORDER BY a.data_criacao DESC
         `;
 
-    console.log('🔍 Executando query...');
+    console.log(' Executando query...');
 
     const [anuncios] = await connection.promise().query(query);
 
-    console.log(`✅ ${anuncios.length} anúncios encontrados`);
+    console.log(` ${anuncios.length} anúncios encontrados`);
     console.log('========================================\n');
 
     res.json(anuncios);
 
   } catch (erro) {
-    console.error('\n❌ ERRO AO BUSCAR ANÚNCIOS:', erro.message);
+    console.error('\nERRO AO BUSCAR ANÚNCIOS:', erro.message);
     console.error('========================================\n');
 
     res.status(500).json({
@@ -1948,12 +1928,11 @@ app.get('/anuncios', async (req, res) => {
   }
 });
 
-// 3️⃣ BUSCAR ANÚNCIOS POR USUÁRIO (rota específica - ANTES de /anuncios/:id)
 app.get('/anuncios/usuario/:cpf', async (req, res) => {
   try {
     const { cpf } = req.params;
 
-    console.log('📥 Buscando anúncios do CPF:', cpf);
+    console.log(' Buscando anúncios do CPF:', cpf);
 
     const query = `
             SELECT * FROM anuncio
@@ -1963,12 +1942,12 @@ app.get('/anuncios/usuario/:cpf', async (req, res) => {
 
     const [anuncios] = await connection.promise().query(query, [cpf]);
 
-    console.log(`✅ ${anuncios.length} anúncios encontrados para ${cpf}`);
+    console.log(` ${anuncios.length} anúncios encontrados para ${cpf}`);
 
     res.json(anuncios);
 
   } catch (erro) {
-    console.error('❌ Erro ao buscar anúncios do usuário:', erro);
+    console.error(' Erro ao buscar anúncios do usuário:', erro);
     res.status(500).json({
       success: false,
       message: 'Erro ao buscar anúncios: ' + erro.message
@@ -1976,12 +1955,11 @@ app.get('/anuncios/usuario/:cpf', async (req, res) => {
   }
 });
 
-// 4️⃣ BUSCAR ANÚNCIO POR ID (com parâmetro genérico - DEVE VIR POR ÚLTIMO)
 app.get('/anuncios/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('📥 Buscando anúncio ID:', id);
+    console.log(' Buscando anúncio ID:', id);
 
     const query = `
             SELECT 
@@ -2003,7 +1981,7 @@ app.get('/anuncios/:id', async (req, res) => {
       });
     }
 
-    console.log('✅ Anúncio encontrado:', resultado[0].titulo);
+    console.log(' Anúncio encontrado:', resultado[0].titulo);
 
     res.json({
       success: true,
@@ -2011,7 +1989,7 @@ app.get('/anuncios/:id', async (req, res) => {
     });
 
   } catch (erro) {
-    console.error('❌ Erro ao buscar anúncio:', erro);
+    console.error(' Erro ao buscar anúncio:', erro);
     res.status(500).json({
       success: false,
       message: 'Erro ao buscar anúncio: ' + erro.message
@@ -2019,12 +1997,11 @@ app.get('/anuncios/:id', async (req, res) => {
   }
 });
 
-// 5️⃣ EXCLUIR ANÚNCIO (DELETE com parâmetro)
 app.delete('/anuncios/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('🗑️ Tentando excluir anúncio:', id);
+    console.log(' Tentando excluir anúncio:', id);
 
     const [anuncio] = await connection.promise().query(
       'SELECT * FROM anuncio WHERE id = ?',
@@ -2041,7 +2018,7 @@ app.delete('/anuncios/:id', async (req, res) => {
     const query = 'UPDATE anuncio SET ativo = 0 WHERE id = ?';
     await connection.promise().query(query, [id]);
 
-    console.log('✅ Anúncio excluído com sucesso');
+    console.log('Anúncio excluído com sucesso');
 
     res.json({
       success: true,
@@ -2049,7 +2026,7 @@ app.delete('/anuncios/:id', async (req, res) => {
     });
 
   } catch (erro) {
-    console.error('❌ Erro ao excluir anúncio:', erro);
+    console.error(' Erro ao excluir anúncio:', erro);
     res.status(500).json({
       success: false,
       message: 'Erro ao excluir anúncio: ' + erro.message
