@@ -61,13 +61,15 @@ async function carregarFeed(filtroEsporte = "") {
   try {
     let url;
 
+    // Se tem CPF na URL, busca posts daquele usuário específico
     if (cpfDaURL) {
       url = filtroEsporte
         ? `http://localhost:3000/publicacoes/${cpfDaURL}?esporte=${encodeURIComponent(filtroEsporte)}`
         : `http://localhost:3000/publicacoes/${cpfDaURL}`;
     } else {
+      // Se NÃO tem CPF na URL, busca posts de TODOS os usuários
       url = filtroEsporte
-        ? `http://localhost:3000/publicacoes/${cpf}?esporte=${encodeURIComponent(filtroEsporte)}`
+        ? `http://localhost:3000/publicacoes?esporte=${encodeURIComponent(filtroEsporte)}`  // ← CORREÇÃO AQUI
         : "http://localhost:3000/publicacoes";
     }
 
@@ -75,10 +77,10 @@ async function carregarFeed(filtroEsporte = "") {
     if (!resposta.ok) throw new Error("Erro ao buscar publicações");
 
     const dados = await resposta.json();
-    console.log(" Retorno do servidor:", dados);
+    console.log("📋 Retorno do servidor:", dados);
 
     const cpfLogado = localStorage.getItem("cpf");
-    console.log("CPF logado:", cpfLogado);
+    console.log("🔑 CPF logado:", cpfLogado);
 
     if (Array.isArray(dados)) {
       dados.forEach(p => console.log("Campos disponíveis em cada post:", Object.keys(p)));
@@ -542,7 +544,7 @@ async function criarPost() {
   }
 }
 
-// ================== MOSTRAR ESPORTES ==================
+// ================== MOSTRAR ESPORTES (CORRIGIDO) ==================
 async function carregarEsportes() {
   const container = document.getElementById("atalhos-esportes");
   if (!container) return;
@@ -582,14 +584,22 @@ async function carregarEsportes() {
         </a>
       `;
 
-      div.addEventListener("click", () => {
+      div.addEventListener("click", (e) => {
+        e.preventDefault(); // ← ADICIONE ISSO
+        
+        console.log(` Clicou no esporte: ${nome}`); // ← DEBUG
+        
+        // Remove classe ativo de todos
         document.querySelectorAll("#atalhos-esportes .esporte-item a").forEach(link => {
           link.classList.remove("ativo");
         });
 
+        // Adiciona no clicado
         const link = div.querySelector("a");
         link.classList.add("ativo");
 
+        // Carrega feed filtrado
+        console.log(`Carregando feed para esporte: ${nome}`); // ← DEBUG
         carregarFeed(nome);
       });
 

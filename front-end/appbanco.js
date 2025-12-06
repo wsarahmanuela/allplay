@@ -567,33 +567,52 @@ app.post('/publicacoes', (req, res) => {
   });
 });
 
-// ===================== LISTAR TODAS AS PUBLICAÇÕES =====================
+// ===================== LISTAR TODAS AS PUBLICAÇÕES (CORRIGIDO) =====================
 app.get('/publicacoes', (req, res) => {
+  const { esporte } = req.query; // ← ADICIONAR ISSO
+  
   console.log("GET PUBLICACOES");
+  console.log(" Filtro de esporte:", esporte || "nenhum"); // ← DEBUG
 
-  const query = `
+  let query = `
     SELECT 
       p.IDpublicacao,
       p.conteudo,
       p.imagem,
       p.data_publicacao,
+      p.esporte,
       u.nome,
       u.nomeUsuario,
       u.fotoDePerfil,
       p.autor_CPF AS cpf
     FROM publicacao p
     JOIN usuario u ON p.autor_CPF = u.CPF
-    ORDER BY p.data_publicacao DESC
   `;
 
-  connection.query(query, (erro, resultados) => {
+  const params = [];
+
+  // ← ADICIONAR FILTRO DE ESPORTE
+  if (esporte && esporte.trim() !== "") {
+    query += " WHERE p.esporte = ?";
+    params.push(esporte);
+    console.log(" Aplicando filtro WHERE esporte =", esporte);
+  }
+
+  query += " ORDER BY p.data_publicacao DESC";
+
+  console.log(" Query final:", query);
+  console.log(" Params:", params);
+
+  connection.query(query, params, (erro, resultados) => {
     if (erro) {
-      console.error('Erro ao buscar publicações:', erro);
+      console.error(' Erro ao buscar publicações:', erro);
       return res.status(500).json({
         success: false,
         message: 'Erro ao carregar publicações.'
       });
     }
+
+    console.log(`${resultados.length} publicações encontradas`);
 
     res.json({
       success: true,
@@ -601,7 +620,6 @@ app.get('/publicacoes', (req, res) => {
     });
   });
 });
-
 // =================== PUBLICAR POSTAGEM (com imagem ou texto) ===================
 app.post("/publicacoes/imagem", upload.single("imagem"), (req, res) => {
   const { autor_CPF, conteudo, esporte } = req.body;
