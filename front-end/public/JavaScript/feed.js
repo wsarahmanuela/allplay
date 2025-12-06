@@ -1049,11 +1049,68 @@ async function abrirDetalhesEvento(idEvento) {
     alert('Erro ao carregar detalhes do evento');
   }
 }
-// ==================== ANÚNCIOS ====================
+// ==================== ANÚNCIOS COM SISTEMA DE PERMISSÕES ====================
 let imagensAnuncioSelecionadas = [];
+let usuarioPodeAnunciar = false;
 
-// Abrir Modal
+// ========== VERIFICAR PERMISSÃO AO CARREGAR PÁGINA ==========
+async function verificarPermissaoAnuncio() {
+    const cpf = localStorage.getItem('cpf');
+    
+    console.log('🔐 Verificando permissão de anúncio...');
+    
+    if (!cpf) {
+        console.log('❌ Usuário não logado');
+        usuarioPodeAnunciar = false;
+        ocultarBotaoAnuncio();
+        return;
+    }
+    
+    try {
+        const response = await fetch(`http://localhost:3000/api/verificar-permissao-anuncio?cpf=${cpf}`);
+        const data = await response.json();
+        
+        usuarioPodeAnunciar = data.podeAnunciar || false;
+        
+        console.log(`✅ Permissão verificada: ${usuarioPodeAnunciar ? 'AUTORIZADO ✓' : 'NÃO AUTORIZADO ✗'}`);
+        
+        // Atualizar interface
+        if (usuarioPodeAnunciar) {
+            mostrarBotaoAnuncio();
+        } else {
+            ocultarBotaoAnuncio();
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao verificar permissão:', error);
+        usuarioPodeAnunciar = false;
+        ocultarBotaoAnuncio();
+    }
+}
+
+function mostrarBotaoAnuncio() {
+    const btnNovoAnuncio = document.querySelector('.btn-novo-anuncio');
+    if (btnNovoAnuncio) {
+        btnNovoAnuncio.style.display = 'flex';
+        btnNovoAnuncio.title = 'Você tem permissão para criar anúncios';
+    }
+}
+
+function ocultarBotaoAnuncio() {
+    const btnNovoAnuncio = document.querySelector('.btn-novo-anuncio');
+    if (btnNovoAnuncio) {
+        btnNovoAnuncio.style.display = 'none';
+    }
+}
+
+// ========== ABRIR MODAL (COM VERIFICAÇÃO) ==========
 function abrirModalCriarAnuncio() {
+    // Verificação dupla de segurança
+    if (!usuarioPodeAnunciar) {
+        alert('🚫 Você não tem permissão para criar anúncios.\n\nEntre em contato com o suporte para solicitar acesso.');
+        return;
+    }
+    
     document.getElementById('modalCriarAnuncio').classList.add('ativo');
     imagensAnuncioSelecionadas = [];
     document.getElementById('previewImagens').innerHTML = '';
@@ -1071,19 +1128,24 @@ function fecharModalAnuncio() {
 }
 
 // ==================== CAPTURA DE IMAGENS ====================
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Verificar permissão ao carregar
+    verificarPermissaoAnuncio();
+    
+    // Carregar anúncios
+    carregarAnuncios();
+    
     const inputImagens = document.getElementById('imagensAnuncio');
     
     if (inputImagens) {
         inputImagens.addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
             
-            console.log(' Imagens selecionadas:', files.length);
+            console.log('📸 Imagens selecionadas:', files.length);
             
             // Verificar limite de 3 imagens
             if (files.length > 3) {
-                alert(' Você pode selecionar no máximo 3 imagens!');
+                alert('⚠️ Você pode selecionar no máximo 3 imagens!');
                 this.value = '';
                 return;
             }
@@ -1102,17 +1164,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Atualizar texto informativo
             const infoTexto = files.length === 1 
-                ? ' 1 imagem selecionada' 
-                : ` ${files.length} imagens selecionadas`;
+                ? '✓ 1 imagem selecionada' 
+                : `✓ ${files.length} imagens selecionadas`;
             document.getElementById('infoImagens').textContent = infoTexto;
             
-            console.log(' Imagens armazenadas:', imagensAnuncioSelecionadas.length);
+            console.log('✅ Imagens armazenadas:', imagensAnuncioSelecionadas.length);
         });
     }
 });
 
 // ==================== PREVIEW DAS IMAGENS ====================
-
 function mostrarPreviewImagens(files) {
     const container = document.getElementById('previewImagens');
     container.innerHTML = '';
@@ -1125,7 +1186,7 @@ function mostrarPreviewImagens(files) {
             div.classList.add('preview-item');
             div.innerHTML = `
                 <img src="${e.target.result}" alt="Preview ${index + 1}">
-                <button type="button" class="btn-remover-preview" onclick="removerImagemAnuncio(${index})">
+                <button type="button" class="btn-remover-preview" onclick="removerImagemAnuncio(${index})" title="Remover imagem">
                     ×
                 </button>
             `;
@@ -1137,9 +1198,8 @@ function mostrarPreviewImagens(files) {
 }
 
 // ==================== REMOVER IMAGEM ====================
-
 function removerImagemAnuncio(index) {
-    console.log(' Removendo imagem:', index);
+    console.log('🗑️ Removendo imagem:', index);
     
     // Criar novo array sem a imagem removida
     const novosArquivos = Array.from(imagensAnuncioSelecionadas);
@@ -1157,109 +1217,120 @@ function removerImagemAnuncio(index) {
     if (novosArquivos.length > 0) {
         mostrarPreviewImagens(novosArquivos);
         const infoTexto = novosArquivos.length === 1 
-            ? ' 1 imagem selecionada' 
-            : ` ${novosArquivos.length} imagens selecionadas`;
+            ? '✓ 1 imagem selecionada' 
+            : `✓ ${novosArquivos.length} imagens selecionadas`;
         document.getElementById('infoImagens').textContent = infoTexto;
     } else {
         document.getElementById('previewImagens').innerHTML = '';
         document.getElementById('infoImagens').textContent = 'Nenhuma imagem selecionada';
     }
     
-    console.log(' Imagens restantes:', imagensAnuncioSelecionadas.length);
+    console.log('✅ Imagens restantes:', imagensAnuncioSelecionadas.length);
 }
 
-// ==================== CRIAR ANÚNCIO ====================
-
+// ==================== CRIAR ANÚNCIO (COM VALIDAÇÃO DE PERMISSÃO) ====================
 async function criarAnuncio(event) {
     event.preventDefault();
     
-    console.log(' Iniciando criação de anúncio...');
+    console.log('\n📝 Iniciando criação de anúncio...');
+    
+    // Verificação de permissão
+    if (!usuarioPodeAnunciar) {
+        alert('🚫 Você não tem permissão para criar anúncios.\n\nEntre em contato com o suporte.');
+        fecharModalAnuncio();
+        return;
+    }
     
     const titulo = document.getElementById('tituloAnuncio').value.trim();
     const descricao = document.getElementById('descricaoAnuncio').value.trim();
     const cpf = localStorage.getItem('cpf');
     
-    console.log('Título:', titulo);
-    console.log('Descrição:', descricao);
-    console.log('CPF:', cpf);
-    console.log('Imagens no array:', imagensAnuncioSelecionadas.length);
+    console.log('   Título:', titulo);
+    console.log('   Descrição:', descricao.substring(0, 50) + '...');
+    console.log('   CPF:', cpf);
+    console.log('   Imagens:', imagensAnuncioSelecionadas.length);
     
     // ==================== VALIDAÇÕES ====================
-    
     if (!titulo) {
-        alert(' Por favor, insira um título para o anúncio');
+        alert('⚠️ Por favor, insira um título para o anúncio');
+        return;
+    }
+    
+    if (titulo.length > 200) {
+        alert('⚠️ O título deve ter no máximo 200 caracteres');
         return;
     }
     
     if (!descricao) {
-        alert(' Por favor, insira uma descrição para o anúncio');
+        alert('⚠️ Por favor, insira uma descrição para o anúncio');
         return;
     }
     
     if (!cpf) {
-        alert(' Erro: Você precisa estar logado para criar um anúncio');
+        alert('❌ Erro: Você precisa estar logado para criar um anúncio');
+        fecharModalAnuncio();
         return;
     }
     
     if (imagensAnuncioSelecionadas.length === 0) {
-        alert(' Por favor, selecione pelo menos 1 imagem');
+        alert('⚠️ Por favor, selecione pelo menos 1 imagem');
         return;
     }
     
     // ==================== CRIAR FORMDATA ====================
-    
     const formData = new FormData();
     formData.append('titulo', titulo);
     formData.append('descricao', descricao);
     formData.append('criador_cpf', cpf);
     
-    // Adicionar todas as imagens com o nome "imagens" (plural)
+    // Adicionar todas as imagens
     imagensAnuncioSelecionadas.forEach((file) => {
         formData.append('imagens', file);
-        console.log(' Adicionando imagem:', file.name, '| Tamanho:', (file.size / 1024).toFixed(2), 'KB');
+        console.log('   📸 Adicionando:', file.name, '|', (file.size / 1024).toFixed(2), 'KB');
     });
     
-    // Log do FormData
-    console.log(' FormData criado com:');
-    for (let pair of formData.entries()) {
-        console.log(`  ${pair[0]}:`, pair[1]);
-    }
-    
     try {
-        console.log(' Enviando para o servidor...');
+        console.log('⏳ Enviando para o servidor...');
         
         const response = await fetch('http://localhost:3000/anuncios', {
             method: 'POST',
             body: formData
         });
         
-        console.log(' Status da resposta:', response.status);
+        console.log('📡 Status da resposta:', response.status);
         
         const result = await response.json();
         
-        console.log(' Resposta do servidor:', result);
+        console.log('📦 Resposta do servidor:', result);
         
         if (result.success) {
-            alert(' Anúncio criado com sucesso!');
+            alert('✅ Anúncio criado com sucesso!');
             fecharModalAnuncio();
             carregarAnuncios();
         } else {
-            alert(' Erro ao criar anúncio: ' + (result.message || 'Erro desconhecido'));
+            // Mensagens de erro específicas
+            if (response.status === 403) {
+                alert('🚫 Você não tem permissão para criar anúncios.\n\n' + result.message);
+                usuarioPodeAnunciar = false;
+                ocultarBotaoAnuncio();
+                fecharModalAnuncio();
+            } else {
+                alert('❌ Erro ao criar anúncio:\n\n' + (result.message || 'Erro desconhecido'));
+            }
         }
     } catch (erro) {
-        console.error(' Erro ao criar anúncio:', erro);
-        alert(' Erro ao criar anúncio. Verifique sua conexão e tente novamente.');
+        console.error('❌ Erro ao criar anúncio:', erro);
+        alert('❌ Erro ao criar anúncio.\n\nVerifique sua conexão e tente novamente.');
     }
 }
 
 // ==================== CARREGAR ANÚNCIOS ====================
-
 async function carregarAnuncios() {
-    console.log(' Carregando anúncios...');
+    console.log('📋 Carregando anúncios...');
     
     const container = document.getElementById('container-anuncios');
     if (!container) {
-        console.error(' Container de anúncios não encontrado');
+        console.error('❌ Container de anúncios não encontrado');
         return;
     }
     
@@ -1272,7 +1343,7 @@ async function carregarAnuncios() {
         
         const anuncios = await response.json();
         
-        console.log(' Anúncios recebidos:', anuncios.length);
+        console.log(`✅ ${anuncios.length} anúncio(s) recebido(s)`);
         
         if (!Array.isArray(anuncios)) {
             container.innerHTML = '<p class="mensagem-anuncios-vazia">❌ Erro ao carregar anúncios</p>';
@@ -1287,13 +1358,12 @@ async function carregarAnuncios() {
         renderizarAnuncios(anuncios);
         
     } catch (erro) {
-        console.error(' Erro ao carregar anúncios:', erro);
+        console.error('❌ Erro ao carregar anúncios:', erro);
         container.innerHTML = '<p class="mensagem-anuncios-vazia">❌ Erro ao carregar anúncios</p>';
     }
 }
 
-// ==================== RENDERIZAR ANÚNCIOS ====================
-
+// ==================== RENDERIZAR ANÚNCIOS (CORRIGIDO) ====================
 function renderizarAnuncios(anuncios) {
     const container = document.getElementById('container-anuncios');
     container.innerHTML = '';
@@ -1309,21 +1379,26 @@ function renderizarAnuncios(anuncios) {
         
         anuncioCard.innerHTML = `
             ${anuncio.criador_cpf === cpfLogado ? `
-                <button class="btn-excluir-anuncio" onclick="excluirAnuncio(${anuncio.id}, '${anuncio.titulo.replace(/'/g, "\\'")}')">
+                <button class="btn-excluir-anuncio" 
+                        onclick="excluirAnuncio(${anuncio.id}, '${anuncio.titulo.replace(/'/g, "\\'")}')"
+                        title="Excluir anúncio">
                     ×
                 </button>
             ` : ''}
             
-            <div class="anuncio-header">
-                <h4>${anuncio.titulo}</h4>
-                <p>${anuncio.descricao}</p>
-            </div>
-            
             <div class="anuncio-carrossel" id="carrossel-${anuncio.id}">
+                ${imagens.length > 1 ? `
+                    <div class="contador-imagens">
+                        <i class="fa-solid fa-images"></i>
+                        <span id="contador-${anuncio.id}">1/${imagens.length}</span>
+                    </div>
+                ` : ''}
+                
                 ${imagens.map((img, idx) => `
                     <img src="http://localhost:3000/uploads/${img}" 
                          alt="${anuncio.titulo}" 
-                         class="${idx === 0 ? 'ativo' : ''}">
+                         class="${idx === 0 ? 'ativo' : ''}"
+                         onerror="this.src='http://localhost:3000/img/placeholder-anuncio.png'">
                 `).join('')}
                 
                 ${imagens.length > 1 ? `
@@ -1342,24 +1417,41 @@ function renderizarAnuncios(anuncios) {
                     </div>
                 ` : ''}
             </div>
+            
+            <div class="anuncio-header">
+                <h4>${anuncio.titulo}</h4>
+                <p>${anuncio.descricao}</p>
+            </div>
         `;
         
         container.appendChild(anuncioCard);
+        
+        // Inicializar índice do carrossel
+        if (!carrosselIndices[anuncio.id]) {
+            carrosselIndices[anuncio.id] = 0;
+        }
     });
     
-    console.log(` ${anuncios.length} anúncios renderizados`);
+    console.log(`✅ ${anuncios.length} anúncio(s) renderizado(s)`);
 }
 
-// ==================== CARROSSEL COM VELOCIDADE AJUSTADA ====================
-
+// ==================== CARROSSEL (CORRIGIDO E MELHORADO) ====================
 const carrosselIndices = {};
 
 function navegarCarrosselAnuncio(id, direcao) {
     const carrossel = document.getElementById(`carrossel-${id}`);
+    if (!carrossel) return;
+    
     const imagens = carrossel.querySelectorAll('img');
     const indicadores = carrossel.querySelectorAll('.indicador');
+    const contador = document.getElementById(`contador-${id}`);
     
-    if (!carrosselIndices[id]) carrosselIndices[id] = 0;
+    if (imagens.length === 0) return;
+    
+    // Inicializar índice se não existir
+    if (!carrosselIndices[id]) {
+        carrosselIndices[id] = 0;
+    }
     
     // Remover classe ativo da imagem atual
     imagens[carrosselIndices[id]].classList.remove('ativo');
@@ -1382,56 +1474,100 @@ function navegarCarrosselAnuncio(id, direcao) {
     if (indicadores.length > 0) {
         indicadores[carrosselIndices[id]].classList.add('ativo');
     }
+    
+    // Atualizar contador
+    if (contador) {
+        contador.textContent = `${carrosselIndices[id] + 1}/${imagens.length}`;
+    }
 }
 
 function irParaSlideAnuncio(id, index) {
     const carrossel = document.getElementById(`carrossel-${id}`);
+    if (!carrossel) return;
+    
     const imagens = carrossel.querySelectorAll('img');
     const indicadores = carrossel.querySelectorAll('.indicador');
+    const contador = document.getElementById(`contador-${id}`);
+    
+    if (imagens.length === 0) return;
     
     // Remover todas as classes ativo
     imagens.forEach(img => img.classList.remove('ativo'));
     indicadores.forEach(ind => ind.classList.remove('ativo'));
     
     // Adicionar classe ativo no índice selecionado
-    imagens[index].classList.add('ativo');
-    indicadores[index].classList.add('ativo');
+    if (imagens[index]) {
+        imagens[index].classList.add('ativo');
+    }
+    if (indicadores[index]) {
+        indicadores[index].classList.add('ativo');
+    }
     
+    // Atualizar índice
     carrosselIndices[id] = index;
+    
+    // Atualizar contador
+    if (contador) {
+        contador.textContent = `${index + 1}/${imagens.length}`;
+    }
 }
 
-// ==================== EXCLUIR ANÚNCIO ====================
+// ==================== NAVEGAÇÃO POR TECLADO (BONUS) ====================
+document.addEventListener('keydown', function(e) {
+    // Verificar se há algum anúncio sendo visualizado
+    const anunciosVisiveis = document.querySelectorAll('.anuncio-card:hover');
+    
+    if (anunciosVisiveis.length > 0) {
+        const anuncio = anunciosVisiveis[0];
+        const carrossel = anuncio.querySelector('.anuncio-carrossel');
+        
+        if (carrossel) {
+            const id = parseInt(carrossel.id.replace('carrossel-', ''));
+            
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                navegarCarrosselAnuncio(id, -1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navegarCarrosselAnuncio(id, 1);
+            }
+        }
+    }
+});
 
-async function excluirAnuncio(id, titulo) {
-    if (!confirm(` Deseja realmente excluir o anúncio "${titulo}"?`)) {
-        return;
+// ==================== AUTO-PLAY OPCIONAL ====================
+let autoplayIntervals = {};
+
+function iniciarAutoplay(id, intervalo = 5000) {
+    // Limpar intervalo anterior se existir
+    if (autoplayIntervals[id]) {
+        clearInterval(autoplayIntervals[id]);
     }
     
-    try {
-        console.log(' Excluindo anúncio ID:', id);
-        
-        const response = await fetch(`http://localhost:3000/anuncios/${id}`, {
-            method: 'DELETE'
-        });
-        
-        const result = await response.json();
-        
-        console.log(' Resposta:', result);
-        
-        if (result.success) {
-            alert(' Anúncio excluído com sucesso!');
-            carregarAnuncios();
+    // Iniciar novo autoplay
+    autoplayIntervals[id] = setInterval(() => {
+        const carrossel = document.getElementById(`carrossel-${id}`);
+        if (carrossel) {
+            // Pausar se o mouse estiver sobre o anúncio
+            const anuncioCard = carrossel.closest('.anuncio-card');
+            if (!anuncioCard.matches(':hover')) {
+                navegarCarrosselAnuncio(id, 1);
+            }
         } else {
-            alert(' Erro ao excluir anúncio: ' + (result.message || 'Erro desconhecido'));
+            // Limpar intervalo se o carrossel não existir mais
+            clearInterval(autoplayIntervals[id]);
+            delete autoplayIntervals[id];
         }
-    } catch (erro) {
-        console.error(' Erro ao excluir anúncio:', erro);
-        alert(' Erro ao excluir anúncio');
+    }, intervalo);
+}
+
+function pararAutoplay(id) {
+    if (autoplayIntervals[id]) {
+        clearInterval(autoplayIntervals[id]);
+        delete autoplayIntervals[id];
     }
 }
 
-// =================== ATUALIZAR INICIALIZAÇÃO ===================
-// Certifique-se de que esta linha está no DOMContentLoaded:
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log(" Iniciando aplicação...");
@@ -1442,6 +1578,17 @@ document.addEventListener("DOMContentLoaded", () => {
     preencherSelectEsportes();
     carregarEventos();
     carregarAnuncios(); // ← ESTA LINHA DEVE ESTAR AQUI
+
+    setTimeout(() => {
+         const carrosseis = document.querySelectorAll('.anuncio-carrossel');
+         carrosseis.forEach(carrossel => {
+             const id = parseInt(carrossel.id.replace('carrossel-', ''));
+             const imagens = carrossel.querySelectorAll('img');
+             if (imagens.length > 1) {
+                 iniciarAutoplay(id);
+             }
+         });
+     }, 1000);
     
     console.log(" Todas as funções inicializadas");
 });

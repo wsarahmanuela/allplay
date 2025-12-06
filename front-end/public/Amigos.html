@@ -101,7 +101,7 @@
         </div>
 
         <div class="right-sidebar">
-            <div class="sidebar-titulo">
+            <<div class="sidebar-titulo">
                 <h4>Eventos</h4>
                 <a href="#" class="btn-novo-evento" onclick="abrirModalCriarEvento(); return false;">
                     <i class="fa-solid fa-plus"></i>Postar Eventos
@@ -114,14 +114,15 @@
             </div>
 
             <!-- ÁREA DE ANÚNCIOS (mantém como está) -->
-            <div class="sidebar-titulo">
+            <div class="sidebar-titulo" style="margin-top: 30px;">
                 <h4>Anúncios</h4>
+                <a href="#" class="btn-novo-anuncio" onclick="abrirModalCriarAnuncio(); return false;">
+                    <i class="fa-solid fa-plus"></i>Criar Anúncio
+                </a>
             </div>
-            <p class="sidebar-text">Matricule seus filhos na escolinha de futebol mais próxima: </p>
-            <img src="imagens/criancas.jpg" class="sidebar-ads">
 
-            <div class="sidebar-titulo">
-
+            <div class="container-anuncios-dinamicos" id="container-anuncios">
+                <p class="mensagem-anuncios-vazia">Carregando anúncios...</p>
             </div>
         </div>
 
@@ -192,7 +193,7 @@
             </div>
         </div>
 
-          <!-- MODAL DETALHES DO EVENTO -->
+        <!-- MODAL DETALHES DO EVENTO -->
         <div class="modal-overlay" id="modalDetalhesEvento">
             <div class="modal-evento">
                 <div class="modal-header">
@@ -205,6 +206,53 @@
                 </div>
             </div>
         </div>
+
+        <!-- MODAL CRIAR ANÚNCIO -->
+
+        <div class="modal-overlay" id="modalCriarAnuncio">
+            <div class="modal-evento">
+                <div class="modal-header">
+                    <h3>Criar Novo Anúncio</h3>
+                    <button class="btn-fechar" onclick="fecharModalAnuncio()">&times;</button>
+                </div>
+
+                <form id="formCriarAnuncio" onsubmit="criarAnuncio(event)">
+                    <div class="form-grupo">
+                        <label for="tituloAnuncio">Título do Anúncio *</label>
+                        <input type="text" id="tituloAnuncio" required placeholder="Ex: Aulas de Futebol para Crianças"
+                            maxlength="200">
+                    </div>
+
+                    <div class="form-grupo">
+                        <label for="descricaoAnuncio">Descrição *</label>
+                        <textarea id="descricaoAnuncio" required placeholder="Descreva seu anúncio..."
+                            rows="4"></textarea>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label>Imagens (até 3) *</label>
+                        <div class="input-file-custom">
+                            <button type="button" class="btn-selecionar-imagens"
+                                onclick="document.getElementById('imagensAnuncio').click()">
+                                <i class="fa-solid fa-image"></i>
+                                Selecionar Imagens
+                            </button>
+
+                            <span class="info-imagens" id="infoImagens">Nenhuma imagem selecionada</span>
+
+                            <!-- ADICIONADO MULTIPLE AQUI -->
+                            <input type="file" id="imagensAnuncio" accept="image/*" multiple>
+                        </div>
+                        <small>Selecione de 1 a 3 imagens para o anúncio</small>
+
+                        <div class="preview-imagens" id="previewImagens"></div>
+                    </div>
+
+                    <button type="submit" class="btn-criar-evento">Criar Anúncio</button>
+                </form>
+            </div>
+        </div>
+
 </body>
 
 </html>

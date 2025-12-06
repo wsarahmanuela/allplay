@@ -790,94 +790,106 @@ app.use(express.static("public"));
 
 //================ MAP ================
 // ROTA 1: ATUALIZA LOCALIZAÇÃO E BUSCA USUÁRIOS PRÓXIMOS (Rota POST que estava faltando)
-app.post('/api/usuarios-proximos', (req, res) => {
-  const { latitude, longitude, cpf } = req.body;
-  const raio_metros = 20000; // 20 km
+  app.post('/api/usuarios-proximos', (req, res) => {
+    const { latitude, longitude, cpf } = req.body;
+    const raio_metros = 20000; // 20 km
 
-  console.log('\n Rota /api/usuarios-proximos chamada');
-  console.log('   CPF:', cpf);
-  console.log('   Lat:', latitude);
-  console.log('   Lon:', longitude);
+    console.log('\n Rota /api/usuarios-proximos chamada');
+    console.log('   CPF:', cpf);
+    console.log('   Lat:', latitude);
+    console.log('   Lon:', longitude);
 
-  if (!cpf || !latitude || !longitude) {
-    return res.status(400).json({
-      success: false,
-      message: 'CPF, latitude e longitude são obrigatórios.'
-    });
-  }
-
-  const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
-
-  connection.query(updateSql, [latitude, longitude, cpf], (errUpdate) => {
-    if (errUpdate) {
-      console.error(' Erro ao atualizar localização:', errUpdate);
-      return res.status(500).json({
+    if (!cpf || !latitude || !longitude) {
+      return res.status(400).json({
         success: false,
-        message: 'Erro ao atualizar localização'
+        message: 'CPF, latitude e longitude são obrigatórios.'
       });
     }
 
-    console.log(' Localização atualizada');
+    const updateSql = "UPDATE usuario SET latitude = ?, longitude = ? WHERE cpf = ?";
 
-    const haversineQuery = `
-            SELECT
-                u.cpf,
-                u.nome,
-                u.fotoDePerfil,
-                ( 6371000 * acos(
-                    cos(radians(?)) * cos(radians(u.latitude))
-                    * cos(radians(u.longitude) - radians(?))
-                    + sin(radians(?)) * sin(radians(u.latitude))
-                )) AS distancia_m
-            FROM usuario u
-            WHERE u.cpf != ?
-              AND u.latitude IS NOT NULL 
-              AND u.longitude IS NOT NULL
-            HAVING distancia_m < ?
-            ORDER BY distancia_m
-            LIMIT 10
-        `;
-
-    const params = [latitude, longitude, latitude, cpf, raio_metros];
-
-    connection.query(haversineQuery, params, (erroBusca, resultados) => {
-      if (erroBusca) {
-        console.error(' Erro na busca Haversine:', erroBusca);
+    connection.query(updateSql, [latitude, longitude, cpf], (errUpdate) => {
+      if (errUpdate) {
+        console.error(' Erro ao atualizar localização:', errUpdate);
         return res.status(500).json({
           success: false,
-          message: 'Erro ao buscar usuários próximos.',
-          erro: erroBusca.sqlMessage
+          message: 'Erro ao atualizar localização'
         });
       }
 
-      res.json({
-        success: true,
-        usuarios: resultados
-      });
+      console.log(' Localização atualizada');
 
-      console.log(` Retornados ${resultados.length} usuários próximos`);
+      const haversineQuery = `
+              SELECT
+                  u.cpf,
+                  u.nome,
+                  u.fotoDePerfil,
+                  ( 6371000 * acos(
+                      cos(radians(?)) * cos(radians(u.latitude))
+                      * cos(radians(u.longitude) - radians(?))
+                      + sin(radians(?)) * sin(radians(u.latitude))
+                  )) AS distancia_m
+              FROM usuario u
+              WHERE u.cpf != ?
+                AND u.latitude IS NOT NULL 
+                AND u.longitude IS NOT NULL
+              HAVING distancia_m < ?
+              ORDER BY distancia_m
+              LIMIT 10
+          `;
+
+      const params = [latitude, longitude, latitude, cpf, raio_metros];
+
+      connection.query(haversineQuery, params, (erroBusca, resultados) => {
+        if (erroBusca) {
+          console.error(' Erro na busca Haversine:', erroBusca);
+          return res.status(500).json({
+            success: false,
+            message: 'Erro ao buscar usuários próximos.',
+            erro: erroBusca.sqlMessage
+          });
+        }
+
+        res.json({
+          success: true,
+          usuarios: resultados
+        });
+
+        console.log(` Retornados ${resultados.length} usuários próximos`);
+      });
     });
   });
-});
 
-// ENDPOINT: LOCAIS POPULARES
-app.get("/api/locais-populares", (req, res) => {
+  // ENDPOINT: LOCAIS POPULARES
+  app.get("/api/locais-populares", (req, res) => {
   const sql = `
-        SELECT DISTINCT local 
-        FROM evento
-        WHERE local IS NOT NULL AND local != ''
-    `;
+    SELECT local, MIN(data_evento) as proxima_data
+    FROM evento
+    WHERE local IS NOT NULL 
+      AND local != ''
+      AND data_evento >= CURDATE()
+    GROUP BY local
+    ORDER BY proxima_data ASC
+  `;
+
+  console.log('🔍 Buscando locais com eventos futuros...');
 
   connection.query(sql, (erro, resultados) => {
     if (erro) {
-      console.error("Erro ao buscar locais populares:", erro);
+      console.error("❌ Erro SQL ao buscar locais populares:");
+      console.error("   Código:", erro.code);
+      console.error("   Mensagem:", erro.sqlMessage);
+      console.error("   SQL State:", erro.sqlState);
+      
       return res.status(500).json({
         success: false,
-        message: "Erro ao buscar locais populares."
+        message: "Erro ao buscar locais populares.",
+        erro: erro.sqlMessage
       });
     }
 
     const locais = resultados.map(r => r.local);
+    console.log(`✅ ${locais.length} locais com eventos futuros encontrados:`, locais);
 
     res.json({
       success: true,
@@ -886,68 +898,83 @@ app.get("/api/locais-populares", (req, res) => {
   });
 });
 
-app.get('/api/todos-usuarios-mapa', (req, res) => {
-  console.log('\n Buscando todos os usuários para o mapa...');
+  app.get('/api/todos-usuarios-mapa', (req, res) => {
+    console.log('\n Buscando todos os usuários para o mapa...');
 
-  const sql = `
-    SELECT CPF, nome, latitude, longitude
-    FROM usuario
-    WHERE latitude IS NOT NULL 
-      AND longitude IS NOT NULL
-  `;
+    const sql = `
+      SELECT CPF, nome, latitude, longitude
+      FROM usuario
+      WHERE latitude IS NOT NULL 
+        AND longitude IS NOT NULL
+    `;
 
-  connection.query(sql, (erro, resultados) => {
-    if (erro) {
-      console.error(' Erro ao buscar usuários do mapa:', erro);
-      return res.status(500).json({
-        success: false,
-        message: "Erro interno do servidor ao consultar o banco de dados.",
-        erro: erro.sqlMessage
+    connection.query(sql, (erro, resultados) => {
+      if (erro) {
+        console.error(' Erro ao buscar usuários do mapa:', erro);
+        return res.status(500).json({
+          success: false,
+          message: "Erro interno do servidor ao consultar o banco de dados.",
+          erro: erro.sqlMessage
+        });
+      }
+
+      const usuariosParaMapa = resultados.map(u => ({
+        cpf: u.CPF,
+        nome: u.nome,
+        latitude: parseFloat(u.latitude),
+        longitude: parseFloat(u.longitude)
+      }));
+
+      console.log(` Retornando ${usuariosParaMapa.length} usuários para o mapa`);
+
+      res.json({
+        success: true,
+        message: "Lista de todos os usuários para o mapa obtida com sucesso.",
+        usuarios: usuariosParaMapa
       });
-    }
-
-    const usuariosParaMapa = resultados.map(u => ({
-      cpf: u.CPF,
-      nome: u.nome,
-      latitude: parseFloat(u.latitude),
-      longitude: parseFloat(u.longitude)
-    }));
-
-    console.log(` Retornando ${usuariosParaMapa.length} usuários para o mapa`);
-
-    res.json({
-      success: true,
-      message: "Lista de todos os usuários para o mapa obtida com sucesso.",
-      usuarios: usuariosParaMapa
     });
   });
-});
 
-app.get("/api/eventos-por-local", (req, res) => {
+  app.get("/api/eventos-por-local", (req, res) => {
   const { local } = req.query;
 
   console.log('\n[API] /api/eventos-por-local CHAMADA');
-  console.log('   Local solicitado:', local);
+  console.log('   📍 Local solicitado:', local);
 
   if (!local) {
-    console.log('Local não fornecido');
+    console.log('❌ Local não fornecido');
     return res.status(400).json({
       success: false,
       message: "Nome do local é obrigatório."
     });
   }
 
-  // Query simplificada usando SELECT * para pegar todas as colunas
-  const sql = `SELECT * FROM evento WHERE local = ? ORDER BY data_evento DESC LIMIT 10`;
+  // ✅ Buscar apenas eventos FUTUROS
+  const sql = `
+    SELECT 
+      IDevento,
+      titulo,
+      descricao,
+      horario,
+      data_evento,
+      responsavel,
+      local,
+      esportes,
+      clube_id
+    FROM evento 
+    WHERE local = ? 
+      AND data_evento >= CURDATE()
+    ORDER BY data_evento ASC, horario ASC 
+    LIMIT 10
+  `;
 
-  console.log('Executando SQL...');
+  console.log('🔍 Buscando eventos futuros para o local...');
 
   connection.query(sql, [local], (erro, resultados) => {
     if (erro) {
-      console.error('ERRO SQL:');
-      console.error('Código:', erro.code);
-      console.error('Mensagem:', erro.sqlMessage);
-      console.error('SQL State:', erro.sqlState);
+      console.error('❌ ERRO SQL:');
+      console.error('   Código:', erro.code);
+      console.error('   Mensagem:', erro.sqlMessage);
 
       return res.status(500).json({
         success: false,
@@ -956,18 +983,17 @@ app.get("/api/eventos-por-local", (req, res) => {
       });
     }
 
-    console.log(`Query OK! ${resultados.length} evento(s) encontrado(s)`);
+    console.log(`✅ ${resultados.length} evento(s) futuro(s) encontrado(s)`);
 
     if (resultados.length > 0) {
-      console.log('Primeiro evento:', {
-        id: resultados[0].IDevento,
+      console.log('📅 Próximo evento:', {
         titulo: resultados[0].titulo,
-        local: resultados[0].local,
-        data: resultados[0].data_evento
+        data: resultados[0].data_evento,
+        horario: resultados[0].horario
       });
     }
 
-    // Formatar resposta com dados consistentes
+    // Formatar resposta
     const eventosFormatados = resultados.map(ev => ({
       idEvento: ev.IDevento,
       titulo: ev.titulo,
@@ -975,7 +1001,8 @@ app.get("/api/eventos-por-local", (req, res) => {
       dataEvento: ev.data_evento,
       horaEvento: ev.horario,
       local: ev.local,
-      tipo: ev.esportes || ev.tipo || 'Evento'
+      tipo: ev.esportes || 'Evento',
+      responsavel: ev.responsavel
     }));
 
     res.json({
@@ -984,6 +1011,7 @@ app.get("/api/eventos-por-local", (req, res) => {
     });
   });
 });
+
 
 // barra de pesquisa
 app.get("/search", (req, res) => {
@@ -2030,6 +2058,227 @@ app.delete('/anuncios/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro ao excluir anúncio: ' + erro.message
+    });
+  }
+});
+
+// ==================== ROTA PARA VERIFICAR PERMISSÃO ====================
+app.get('/api/verificar-permissao-anuncio', async (req, res) => {
+  const { cpf } = req.query;
+  
+  console.log('\n🔐 Verificando permissão de anúncio para CPF:', cpf);
+  
+  if (!cpf) {
+    return res.status(400).json({
+      success: false,
+      message: 'CPF é obrigatório'
+    });
+  }
+  
+  try {
+    const query = 'SELECT podeAnunciar FROM usuario WHERE cpf = ?';
+    const [resultado] = await connection.promise().query(query, [cpf]);
+    
+    if (resultado.length === 0) {
+      return res.json({
+        success: true,
+        podeAnunciar: false,
+        message: 'Usuário não encontrado'
+      });
+    }
+    
+    const podeAnunciar = resultado[0].podeAnunciar === 1;
+    
+    console.log(`✅ Permissão: ${podeAnunciar ? 'AUTORIZADO ✓' : 'NÃO AUTORIZADO ✗'}`);
+    
+    res.json({
+      success: true,
+      podeAnunciar
+    });
+    
+  } catch (erro) {
+    console.error('❌ Erro ao verificar permissão:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao verificar permissão'
+    });
+  }
+});
+
+// ==================== ROTA CRIAR ANÚNCIO (COM VERIFICAÇÃO DE PERMISSÃO) ====================
+app.post('/anuncios', uploadAnuncios.array("imagens", 3), async (req, res) => {
+  try {
+    const { titulo, descricao, criador_cpf } = req.body;
+
+    console.log("\n📝 Criando novo anúncio...");
+    console.log("   Body:", req.body);
+    console.log("   Files:", req.files?.length || 0);
+
+    // ========== VALIDAÇÕES BÁSICAS ==========
+    if (!titulo || !descricao || !criador_cpf) {
+      return res.status(400).json({
+        success: false,
+        message: 'Título, descrição e CPF do criador são obrigatórios'
+      });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pelo menos uma imagem é obrigatória'
+      });
+    }
+
+    // ========== VERIFICAR PERMISSÃO ==========
+    console.log('🔐 Verificando permissão do usuário...');
+    
+    const [usuarioResult] = await connection.promise().query(
+      'SELECT podeAnunciar FROM usuario WHERE cpf = ?',
+      [criador_cpf]
+    );
+
+    if (usuarioResult.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não encontrado'
+      });
+    }
+
+    if (usuarioResult[0].podeAnunciar !== 1) {
+      console.log('❌ ACESSO NEGADO - Usuário não tem permissão');
+      return res.status(403).json({
+        success: false,
+        message: 'Você não tem permissão para criar anúncios. Entre em contato com o suporte.'
+      });
+    }
+
+    console.log('✅ Permissão verificada - Usuário autorizado');
+
+    // ========== PROCESSAR IMAGENS ==========
+    const imagens = req.files.map(f => f.filename);
+
+    const imagem1 = imagens[0] || null;
+    const imagem2 = imagens[1] || null;
+    const imagem3 = imagens[2] || null;
+
+    console.log(`📸 Imagens processadas: ${imagens.length}`);
+    imagens.forEach((img, i) => console.log(`   ${i + 1}. ${img}`));
+
+    // ========== INSERIR NO BANCO ==========
+    const query = `
+      INSERT INTO anuncio (titulo, descricao, imagem1, imagem2, imagem3, criador_cpf)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const [resultado] = await connection.promise().query(query, [
+      titulo,
+      descricao,
+      imagem1,
+      imagem2,
+      imagem3,
+      criador_cpf
+    ]);
+
+    console.log(`✅ Anúncio criado com sucesso! ID: ${resultado.insertId}`);
+
+    res.json({
+      success: true,
+      message: "Anúncio criado com sucesso",
+      anuncioId: resultado.insertId
+    });
+
+  } catch (erro) {
+    console.error("❌ Erro ao criar anúncio:", erro);
+    res.status(500).json({
+      success: false,
+      message: "Erro ao criar anúncio: " + erro.message
+    });
+  }
+});
+
+// ==================== ROTA PARA CONCEDER/REMOVER PERMISSÃO (ADMIN) ====================
+app.post('/api/admin/gerenciar-permissao-anuncio', async (req, res) => {
+  const { cpf, podeAnunciar, adminCpf } = req.body;
+  
+  console.log('\n🔧 Gerenciando permissão de anúncio...');
+  console.log('   CPF alvo:', cpf);
+  console.log('   Nova permissão:', podeAnunciar ? 'CONCEDER' : 'REMOVER');
+  console.log('   Admin CPF:', adminCpf);
+  
+  if (!cpf || podeAnunciar === undefined || !adminCpf) {
+    return res.status(400).json({
+      success: false,
+      message: 'CPF, permissão e CPF do admin são obrigatórios'
+    });
+  }
+  
+  try {
+    // Opcional: Verificar se adminCpf é realmente um admin
+    // const [admin] = await connection.promise().query(
+    //   'SELECT isAdmin FROM usuario WHERE cpf = ?',
+    //   [adminCpf]
+    // );
+    
+    // if (admin.length === 0 || admin[0].isAdmin !== 1) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: 'Você não tem permissão de administrador'
+    //   });
+    // }
+    
+    // Atualizar permissão
+    const query = 'UPDATE usuario SET podeAnunciar = ? WHERE cpf = ?';
+    const [resultado] = await connection.promise().query(query, [podeAnunciar ? 1 : 0, cpf]);
+    
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não encontrado'
+      });
+    }
+    
+    console.log(`✅ Permissão ${podeAnunciar ? 'concedida' : 'removida'} com sucesso`);
+    
+    res.json({
+      success: true,
+      message: `Permissão ${podeAnunciar ? 'concedida' : 'removida'} com sucesso`
+    });
+    
+  } catch (erro) {
+    console.error('❌ Erro ao gerenciar permissão:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao gerenciar permissão'
+    });
+  }
+});
+
+// ==================== ROTA PARA LISTAR USUÁRIOS COM PERMISSÃO ====================
+app.get('/api/admin/usuarios-autorizados', async (req, res) => {
+  console.log('\n📋 Listando usuários autorizados a anunciar...');
+  
+  try {
+    const query = `
+      SELECT cpf, nome, nomeUsuario, email, podeAnunciar
+      FROM usuario
+      WHERE podeAnunciar = 1
+      ORDER BY nome
+    `;
+    
+    const [usuarios] = await connection.promise().query(query);
+    
+    console.log(`✅ ${usuarios.length} usuário(s) autorizado(s) encontrado(s)`);
+    
+    res.json({
+      success: true,
+      usuarios
+    });
+    
+  } catch (erro) {
+    console.error('❌ Erro ao listar usuários:', erro);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao listar usuários autorizados'
     });
   }
 });
