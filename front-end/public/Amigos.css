@@ -1017,7 +1017,7 @@ i {
 }
 
 .btn-novo-anuncio {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 6px;
     padding: 8px 14px;
