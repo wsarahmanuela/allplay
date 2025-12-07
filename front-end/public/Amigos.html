@@ -100,11 +100,13 @@
             <!-- Usuários aparecem aqui automaticamente -->
         </div>
 
+        <!-- COLUNA DIREITA -->
         <div class="right-sidebar">
-            <<div class="sidebar-titulo">
+            <!-- EVENTOS -->
+            <div class="sidebar-titulo">
                 <h4>Eventos</h4>
                 <a href="#" class="btn-novo-evento" onclick="abrirModalCriarEvento(); return false;">
-                    <i class="fa-solid fa-plus"></i>Postar Eventos
+                    <i class="fa-solid fa-plus"></i> Postar Eventos
                 </a>
             </div>
 
@@ -113,11 +115,11 @@
                 <p class="mensagem-eventos-vazia">Carregando eventos...</p>
             </div>
 
-            <!-- ÁREA DE ANÚNCIOS (mantém como está) -->
+            <!-- ÁREA DE ANÚNCIOS -->
             <div class="sidebar-titulo" style="margin-top: 30px;">
                 <h4>Anúncios</h4>
                 <a href="#" class="btn-novo-anuncio" onclick="abrirModalCriarAnuncio(); return false;">
-                    <i class="fa-solid fa-plus"></i>Criar Anúncio
+                    <i class="fa-solid fa-plus"></i> Criar Anúncio
                 </a>
             </div>
 
@@ -125,133 +127,132 @@
                 <p class="mensagem-anuncios-vazia">Carregando anúncios...</p>
             </div>
         </div>
+    </div>
 
     <script src="JavaScript/amgs.js"></script>
 
     <!-- MODAL CRIAR EVENTO -->
-        <div class="modal-overlay" id="modalCriarEvento">
-            <div class="modal-evento">
-                <div class="modal-header">
-                    <h3>Criar Novo Evento</h3>
-                    <button class="btn-fechar" onclick="fecharModalCriar()">&times;</button>
+    <div class="modal-overlay" id="modalCriarEvento">
+        <div class="modal-evento">
+            <div class="modal-header">
+                <h3>Criar Novo Evento</h3>
+                <button class="btn-fechar" onclick="fecharModalCriar()">&times;</button>
+            </div>
+
+            <form id="formCriarEvento" onsubmit="criarEvento(event)">
+                <div class="form-grupo">
+                    <label for="tituloEvento">Nome do Evento *</label>
+                    <input type="text" id="tituloEvento" required placeholder="Ex: Campeonato de Futebol">
                 </div>
 
-                <form id="formCriarEvento" onsubmit="criarEvento(event)">
+                <div class="form-grupo">
+                    <label for="responsavelEvento">Responsável *</label>
+                    <input type="text" id="responsavelEvento" required placeholder="Quem está organizando">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="localEvento">Local *</label>
+                    <select id="localEvento" required>
+                        <option value="">Carregando locais...</option>
+                    </select>
+                    <small>Escolha um local do mapa ou "Outro local" para digitar</small>
+                </div>
+
+                <div class="form-row">
                     <div class="form-grupo">
-                        <label for="tituloEvento">Nome do Evento *</label>
-                        <input type="text" id="tituloEvento" required placeholder="Ex: Campeonato de Futebol">
-                    </div>
-
-                    <div class="form-grupo">
-                        <label for="responsavelEvento">Responsável *</label>
-                        <input type="text" id="responsavelEvento" required placeholder="Quem está organizando">
-                    </div>
-
-                    <div class="form-grupo">
-                        <label for="localEvento">Local *</label>
-                        <select id="localEvento" required>
-                            <option value="">Carregando locais...</option>
-                        </select>
-                        <small>Escolha um local do mapa ou "Outro local" para digitar</small>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-grupo">
-                            <label for="dataEvento">Data *</label>
-                            <input type="date" id="dataEvento" required>
-                        </div>
-
-                        <div class="form-grupo">
-                            <label for="horarioEvento">Horário *</label>
-                            <input type="time" id="horarioEvento" required>
-                        </div>
+                        <label for="dataEvento">Data *</label>
+                        <input type="date" id="dataEvento" required>
                     </div>
 
                     <div class="form-grupo">
-                        <label for="descricaoEvento">Descrição</label>
-                        <textarea id="descricaoEvento" placeholder="Descreva os detalhes do evento..."></textarea>
+                        <label for="horarioEvento">Horário *</label>
+                        <input type="time" id="horarioEvento" required>
                     </div>
+                </div>
 
-                    <div class="form-grupo">
-                        <label>Esportes *</label>
-                        <small>Selecione um ou mais esportes</small>
-                        <div class="checkbox-grupo" id="esportesCheckbox">
-                            <!-- Será preenchido dinamicamente -->
-                        </div>
+                <div class="form-grupo">
+                    <label for="descricaoEvento">Descrição</label>
+                    <textarea id="descricaoEvento" placeholder="Descreva os detalhes do evento..."></textarea>
+                </div>
+
+                <div class="form-grupo">
+                    <label>Esportes *</label>
+                    <small>Selecione um ou mais esportes</small>
+                    <div class="checkbox-grupo" id="esportesCheckbox">
+                        <!-- Será preenchido dinamicamente -->
                     </div>
+                </div>
 
-                    <div class="form-grupo">
-                        <label for="clubeEvento">Clube (opcional)</label>
-                        <select id="clubeEvento">
-                            <option value="">Nenhum clube</option>
-                            <!-- Será preenchido dinamicamente -->
-                        </select>
-                    </div>
+                <div class="form-grupo">
+                    <label for="clubeEvento">Clube (opcional)</label>
+                    <select id="clubeEvento">
+                        <option value="">Nenhum clube</option>
+                        <!-- Será preenchido dinamicamente -->
+                    </select>
+                </div>
 
-                    <button type="submit" class="btn-criar-evento">Criar Evento</button>
-                </form>
+                <button type="submit" class="btn-criar-evento">Criar Evento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DETALHES DO EVENTO -->
+    <div class="modal-overlay" id="modalDetalhesEvento">
+        <div class="modal-evento">
+            <div class="modal-header">
+                <h3 id="tituloDetalhes">Detalhes do Evento</h3>
+                <button class="btn-fechar" onclick="fecharModalDetalhes()">&times;</button>
+            </div>
+
+            <div class="detalhes-evento" id="conteudoDetalhes">
+                <!-- Será preenchido dinamicamente -->
             </div>
         </div>
+    </div>
 
-        <!-- MODAL DETALHES DO EVENTO -->
-        <div class="modal-overlay" id="modalDetalhesEvento">
-            <div class="modal-evento">
-                <div class="modal-header">
-                    <h3 id="tituloDetalhes">Detalhes do Evento</h3>
-                    <button class="btn-fechar" onclick="fecharModalDetalhes()">&times;</button>
-                </div>
-
-                <div class="detalhes-evento" id="conteudoDetalhes">
-                    <!-- Será preenchido dinamicamente -->
-                </div>
+    <!-- MODAL CRIAR ANÚNCIO -->
+    <div class="modal-overlay" id="modalCriarAnuncio">
+        <div class="modal-evento">
+            <div class="modal-header">
+                <h3>Criar Novo Anúncio</h3>
+                <button class="btn-fechar" onclick="fecharModalAnuncio()">&times;</button>
             </div>
-        </div>
 
-        <!-- MODAL CRIAR ANÚNCIO -->
-
-        <div class="modal-overlay" id="modalCriarAnuncio">
-            <div class="modal-evento">
-                <div class="modal-header">
-                    <h3>Criar Novo Anúncio</h3>
-                    <button class="btn-fechar" onclick="fecharModalAnuncio()">&times;</button>
+            <form id="formCriarAnuncio" onsubmit="criarAnuncio(event)">
+                <div class="form-grupo">
+                    <label for="tituloAnuncio">Título do Anúncio *</label>
+                    <input type="text" id="tituloAnuncio" required placeholder="Ex: Aulas de Futebol para Crianças"
+                        maxlength="200">
                 </div>
 
-                <form id="formCriarAnuncio" onsubmit="criarAnuncio(event)">
-                    <div class="form-grupo">
-                        <label for="tituloAnuncio">Título do Anúncio *</label>
-                        <input type="text" id="tituloAnuncio" required placeholder="Ex: Aulas de Futebol para Crianças"
-                            maxlength="200">
+                <div class="form-grupo">
+                    <label for="descricaoAnuncio">Descrição *</label>
+                    <textarea id="descricaoAnuncio" required placeholder="Descreva seu anúncio..."
+                        rows="4"></textarea>
+                </div>
+
+                <div class="form-grupo">
+                    <label>Imagens (até 3) *</label>
+                    <div class="input-file-custom">
+                        <button type="button" class="btn-selecionar-imagens"
+                            onclick="document.getElementById('imagensAnuncio').click()">
+                            <i class="fa-solid fa-image"></i>
+                            Selecionar Imagens
+                        </button>
+
+                        <span class="info-imagens" id="infoImagens">Nenhuma imagem selecionada</span>
+
+                        <input type="file" id="imagensAnuncio" accept="image/*" multiple style="display: none;">
                     </div>
+                    <small>Selecione de 1 a 3 imagens para o anúncio</small>
 
-                    <div class="form-grupo">
-                        <label for="descricaoAnuncio">Descrição *</label>
-                        <textarea id="descricaoAnuncio" required placeholder="Descreva seu anúncio..."
-                            rows="4"></textarea>
-                    </div>
+                    <div class="preview-imagens" id="previewImagens"></div>
+                </div>
 
-                    <div class="form-grupo">
-                        <label>Imagens (até 3) *</label>
-                        <div class="input-file-custom">
-                            <button type="button" class="btn-selecionar-imagens"
-                                onclick="document.getElementById('imagensAnuncio').click()">
-                                <i class="fa-solid fa-image"></i>
-                                Selecionar Imagens
-                            </button>
-
-                            <span class="info-imagens" id="infoImagens">Nenhuma imagem selecionada</span>
-
-                            <!-- ADICIONADO MULTIPLE AQUI -->
-                            <input type="file" id="imagensAnuncio" accept="image/*" multiple>
-                        </div>
-                        <small>Selecione de 1 a 3 imagens para o anúncio</small>
-
-                        <div class="preview-imagens" id="previewImagens"></div>
-                    </div>
-
-                    <button type="submit" class="btn-criar-evento">Criar Anúncio</button>
-                </form>
-            </div>
+                <button type="submit" class="btn-criar-evento">Criar Anúncio</button>
+            </form>
         </div>
+    </div>
 
 </body>
 
